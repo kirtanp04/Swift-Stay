@@ -3,6 +3,7 @@ import 'dotenv/config';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { UserResponseMiddWare } from './middleware/UserResponse';
+import cookieParser from 'cookie-parser'
 
 export class _Express {
   Port: number = 0;
@@ -16,6 +17,8 @@ export class _Express {
     this.app.use(bodyParser.urlencoded({ extended: true, limit: '10mb', parameterLimit: 2 }));
 
     this.app.use(express.json());
+
+    this.app.use(cookieParser())
   }
 
   route() {

@@ -1,4 +1,4 @@
-import { ProjectResponse } from './Response';
+import { ProjectResponse, errorPath } from './Response';
 
 export class Convert {
     static toString = (value: any): ProjectResponse => {
@@ -12,7 +12,7 @@ export class Convert {
                 _res.error = 'Server Error: Error While Converting to String';
             }
         } catch (error: any) {
-            _res.error = error;
+            _res.error = errorPath('common/Convert', 'toString', 15) + error;
         } finally {
             return _res;
         }
@@ -29,7 +29,7 @@ export class Convert {
                 _res.error = 'Server Error: Not able to Parse Value';
             }
         } catch (error: any) {
-            _res.error = error;
+            _res.error = errorPath('common/Convert', 'toParse', 32) + error;
         } finally {
             return _res;
         }
