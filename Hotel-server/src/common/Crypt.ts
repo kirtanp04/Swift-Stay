@@ -55,7 +55,7 @@ export class Crypt {
                     _res.data = parseObj.data;
 
                 } else {
-                    
+
                     _res.error = errorPath('common/Crypt', 'Decryption', 56) + parseObj.error
                 }
 

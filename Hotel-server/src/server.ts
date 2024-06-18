@@ -1,9 +1,10 @@
-import express, { Express, urlencoded } from 'express';
+import express, { Express, NextFunction, Request, Response, urlencoded } from 'express';
 import 'dotenv/config';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { UserResponseMiddWare } from './middleware/UserResponse';
+import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
 import cookieParser from 'cookie-parser'
+import { UserResponse } from './common/Response';
 
 export class _Express {
   Port: number = 0;
@@ -24,7 +25,16 @@ export class _Express {
   route() {
     this.app.use('/hotel/api')
 
-    // this.app.use(UserResponseMiddWare())
+    this.app.all('*', (req: Request, res: Response, next: NextFunction) => {
+      let objUserResponse = new UserResponse()
+      objUserResponse.Message = 'API error / Path not found.'
+      objUserResponse.isError = true
+      objUserResponse.statusCode = 404
+
+      SendResponseToUser(objUserResponse, next)
+    })
+
+    this.app.use(UserResponseMiddWare) // sending data to user middle ware
   }
 
   listen() {

@@ -1,11 +1,10 @@
-import { NextFunction, Request, Response } from 'express';
-import { ProjectResponse, errorPath } from './Response';
+import { Request, Response } from 'express';
 import { SecrtKey } from 'src/env';
-import { Convert } from './Convert';
 import { Crypt } from './Crypt';
+import { ProjectResponse, errorPath } from './Response';
 
 export class Storage {
-    static setCookie(key: string, value: string, res: Response, next?: NextFunction): ProjectResponse {
+    static setCookie(key: string, value: string, res: Response, cookiePath?: string, maxAge?: number): ProjectResponse {
         let _res = new ProjectResponse();
         try {
             const encryptedObj = Crypt.Encryption(value);
@@ -15,10 +14,13 @@ export class Storage {
                     httpOnly: true,
                     secure: SecrtKey.Environment === 'production',
                     sameSite: 'strict',
-                    maxAge: 24 * 60 * 60 * 1000, // Cookie expires after 1 day,
+                    maxAge: maxAge !== undefined ? maxAge : 24 * 60 * 60 * 1000, // default Cookie expires after 1 day,
+                    path: cookiePath !== undefined ? cookiePath : '/',
                 });
                 if (!isSetCookie) {
                     _res.error = 'Server Error: Not able to set Cookie.';
+                } else {
+                    _res.data = 'Success: Cookie Set';
                 }
             } else {
                 _res.error = errorPath('common/storage', 'setCookie', 24) + encryptedObj.error;
@@ -30,53 +32,74 @@ export class Storage {
         }
     }
 
-    static getCookie(key: string, req: Request, next?: NextFunction): ProjectResponse {
-
+    static getCookie(key: string, req: Request): ProjectResponse {
         let _res = new ProjectResponse();
         try {
-
-            const cookieValue = req.cookies[key]
+            const cookieValue = req.cookies[key];
 
             if (cookieValue) {
+                const decryptedValueObj = Crypt.Decryption(cookieValue);
 
-                const parsedValueObj = Crypt.Decryption(cookieValue)
-
-                if (parsedValueObj.error = '') {
-                    _res.data = parsedValueObj.data
+                if ((decryptedValueObj.error = '')) {
+                    _res.data = decryptedValueObj.data;
                 } else {
-                    _res.error = errorPath('common/storage', 'getCookie', 47) + parsedValueObj.error
+                    _res.error = errorPath('common/storage', 'getCookie', 47) + decryptedValueObj.error;
                 }
-
             } else {
-                _res.error = 'Server Error: Cookie Not Found.'
+                _res.error = 'Server Error: Cookie Not Found.';
             }
-
         } catch (error) {
-            _res.error = errorPath('common/storage', 'getCookie', 55) + error
+            _res.error = errorPath('common/storage', 'getCookie', 55) + error;
         } finally {
             return _res;
         }
     }
 
-    static setHeader(key: string, value: string, res: Response, next?: NextFunction): ProjectResponse {
+    static setHeader(key: string, value: string, res: Response): ProjectResponse {
         let _res = new ProjectResponse();
 
         try {
-
             const encryptedObj = Crypt.Encryption(value);
 
             if (encryptedObj.error !== '') {
+                const settingHeader = res.setHeader(key, encryptedObj.data);
 
+                if (!settingHeader) {
+                    _res.error = 'Server Error: Header Not Set.';
+                } else {
+                    _res.data = 'Success: Header Set';
+                }
             } else {
-                _res.error = errorPath('common/storage', 'setHeader', 71) + encryptedObj.error
+                _res.error = errorPath('common/storage', 'setHeader', 81) + encryptedObj.error;
             }
-
-            // const hed = res.setHeader()
-
         } catch (error) {
-
+            _res.error = errorPath('common/storage', 'setHeader', 85) + error;
         } finally {
-            return _res
+            return _res;
+        }
+    }
+
+    static getHeader(key: string, req: Request): ProjectResponse {
+        let _res = new ProjectResponse();
+
+        try {
+            const headerValue = req.header(key);
+
+            if (headerValue) {
+                const decryptedValueObj = Crypt.Decryption(headerValue);
+
+                if (decryptedValueObj.error === '') {
+                    _res.data = decryptedValueObj.data;
+                } else {
+                    _res.error = errorPath('common/storage', 'getHeader', 105) + decryptedValueObj.error;
+                }
+            } else {
+                _res.error = 'Server Error: Header Not Found.';
+            }
+        } catch (error) {
+            _res.error = errorPath('common/storage', 'getHeader', 99) + error;
+        } finally {
+            return _res;
         }
     }
 }

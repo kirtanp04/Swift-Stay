@@ -1,9 +1,12 @@
+import { NextFunction } from "express";
 
 export class ProjectResponse {
     data: any = '';
 
     error: any = '';
 }
+
+
 
 export class UserResponse {
 
@@ -17,8 +20,9 @@ export class UserResponse {
 }
 
 
+
 export const errorPath = (fileName: string, functionName: string, lineNumber: number): string => {
     let _errorPath: string
-    _errorPath = `File name: ${fileName}  / Function: ${functionName} / Line: ${lineNumber} `
+    _errorPath = `Server Error: File name: ${fileName}  / Function: ${functionName} / Line: ${lineNumber} `
     return _errorPath
 }
