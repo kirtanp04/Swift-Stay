@@ -1,7 +1,5 @@
-import { ElementType, Suspense } from "react";
-import { useRoutes, Navigate } from "react-router-dom";
-
-// const MultiWellDashboardPage = Loadable(lazy(() => import('../pages/multi-well-dashboard/MultiWellDashboardPage')));
+import { ElementType, Suspense, lazy } from "react";
+import { Navigate, Outlet, useRoutes } from "react-router-dom";
 
 const Loadable = (Component: ElementType) => (props: any) => {
   return (
@@ -11,16 +9,13 @@ const Loadable = (Component: ElementType) => (props: any) => {
   );
 };
 
+const Login = Loadable(lazy(() => import("src/pages/Login")));
+
 export default function Router() {
   return useRoutes([
     {
       path: "/",
-      element: (
-        //   <GuestGuard>
-        //     <Login />
-        //   </GuestGuard>
-        <></>
-      ),
+      element: <Login />,
       children: [
         { path: "about-us", element: <>About</> },
         { path: "contact-us", element: <>About</> },
@@ -28,10 +23,14 @@ export default function Router() {
     },
 
     {
-      path: "/k",
-      element: <></>,
+      path: "k",
+      element: (
+        <>
+          <Outlet />
+        </>
+      ),
       children: [
-        { element: <Navigate to="/k/index" replace />, index: true },
+        { element: <Navigate to="k/index" replace />, index: true },
         { path: "index", element: <>ab</> },
         { path: "list", element: <>cg</> },
       ],
