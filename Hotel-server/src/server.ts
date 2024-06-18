@@ -1,10 +1,10 @@
-import express, { Express, NextFunction, Request, Response, urlencoded } from 'express';
-import 'dotenv/config';
-import cors from 'cors';
 import bodyParser from 'body-parser';
-import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
-import cookieParser from 'cookie-parser'
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import 'dotenv/config';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import { UserResponse } from './common/Response';
+import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
 
 export class _Express {
   Port: number = 0;

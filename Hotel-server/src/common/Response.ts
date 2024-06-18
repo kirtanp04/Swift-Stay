@@ -1,4 +1,3 @@
-import { NextFunction } from "express";
 
 export class ProjectResponse {
     data: any = '';

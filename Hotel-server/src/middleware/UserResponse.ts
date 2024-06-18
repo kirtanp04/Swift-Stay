@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { Crypt } from "src/common/Crypt";
-import { UserResponse } from "src/common/Response";
+import { Crypt } from "../common/Crypt";
+import { UserResponse } from "../common/Response";
 
 export const UserResponseMiddWare = (objRes: UserResponse, req: Request, res: Response, next: NextFunction) => {
     const encryptedData = Crypt.Encryption(objRes)

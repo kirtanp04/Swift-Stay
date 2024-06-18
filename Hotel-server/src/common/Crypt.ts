@@ -1,5 +1,5 @@
 import Cryptr from 'cryptr';
-import { SecrtKey } from 'src/env';
+import { SecrtKey } from '../env';
 import { Convert } from './Convert';
 import { ProjectResponse, errorPath } from './Response';
 
@@ -70,3 +70,6 @@ export class Crypt {
         }
     }
 }
+
+
+

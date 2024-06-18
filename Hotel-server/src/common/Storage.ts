@@ -55,6 +55,24 @@ export class Storage {
         }
     }
 
+    static clereCookie(key: string, res: Response): ProjectResponse {
+        let _res = new ProjectResponse();
+        try {
+
+            const isCleared = res.clearCookie(key)
+            if(isCleared){
+                _res.data = 'Success: Cleared Cookie'
+            }else{
+                errorPath('common/storage', 'clereCookie', 55) + 'Not able clear Cookie, Might Wrong Key';
+            }
+            
+        } catch (error) {
+            _res.error = errorPath('common/storage', 'clereCookie', 55) + error;
+        } finally {
+            return _res;
+        }
+    }
+
     static setHeader(key: string, value: string, res: Response): ProjectResponse {
         let _res = new ProjectResponse();
 

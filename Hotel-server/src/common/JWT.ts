@@ -1,8 +1,9 @@
+import { SecrtKey } from 'src/env';
 import { Crypt } from './Crypt';
 import { ProjectResponse, errorPath } from './Response';
 import jwt from 'jsonwebtoken';
 
-const JWT_KEY = 'jttgthntjhihuh';
+const JWT_KEY = SecrtKey.JWT_KEY;
 export class Jwt {
     static SignJwt = (data: any, expireIn?: string | number): ProjectResponse => {
         let _res = new ProjectResponse();
@@ -15,7 +16,7 @@ export class Jwt {
                     {
                         data: objEncrypt.data,
                     },
-                    JWT_KEY,
+                    JWT_KEY!,
                     { expiresIn: expireIn || '1h', algorithm: 'RS256' },
                     (error, token) => {
                         if (error) {
@@ -44,7 +45,7 @@ export class Jwt {
         let _res = new ProjectResponse();
 
         try {
-            const decodedToken: any = jwt.verify(token, key !== undefined ? key : JWT_KEY);
+            const decodedToken: any = jwt.verify(token, key !== undefined ? key : JWT_KEY!);
             if (decodedToken) {
                 const objDecrypt = Crypt.Decryption(decodedToken.data)
 
