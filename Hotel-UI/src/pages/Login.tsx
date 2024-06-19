@@ -1,8 +1,3 @@
-
-
-
 export default function Login() {
-  return (
-    <div>Login</div>
-  )
+  return <div style={{ fontSize: "4rem", color: "red" }}>Login</div>;
 }

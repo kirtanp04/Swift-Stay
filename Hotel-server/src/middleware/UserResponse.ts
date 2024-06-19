@@ -5,10 +5,12 @@ import { UserResponse } from "../common/Response";
 export const UserResponseMiddWare = (objRes: UserResponse, req: Request, res: Response, next: NextFunction) => {
     const encryptedData = Crypt.Encryption(objRes)
 
-    if (encryptedData) {
-        res.status(objRes.statusCode).json(encryptedData)
+    const objDecrypt = Crypt.Decryption(encryptedData.data)
+
+    if (encryptedData.error === '') {
+        res.status(objRes.statusCode).json(objDecrypt.data)
     } else {
-        res.status(404).json({ message: 'Server Error: Not able to encrypt data while sending data from server.' })
+        res.status(404).json({ message: encryptedData.error })
     }
 }
 

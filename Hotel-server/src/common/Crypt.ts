@@ -5,21 +5,30 @@ import { ProjectResponse, errorPath } from './Response';
 
 export class Crypt {
 
+    private static _cryptr = new Cryptr(SecrtKey.ENCRYPTION_KEY, {
+        saltLength: 10,
+        encoding: 'base64',
+    });
+
 
     static Encryption(value: any): ProjectResponse {
+
         let _res: ProjectResponse = new ProjectResponse();
 
         try {
-            const StringData = Convert.toString(value);
+            let StringData: ProjectResponse = new ProjectResponse()
+            if (isTypeString(value)) {
 
-            if (StringData.error !== '') {
-                const _cryptr = new Cryptr(SecrtKey.ENCRYPTION_KEY, {
-                    saltLength: 10,
-                    encoding: 'base64',
-                    pbkdf2Iterations: 20,
-                });
+                StringData.data = value
 
-                const EncryptedData: string = _cryptr.encrypt(StringData.data);
+            } else {
+                StringData = Convert.toString(value);
+            }
+
+            if (StringData.error === '') {
+
+
+                const EncryptedData: string = this._cryptr.encrypt(StringData.data);
 
                 if (EncryptedData) {
                     _res.data = EncryptedData;
@@ -42,9 +51,7 @@ export class Crypt {
         let _res: ProjectResponse = new ProjectResponse();
 
         try {
-            const _cryptr = new Cryptr(SecrtKey.ENCRYPTION_KEY);
-
-            const DecryptedData: any = _cryptr.decrypt(encryptedValue);
+            const DecryptedData: any = this._cryptr.decrypt(encryptedValue);
 
             if (DecryptedData) {
 
@@ -73,3 +80,14 @@ export class Crypt {
 
 
 
+
+
+export function isTypeString(value: unknown): boolean {
+
+    if (typeof value === 'string') {
+        return true
+    } else {
+        return false
+    }
+
+}

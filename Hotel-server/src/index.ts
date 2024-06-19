@@ -24,7 +24,5 @@ if (cluster.isPrimary) {
 
     _Server.Port = 8080
 
-    _Server.middleware();
-
     _Server.listen();
 }

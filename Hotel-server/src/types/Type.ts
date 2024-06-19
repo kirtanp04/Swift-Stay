@@ -1,4 +1,4 @@
-interface TParam {
+export interface TParam {
     Broker: string
 
     function: string

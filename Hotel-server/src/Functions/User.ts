@@ -1,17 +1,20 @@
 import { NextFunction, Request, Response } from "express"
-import { UserResponse } from "src/common/Response"
+import { UserResponse } from "../common/Response"
+import { TParam } from "../types/Type"
 
 export class UserFunction {
     protected _CreateUser: string = 'CreateUser'
 
     protected _UserLogin: string = 'UserLogin'
 
-
+    // ----------------------------------------------------------------
     protected req: Request | undefined = undefined
 
     protected res: Response | undefined = undefined
 
     protected next: NextFunction | undefined = undefined
+
+    // ----------------------------------------------------------------
 
     objUserResponse: UserResponse = new UserResponse()
 
@@ -41,6 +44,8 @@ export class UserFunction {
 
 
     protected async CreateUser() {
+
+
 
     }
     protected async UserLogin() {

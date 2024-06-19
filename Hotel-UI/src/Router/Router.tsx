@@ -9,7 +9,7 @@ const Loadable = (Component: ElementType) => (props: any) => {
   );
 };
 
-const Login = Loadable(lazy(() => import("src/pages/Login")));
+const Login = Loadable(lazy(() => import("../pages/Login")));
 
 export default function Router() {
   return useRoutes([

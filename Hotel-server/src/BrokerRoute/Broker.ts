@@ -1,31 +1,31 @@
-import express, { NextFunction, Request, Response, Router } from 'express'
-import { UserFunction } from 'src/Functions/User'
-import { Crypt } from 'src/common/Crypt'
-import { SendResponseToUser } from 'src/middleware/UserResponse'
+import express, { NextFunction, Request, Response, Router } from 'express';
+import { UserFunction } from '../Functions/User';
+import { Crypt } from '../common/Crypt';
+import { SendResponseToUser } from '../middleware/UserResponse';
+import { TParam } from '../types/Type';
 
+const BrokerRouter: Router = express.Router();
 
-const BrokerRouter: Router = express.Router()
-
-const _UserBroker: string = 'UserBroker'
-
+const _UserBroker: string = 'UserBroker';
 
 BrokerRouter.get('/manage/:param', (req: Request, res: Response, next: NextFunction) => {
-    const { param } = req.params
-    const objDecrypt = Crypt.Decryption(param)
-    const paramObj = objDecrypt.data as TParam
+    const { param } = req.params;
+
+    const objDecrypt = Crypt.Decryption(param);
+    const paramObj = objDecrypt.data as TParam;
+
+    res.send(param)
 
     if (paramObj.Broker === _UserBroker) {
-        const _UserFunction = new UserFunction(paramObj, req, res, next)
-        return SendResponseToUser(_UserFunction.objUserResponse, next)
+        const _UserFunction = new UserFunction(paramObj, req, res, next);
+        return SendResponseToUser(_UserFunction.objUserResponse, next);
     }
-
-})
+});
 
 BrokerRouter.get('/common/:param', (req: Request, res: Response, next: NextFunction) => {
-    const { param } = req.params
-    const objDecrypt = Crypt.Decryption(param)
-    const paramObj = objDecrypt.data as TParam
+    const { param } = req.params;
+    const objDecrypt = Crypt.Decryption(param);
+    const paramObj = objDecrypt.data as TParam;
+});
 
-
-
-})
+export default BrokerRouter;
