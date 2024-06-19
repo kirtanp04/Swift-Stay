@@ -21,7 +21,7 @@
 
 - **Scaling / optimization**
 
-  - Cluster
+  - Cluster -> for heavy traffic
   - compression
   - node-cache
 
