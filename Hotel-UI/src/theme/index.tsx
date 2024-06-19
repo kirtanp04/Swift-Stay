@@ -15,6 +15,7 @@ import typography from "./typography";
 import breakpoints from "./breakpoints";
 import componentsOverride from "./overrides";
 import shadows, { customShadows } from "./shadows";
+import useThemeSetting from "../hooks/useThemesetting";
 
 // ----------------------------------------------------------------------
 
@@ -23,21 +24,19 @@ type Props = {
 };
 
 export default function ThemeProvider({ children }: Props) {
-  // const { themeMode, themeDirection } = useSettings();
-
-  const isLight = "light" === "light";
+  const { mode } = useThemeSetting();
 
   const themeOptions: ThemeOptions = useMemo(
     () => ({
-      palette: isLight ? palette.light : palette.dark,
+      palette: mode === "light" ? palette.light : palette.dark,
       typography,
       breakpoints,
       shape: { borderRadius: 8 },
-      // direction: themeDirection,
-      shadows: isLight ? shadows.light : shadows.dark,
-      customShadows: isLight ? customShadows.light : customShadows.dark,
+      shadows: mode === "light" ? shadows.light : shadows.dark,
+      customShadows:
+        mode === "light" ? customShadows.light : customShadows.dark,
     }),
-    [isLight]
+    [mode]
   );
 
   const theme = createTheme(themeOptions);

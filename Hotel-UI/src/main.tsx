@@ -4,13 +4,16 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
 import ThemeProvider from "./theme/index.tsx";
+import { ThemeSettingCTXProvider } from "./context/ThemeSettingCTX.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ThemeSettingCTXProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ThemeSettingCTXProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

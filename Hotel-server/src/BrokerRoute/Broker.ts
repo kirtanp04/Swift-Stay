@@ -14,7 +14,6 @@ BrokerRouter.get('/manage/:param', (req: Request, res: Response, next: NextFunct
     const objDecrypt = Crypt.Decryption(param);
     const paramObj = objDecrypt.data as TParam;
 
-    res.send(param)
 
     if (paramObj.Broker === _UserBroker) {
         const _UserFunction = new UserFunction(paramObj, req, res, next);
