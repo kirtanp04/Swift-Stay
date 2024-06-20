@@ -20,20 +20,20 @@ export class Jwt {
                     { expiresIn: expireIn || '1h', algorithm: 'RS256' },
                     (error, token) => {
                         if (error) {
-                            _res.error = errorPath('common/JWT', 'SignJwt', 22) + error;
+                            _res.error = errorPath('common/JWT', 'SignJwt', 23) + error;
                         }
                         if (token !== undefined) {
                             _res.data = token;
                         } else {
-                            _res.error = errorPath('common/JWT', 'SignJwt', 27) + 'While Sign in JWT Getting token undefine';
+                            _res.error = errorPath('common/JWT', 'SignJwt', 28) + 'While Sign in JWT Getting token undefine';
                         }
                     }
                 );
             } else {
-                _res.error = errorPath('common/JWT', 'SignJwt', 32) + objEncrypt.error;
+                _res.error = errorPath('common/JWT', 'SignJwt', 33) + objEncrypt.error;
             }
         } catch (error) {
-            _res.error = errorPath('common/JWT', 'SignJwt', 35) + error;
+            _res.error = errorPath('common/JWT', 'SignJwt', 36) + error;
         } finally {
             return _res;
         }

@@ -60,14 +60,14 @@ export class Storage {
         try {
 
             const isCleared = res.clearCookie(key)
-            if(isCleared){
+            if (isCleared) {
                 _res.data = 'Success: Cleared Cookie'
-            }else{
-                errorPath('common/storage', 'clereCookie', 55) + 'Not able clear Cookie, Might Wrong Key';
+            } else {
+                errorPath('common/storage', 'clereCookie', 66) + 'Not able clear Cookie, Might Wrong Key';
             }
-            
+
         } catch (error) {
-            _res.error = errorPath('common/storage', 'clereCookie', 55) + error;
+            _res.error = errorPath('common/storage', 'clereCookie', 70) + error;
         } finally {
             return _res;
         }
@@ -88,10 +88,10 @@ export class Storage {
                     _res.data = 'Success: Header Set';
                 }
             } else {
-                _res.error = errorPath('common/storage', 'setHeader', 81) + encryptedObj.error;
+                _res.error = errorPath('common/storage', 'setHeader', 91) + encryptedObj.error;
             }
         } catch (error) {
-            _res.error = errorPath('common/storage', 'setHeader', 85) + error;
+            _res.error = errorPath('common/storage', 'setHeader', 95) + error;
         } finally {
             return _res;
         }
@@ -109,13 +109,13 @@ export class Storage {
                 if (decryptedValueObj.error === '') {
                     _res.data = decryptedValueObj.data;
                 } else {
-                    _res.error = errorPath('common/storage', 'getHeader', 105) + decryptedValueObj.error;
+                    _res.error = errorPath('common/storage', 'getHeader', 112) + decryptedValueObj.error;
                 }
             } else {
-                _res.error = 'Server Error: Header Not Found.';
+                _res.error = errorPath('common/storage', 'getHeader', 115) + 'Header Not Found.';
             }
         } catch (error) {
-            _res.error = errorPath('common/storage', 'getHeader', 99) + error;
+            _res.error = errorPath('common/storage', 'getHeader', 118) + error;
         } finally {
             return _res;
         }

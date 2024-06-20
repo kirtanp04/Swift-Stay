@@ -10,3 +10,19 @@
 
 
 console.log('Payment')
+
+
+// Payment.find()
+//   .populate({
+//     path: 'booking',
+//     match: { user: userId },
+//     populate: { path: 'user' }
+//   })
+//   .exec((err, payments) => {
+//     if (err) {
+//       console.error(err);
+//       return;
+//     }// Filter out payments where booking did not match the user
+//     const userPayments = payments.filter(payment => payment.booking);
+//     console.log('Payments for the user:', userPayments);
+//   });
