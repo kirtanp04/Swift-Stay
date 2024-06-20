@@ -9,6 +9,7 @@ import BrokerRouter from './BrokerRoute/Broker';
 import { UserResponse } from './common/Response';
 import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
 import { MainApiLimit } from './middleware/RateLimitApi';
+import { MongoDB } from './Database/DB';
 
 const _app = express()
 
@@ -48,6 +49,10 @@ export class _Express {
         return compression.filter(req, res)
       }
     }))
+  }
+
+  connectDB(){
+    MongoDB.ConnectDB()
   }
 
   route() {

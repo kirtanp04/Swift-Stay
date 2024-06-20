@@ -1,7 +1,10 @@
 export const SecrtKey = {
-    ENCRYPTION_KEY: 'jbug7%&rfGCr4564r%TFf&^%67F76',
+    ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
 
-    JWT_KEY: 'jbug7%&rfGCr4564r%TFf&^%67F76',
+    JWT_KEY: process.env.JWT_KEY,
 
-    Environment: 'production'
+    Environment: 'production',
+
+    MNOGO_URL: process.env.MNOGO_URL,
+
 }

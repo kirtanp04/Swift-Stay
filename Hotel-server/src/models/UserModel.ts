@@ -1,10 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
 
 export class UserClass {
+  _id: string = '';
   name: string = '';
   email: string = '';
   password: string = '';
   phone: string = '';
+  provider: 'google' | 'OAuth' = 'OAuth'
   role: 'guest' | 'admin' = 'admin';
   createdAt: Date = new Date();
 }
@@ -23,6 +25,11 @@ const UserSchema = new Schema<UserClass>({
     type: String,
     required: true,
   },
+  provider: {
+    type: String,
+    enum: ['google', 'OAuth'],
+    required: true,
+  },
   phone: {
     type: String,
     required: true,
@@ -36,5 +43,8 @@ const UserSchema = new Schema<UserClass>({
     type: Date,
   },
 });
+
+
+
 
 export const User = mongoose.model<UserClass>('User', UserSchema);

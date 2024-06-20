@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { UserResponse } from "../common/Response"
 import { TParam } from "../types/Type"
+import { User, UserClass } from "../Models/UserModel"
 
 export class UserFunction {
     protected _CreateUser: string = 'CreateUser'
@@ -16,7 +17,7 @@ export class UserFunction {
 
     // ----------------------------------------------------------------
 
-    objUserResponse: UserResponse = new UserResponse()
+    _objRes: UserResponse = new UserResponse()
 
 
     constructor(paramObj: TParam, req: Request, res: Response, next: NextFunction) {
@@ -43,7 +44,25 @@ export class UserFunction {
     }
 
 
-    protected async CreateUser() {
+    protected async CreateUser(): Promise<UserResponse> {
+
+        const { createdAt, email, name, password, phone, provider, role } = this.req?.body as UserClass
+
+        try {
+
+            const isUser = User.findOne({ email: email })
+            // if(isUser){
+
+            // }else{
+            //     this._objRes.Message = 'User'
+            // }
+
+        } catch {
+
+        } finally {
+            return this._objRes
+        }
+
 
 
 

@@ -2,6 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 import { HotelClass } from './HotelModel';
 
 export class RoomClass {
+    _id: string = '';
     hotel: HotelClass = new HotelClass()
     roomNumber: string = ''
     type: string = '' // e.g., single, double, suite

@@ -1,6 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
 export class HotelClass {
+    _id: string = '';
     name: string = '';
     address: string = '';
     city: string = '';

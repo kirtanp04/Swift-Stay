@@ -1,11 +1,12 @@
 import Cryptr from 'cryptr';
+import bcrypt from 'bcrypt'
 import { SecrtKey } from '../env';
 import { Convert } from './Convert';
 import { ProjectResponse, errorPath } from './Response';
 
 export class Crypt {
 
-    private static _cryptr = new Cryptr(SecrtKey.ENCRYPTION_KEY, {
+    private static _cryptr = new Cryptr(SecrtKey.ENCRYPTION_KEY!, {
         saltLength: 10,
         encoding: 'base64',
     });
@@ -72,6 +73,72 @@ export class Crypt {
             }
         } catch (error: any) {
             _res.error = errorPath('common/Crypt', 'Decryption', 55) + error;
+        } finally {
+            return _res;
+        }
+    }
+
+    static async haseValue(value: any): Promise<ProjectResponse> {
+        let _res: ProjectResponse = new ProjectResponse();
+
+        try {
+            let StringData: ProjectResponse = new ProjectResponse()
+
+            if (isTypeString(value)) {
+                StringData.data = value
+            } else {
+                StringData = Convert.toString(value)
+            }
+
+            if (StringData.error === '') {
+
+                await bcrypt.hash(StringData.data, 10, function (err, hash) {
+                    if (err) {
+                        _res.error = errorPath('common/Crypt', 'haseValue', 97) + err
+                    } else {
+                        _res.data = hash
+                    }
+                });
+
+            } else {
+                _res.error = errorPath('common/Crypt', 'haseValue', 104) + StringData.error
+            }
+
+        } catch (error: any) {
+            _res.error = errorPath('common/Crypt', 'haseValue', 108) + error
+        } finally {
+            return _res;
+        }
+    }
+
+    static async compareHash(value: any, hashValue: string): Promise<ProjectResponse> {
+        let _res: ProjectResponse = new ProjectResponse();
+
+        try {
+            let StringData: ProjectResponse = new ProjectResponse()
+
+            if (isTypeString(value)) {
+                StringData.data = value
+            } else {
+                StringData = Convert.toString(value)
+            }
+
+            if (StringData.error === '') {
+
+                await bcrypt.compare(StringData.data, hashValue, function (err, hash) {
+                    if (err) {
+                        _res.error = errorPath('common/Crypt', 'compareHash', 130) + err
+                    } else {
+                        _res.data = 'Compare Hash / Success'
+                    }
+                });
+
+            } else {
+                _res.error = errorPath('common/Crypt', 'compareHash', 137) + StringData.error
+            }
+
+        } catch (error: any) {
+            _res.error = errorPath('common/Crypt', 'compareHash', 141) + error
         } finally {
             return _res;
         }
