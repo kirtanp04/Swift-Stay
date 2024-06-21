@@ -1,10 +1,12 @@
 import { Box, Typography, styled } from "@mui/material";
 import Page from "../../components/Page";
 import FormProvider from "../../components/Form/FormProvider";
+import LoadingPage from "../../components/LoadingPage";
 
 export default function Login() {
   return (
     <Page title="Login">
+      <LoadingPage />
       <RootStyle>
         <Wrapper>
           <Heading>Sign in to your account.</Heading>
