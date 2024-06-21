@@ -1,16 +1,22 @@
 import { Box, Typography, styled } from "@mui/material";
-import Page from "../../components/Page";
-import FormProvider from "../../components/Form/FormProvider";
-import LoadingPage from "../../components/LoadingPage";
+import { useForm } from "react-hook-form";
+import FormProvider from "src/components/Form/FormProvider";
+import Page from "src/components/Page";
 
 export default function Login() {
+  const _Method = useForm({});
+
+  const { handleSubmit } = _Method;
   return (
     <Page title="Login">
-      <LoadingPage />
       <RootStyle>
         <Wrapper>
           <Heading>Sign in to your account.</Heading>
-          <FieldWrapper>{/* <FormProvider></FormProvider> */}</FieldWrapper>
+          <FieldWrapper>
+            <FormProvider methods={_Method} onSubmit={handleSubmit(() => {})}>
+              kp
+            </FormProvider>
+          </FieldWrapper>
         </Wrapper>
       </RootStyle>
     </Page>

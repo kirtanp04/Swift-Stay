@@ -5,7 +5,8 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import compression from 'compression'
 import helmet from 'helmet'
-import BrokerRouter from './BrokerRoute/Broker';
+import GuestBrokerRouter from './BrokerRoute/GuestBroker';
+import ManagerBrokerRouter from './BrokerRoute/ManagerBroker';
 import { UserResponse } from './common/Response';
 import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
 import { MainApiLimit } from './middleware/RateLimitApi';
@@ -69,7 +70,9 @@ export class _Express {
 
   route() {
 
-    _app.use('/hotel/api', MainApiLimit, BrokerRouter)
+    _app.use('/swiftstay/guest/api', MainApiLimit, GuestBrokerRouter)
+
+    _app.use('/swiftstay/manager/api', MainApiLimit, ManagerBrokerRouter)
 
     _app.all('*', (req: Request, res: Response, next: NextFunction) => {
       let objUserResponse = new UserResponse()

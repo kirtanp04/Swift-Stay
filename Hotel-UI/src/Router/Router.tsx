@@ -1,15 +1,17 @@
 import { ElementType, Suspense, lazy } from "react";
 import { Navigate, Outlet, useRoutes } from "react-router-dom";
+import LoadingPage from "src/components/LoadingPage";
+// import LoadingPage from "../components/LoadingPage";
 
 const Loadable = (Component: ElementType) => (props: any) => {
   return (
-    <Suspense fallback={<div>loading</div>}>
+    <Suspense fallback={<LoadingPage />}>
       <Component {...props} />
     </Suspense>
   );
 };
 
-const Login = Loadable(lazy(() => import("../pages/Authentication/Login")));
+const Login = Loadable(lazy(() => import("src/pages/Authentication/Login")));
 
 export default function Router() {
   return useRoutes([

@@ -1,15 +1,13 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 // import { SecrtKey } from '../env'
-import { UserResponse, errorPath } from '../common'
+import { UserResponse, errorPath } from '../common';
+import { SecrtKey } from '../env';
 
 export class MongoDB {
-
-    private static URL = 'mongodb+srv://kirtanp04:OyBd0kVg6JZxkvpy@hotelcluster.exs9nof.mongodb.net/Stay_Swift';
-
     static ConnectDB = async () => {
         let _userRes = new UserResponse();
         try {
-            await mongoose.connect(this.URL!).then(() => {
+            await mongoose.connect(SecrtKey.MNOGO_URL!).then(() => {
                 _userRes.isError = false;
                 _userRes.data = 'Database Connection: Success';
             });

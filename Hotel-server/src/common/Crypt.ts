@@ -6,7 +6,7 @@ import { ProjectResponse, errorPath } from './Response';
 
 export class Crypt {
 
-    private static _cryptr = new Cryptr(SecrtKey.ENCRYPTION_KEY!, {
+    private static _cryptr = new Cryptr('knjbvuigbuvhuy84578953686578ty78', {
         saltLength: 10,
         encoding: 'base64',
     });

@@ -5,15 +5,15 @@ import { TParam } from '../types/Type';
 import * as Functions from '../Functions'
 
 
-const BrokerRouter: Router = express.Router();
+const GuestBrokerRouter: Router = express.Router();
 
 const _UserBroker: string = 'UserBroker';
 const _HotelBroker: string = 'HotelBroker';
 const _RoomBroker: string = 'RoomBroker';
 
-BrokerRouter.get('/guest/:param', (req: Request, res: Response, next: NextFunction) => {
+GuestBrokerRouter.get('/:param', (req: Request, res: Response, next: NextFunction) => {
     const { param } = req.params;
-    
+
 
     const objDecrypt = Crypt.Decryption(param);
     const paramObj = objDecrypt.data as TParam;
@@ -23,16 +23,12 @@ BrokerRouter.get('/guest/:param', (req: Request, res: Response, next: NextFuncti
         return SendResponseToUser(_UserFunction.objUserResponse, next);
     }
 
-    if(paramObj.Broker === _HotelBroker){
+    if (paramObj.Broker === _HotelBroker) {
         const _HotelFunction = new Functions.HotelFunction(paramObj, req, res, next)
-        return SendResponseToUser(_HotelFunction.objUserResponse,next)
+        return SendResponseToUser(_HotelFunction.objUserResponse, next)
     }
 });
 
-BrokerRouter.get('/manage/:param', (req: Request, res: Response, next: NextFunction) => {
-    const { param } = req.params;
-    const objDecrypt = Crypt.Decryption(param);
-    const paramObj = objDecrypt.data as TParam;
-});
 
-export default BrokerRouter;
+
+export default GuestBrokerRouter;
