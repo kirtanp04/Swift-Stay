@@ -25,6 +25,8 @@
   - compression
   - node-cache
 
+  </div>
+
   <div style="flex: 1; padding: 10px;">
 
 ## Frontend

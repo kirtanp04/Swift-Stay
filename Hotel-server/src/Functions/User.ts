@@ -1,74 +1,72 @@
-import { NextFunction, Request, Response } from "express"
-import { UserResponse } from "../common/Response"
-import { TParam } from "../types/Type"
-import { User, UserClass } from "../Models/UserModel"
+import { NextFunction, Request, Response } from 'express';
+import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Response';
+import { TParam } from '../types/Type';
+import { Crypt, HttpStatusCodes } from '../common';
+import { User, UserClass } from '../Models/UserModel';
 
 export class UserFunction {
-    protected _CreateUser: string = 'CreateUser'
+    protected _CreateUser: string = 'CreateUser';
 
-    protected _UserLogin: string = 'UserLogin'
-
-    // ----------------------------------------------------------------
-    protected req: Request | undefined = undefined
-
-    protected res: Response | undefined = undefined
-
-    protected next: NextFunction | undefined = undefined
+    protected _UserLogin: string = 'UserLogin';
 
     // ----------------------------------------------------------------
+    protected req: Request | undefined = undefined;
 
-    _objRes: UserResponse = new UserResponse()
+    protected res: Response | undefined = undefined;
 
+    protected next: NextFunction | undefined = undefined;
+
+    // ----------------------------------------------------------------
+
+    objUserResponse: UserResponse = new UserResponse();
 
     constructor(paramObj: TParam, req: Request, res: Response, next: NextFunction) {
+        this.req = req;
 
-        this.req = req
+        this.res = res;
 
-        this.res = res
-
-        this.next = next
-
+        this.next = next;
 
         if (paramObj.function === this._CreateUser) {
-
-            this.CreateUser()
-
+            this.CreateUser();
         }
 
         if (paramObj.function === this._UserLogin) {
-
-            this.UserLogin()
+            this.UserLogin();
         }
-
-
     }
 
-
-    protected async CreateUser(): Promise<UserResponse> {
-
-        const { createdAt, email, name, password, phone, provider, role } = this.req?.body as UserClass
+    protected async CreateUser() {
+        const { createdAt, email, name, password, phone, profileImg, role } = this.req?.body as UserClass;
 
         try {
+            const isUser = await User.findOne({ email: email });
 
-            const isUser = User.findOne({ email: email })
-            // if(isUser){
+            if (isUser) {
+                this.objUserResponse = GetUserErrorObj('User already exist. Enter another user name.', 403);
+            } else {
+                const objHashPass = await Crypt.hashValue(password);
 
-            // }else{
-            //     this._objRes.Message = 'User'
-            // }
+                if (objHashPass.error !== '') {
+                    this.objUserResponse = GetUserErrorObj(objHashPass.error, HttpStatusCodes.BAD_REQUEST);
+                } else {
+                    const newUser = await User.create({
+                        createdAt,
+                        email,
+                        name,
+                        phone,
+                        profileImg,
+                        role,
+                        password: objHashPass.data,
+                    });
+                    newUser.save();
 
-        } catch {
-
-        } finally {
-            return this._objRes
+                    this.objUserResponse = GetUserSuccessObj('User has been created', HttpStatusCodes.CREATED);
+                }
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error, HttpStatusCodes.BAD_REQUEST);
         }
-
-
-
-
     }
-    protected async UserLogin() {
-
-    }
-
+    protected async UserLogin() { }
 }

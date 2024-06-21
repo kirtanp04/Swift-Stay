@@ -9,7 +9,7 @@ import BrokerRouter from './BrokerRoute/Broker';
 import { UserResponse } from './common/Response';
 import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
 import { MainApiLimit } from './middleware/RateLimitApi';
-import { MongoDB } from './Database/DB';
+import { MongoDB } from './DB/MongoDB';
 
 const _app = express()
 
@@ -27,17 +27,14 @@ export class _Express {
 
   middleware() {
 
-    _app.use(cors());
+    _app.use(cors({
+      credentials: true,
+      methods: 'GET,POST',
+      optionsSuccessStatus: 201,
+      origin: 'http://localhost:5173'
+    }));
 
     _app.use(helmet())
-
-    _app.use(bodyParser.json({ limit: '50mb' }));
-
-    _app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 2 }));
-
-    _app.use(express.json({ limit: '50mb' }));
-
-    _app.use(cookieParser())
 
     _app.use(compression({
       level: 9,
@@ -49,10 +46,25 @@ export class _Express {
         return compression.filter(req, res)
       }
     }))
-  }
 
-  connectDB(){
-    MongoDB.ConnectDB()
+    _app.use(bodyParser.json({ limit: '50mb' }));
+
+    _app.use(bodyParser.urlencoded({ extended: true, limit: '50mb', parameterLimit: 2 }));
+
+    _app.use(express.json({ limit: '50mb' }));
+
+    _app.use(cookieParser())
+
+    _app.use(compression({
+      level: 9,
+      threshold: '10kb',
+      filter: (req: Request, res: Response) => {
+        if (req.headers['x-no-compression']) {
+          return false
+        }
+        return compression.filter(req, res)
+      }
+    }))
   }
 
   route() {
@@ -68,6 +80,10 @@ export class _Express {
     })
 
     _app.use(UserResponseMiddWare) // sending data to user middle ware
+  }
+
+  connectToDB() {
+    MongoDB.ConnectDB()
   }
 
   listen() {

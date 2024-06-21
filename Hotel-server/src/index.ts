@@ -24,7 +24,7 @@ if (cluster.isPrimary) {
 
     _Server.Port = 8080
 
-    _Server.connectDB()
+    _Server.connectToDB()
 
     _Server.listen();
 }

@@ -1,4 +1,4 @@
-import { SecrtKey } from 'src/env';
+import { SecrtKey } from '../env';
 import { Crypt } from './Crypt';
 import { ProjectResponse, errorPath } from './Response';
 import jwt from 'jsonwebtoken';
@@ -20,20 +20,20 @@ export class Jwt {
                     { expiresIn: expireIn || '1h', algorithm: 'RS256' },
                     (error, token) => {
                         if (error) {
-                            _res.error = errorPath('common/JWT', 'SignJwt', 22) + error;
+                            _res.error = errorPath('common/JWT', 'SignJwt', 23) + error;
                         }
                         if (token !== undefined) {
                             _res.data = token;
                         } else {
-                            _res.error = errorPath('common/JWT', 'SignJwt', 27) + 'While Sign in JWT Getting token undefine';
+                            _res.error = errorPath('common/JWT', 'SignJwt', 28) + 'While Sign in JWT Getting token undefine';
                         }
                     }
                 );
             } else {
-                _res.error = errorPath('common/JWT', 'SignJwt', 32) + objEncrypt.error;
+                _res.error = errorPath('common/JWT', 'SignJwt', 33) + objEncrypt.error;
             }
         } catch (error) {
-            _res.error = errorPath('common/JWT', 'SignJwt', 35) + error;
+            _res.error = errorPath('common/JWT', 'SignJwt', 36) + error;
         } finally {
             return _res;
         }
@@ -41,11 +41,11 @@ export class Jwt {
 
 
 
-    static VerifyJwt = (token: string, key?: string): ProjectResponse => {
+    static VerifyJwt = (token: string): ProjectResponse => {
         let _res = new ProjectResponse();
 
         try {
-            const decodedToken: any = jwt.verify(token, key !== undefined ? key : JWT_KEY!);
+            const decodedToken: any = jwt.verify(token, JWT_KEY!);
             if (decodedToken) {
                 const objDecrypt = Crypt.Decryption(decodedToken.data)
 
@@ -55,7 +55,7 @@ export class Jwt {
                     _res.error = errorPath('common/JWT', 'VerifyJwt', 54) + objDecrypt.error;
                 }
             } else {
-                _res.error = errorPath('common/JWT', 'VerifyJwt', 57) + 'Not able to Decode Token, Might bo Wrong Key Provided.';
+                _res.error = errorPath('common/JWT', 'VerifyJwt', 57) + 'Not able to Decode Token, Might bo Wrong Token/key Provided.';
             }
         } catch (error) {
             _res.error = errorPath('common/JWT', 'VerifyJwt', 60) + error;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { SecrtKey } from 'src/env';
+import { SecrtKey } from '../env';
 import { Crypt } from './Crypt';
 import { ProjectResponse, errorPath } from './Response';
 
@@ -23,10 +23,10 @@ export class Storage {
                     _res.data = 'Success: Cookie Set';
                 }
             } else {
-                _res.error = errorPath('common/storage', 'setCookie', 24) + encryptedObj.error;
+                _res.error = errorPath('common/storage', 'setCookie', 26) + encryptedObj.error;
             }
         } catch (err) {
-            _res.error = errorPath('common/storage', 'setCookie', 27) + err;
+            _res.error = errorPath('common/storage', 'setCookie', 29) + err;
         } finally {
             return _res;
         }
@@ -43,31 +43,35 @@ export class Storage {
                 if ((decryptedValueObj.error = '')) {
                     _res.data = decryptedValueObj.data;
                 } else {
-                    _res.error = errorPath('common/storage', 'getCookie', 47) + decryptedValueObj.error;
+                    _res.error = errorPath('common/storage', 'getCookie', 46) + decryptedValueObj.error;
                 }
             } else {
-                _res.error = 'Server Error: Cookie Not Found.';
+                _res.error = errorPath('common/storage', 'getCookie', 49) + 'Cookie Not Found.';
             }
         } catch (error) {
-            _res.error = errorPath('common/storage', 'getCookie', 55) + error;
+            _res.error = errorPath('common/storage', 'getCookie', 52) + error;
         } finally {
             return _res;
         }
     }
 
-    static clereCookie(key: string, res: Response): ProjectResponse {
+    static clereCookie(key: string, res: Response, req: Request): ProjectResponse {
         let _res = new ProjectResponse();
         try {
+            const _cookieObj = this.getCookie(key, req);
 
-            const isCleared = res.clearCookie(key)
-            if(isCleared){
-                _res.data = 'Success: Cleared Cookie'
-            }else{
-                errorPath('common/storage', 'clereCookie', 55) + 'Not able clear Cookie, Might Wrong Key';
+            if (_cookieObj.error === '') {
+                const isCleared = res.clearCookie(key);
+                if (isCleared) {
+                    _res.data = 'Success: Cleared Cookie';
+                } else {
+                    _res.error = errorPath('common/storage', 'clereCookie', 68) + 'Not able clear Cookie, Might Wrong Key';
+                }
+            } else {
+                _res.error = errorPath('common/storage', 'clereCookie', 71) + _cookieObj.error;
             }
-            
         } catch (error) {
-            _res.error = errorPath('common/storage', 'clereCookie', 55) + error;
+            _res.error = errorPath('common/storage', 'clereCookie', 74) + error;
         } finally {
             return _res;
         }
@@ -83,15 +87,15 @@ export class Storage {
                 const settingHeader = res.setHeader(key, encryptedObj.data);
 
                 if (!settingHeader) {
-                    _res.error = 'Server Error: Header Not Set.';
+                    _res.error = errorPath('common/storage', 'setHeader', 90) + ' Header Not Set.';
                 } else {
                     _res.data = 'Success: Header Set';
                 }
             } else {
-                _res.error = errorPath('common/storage', 'setHeader', 81) + encryptedObj.error;
+                _res.error = errorPath('common/storage', 'setHeader', 95) + encryptedObj.error;
             }
         } catch (error) {
-            _res.error = errorPath('common/storage', 'setHeader', 85) + error;
+            _res.error = errorPath('common/storage', 'setHeader', 98) + error;
         } finally {
             return _res;
         }
@@ -109,13 +113,13 @@ export class Storage {
                 if (decryptedValueObj.error === '') {
                     _res.data = decryptedValueObj.data;
                 } else {
-                    _res.error = errorPath('common/storage', 'getHeader', 105) + decryptedValueObj.error;
+                    _res.error = errorPath('common/storage', 'getHeader', 116) + decryptedValueObj.error;
                 }
             } else {
-                _res.error = 'Server Error: Header Not Found.';
+                _res.error = errorPath('common/storage', 'getHeader', 119) + 'Header Not Found.';
             }
         } catch (error) {
-            _res.error = errorPath('common/storage', 'getHeader', 99) + error;
+            _res.error = errorPath('common/storage', 'getHeader', 122) + error;
         } finally {
             return _res;
         }

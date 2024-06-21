@@ -78,67 +78,60 @@ export class Crypt {
         }
     }
 
-    static async haseValue(value: any): Promise<ProjectResponse> {
+    static async hashValue(value: any): Promise<ProjectResponse> {
+
         let _res: ProjectResponse = new ProjectResponse();
 
         try {
-            let StringData: ProjectResponse = new ProjectResponse()
+            // let StringData: ProjectResponse = new ProjectResponse()
+            // if (isTypeString(value)) {
 
-            if (isTypeString(value)) {
-                StringData.data = value
-            } else {
-                StringData = Convert.toString(value)
-            }
+            //     StringData.data = value
 
-            if (StringData.error === '') {
+            // } else {
+            //     StringData = Convert.toString(value);
+            // }
 
-                await bcrypt.hash(StringData.data, 10, function (err, hash) {
-                    if (err) {
-                        _res.error = errorPath('common/Crypt', 'haseValue', 97) + err
-                    } else {
-                        _res.data = hash
-                    }
-                });
+            // if (StringData.error === '') {
 
-            } else {
-                _res.error = errorPath('common/Crypt', 'haseValue', 104) + StringData.error
-            }
+            await bcrypt.hash(value, 10, (err, hash) => {
+                if (err) {
+                    _res.error = errorPath('common/Crypt', 'hashValue', 99) + err
+                } else {
+                    _res.data = hash
+                }
+            })
 
+
+            // } else {
+            //     _res.error = errorPath('common/Crypt', 'hashValue', 107) + StringData.error;
+            // }
         } catch (error: any) {
-            _res.error = errorPath('common/Crypt', 'haseValue', 108) + error
+            _res.error = errorPath('common/Crypt', 'hashValue', 110) + error;
         } finally {
             return _res;
         }
     }
 
-    static async compareHash(value: any, hashValue: string): Promise<ProjectResponse> {
+    static async compareHash(hashValue: string, originalValue: any): Promise<ProjectResponse> {
+
         let _res: ProjectResponse = new ProjectResponse();
 
         try {
-            let StringData: ProjectResponse = new ProjectResponse()
 
-            if (isTypeString(value)) {
-                StringData.data = value
-            } else {
-                StringData = Convert.toString(value)
-            }
 
-            if (StringData.error === '') {
+            await bcrypt.compare(originalValue, hashValue, (err, hash) => {
+                if (err) {
+                    _res.error = errorPath('common/Crypt', 'compareHash', 134) + err
+                } else {
+                    _res.data = 'Success: compare HashValue'
+                }
+            })
 
-                await bcrypt.compare(StringData.data, hashValue, function (err, hash) {
-                    if (err) {
-                        _res.error = errorPath('common/Crypt', 'compareHash', 130) + err
-                    } else {
-                        _res.data = 'Compare Hash / Success'
-                    }
-                });
 
-            } else {
-                _res.error = errorPath('common/Crypt', 'compareHash', 137) + StringData.error
-            }
 
         } catch (error: any) {
-            _res.error = errorPath('common/Crypt', 'compareHash', 141) + error
+            _res.error = errorPath('common/Crypt', 'compareHash', 145) + error;
         } finally {
             return _res;
         }

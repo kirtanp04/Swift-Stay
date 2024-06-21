@@ -5,6 +5,5 @@ export const SecrtKey = {
 
     Environment: 'production',
 
-    MNOGO_URL: process.env.MNOGO_URL,
-
+    MNOGO_URL: process.env.MNOGO_URL
 }

@@ -18,7 +18,7 @@ export default function Page({ title, description, children }: Props) {
       <RootStyle>
         <Helmet>
           <meta charSet="utf-8" />
-          <title>{title}</title>
+          <title>{title} | Swift Stay</title>
           <link rel="canonical" href={pathname} />
           <meta name="description" content={_description} />
         </Helmet>

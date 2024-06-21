@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { Options, rateLimit } from 'express-rate-limit'
-import { UserResponse } from '../common/Response'
+import { GetUserErrorObj, UserResponse } from '../common/Response'
 import { SendResponseToUser } from './UserResponse'
 
 // const allowlist = ['192.168.0.56', '192.168.0.21'] //Ip address
@@ -15,10 +15,7 @@ export const MainApiLimit = rateLimit({
     handler: (req: Request, res: Response, next: NextFunction, options: Options) => {
         let _UserResponse = new UserResponse()
 
-        _UserResponse.Message = options.message
-        _UserResponse.data = ''
-        _UserResponse.isError = true
-        _UserResponse.statusCode = options.statusCode
+        _UserResponse = GetUserErrorObj('Server Error: To many Api Calls. Wait for a 1min', options.statusCode)
 
         SendResponseToUser(_UserResponse, next)
     },
