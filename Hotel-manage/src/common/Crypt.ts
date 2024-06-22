@@ -62,3 +62,80 @@ export class Crypt {
     }
 }
 
+// import * as CryptoTS from 'crypto-ts';
+// import { logEntry } from 'src/logging/logger';
+
+// export class RSAService {
+//   private static key = CryptoTS.enc.Utf8.parse('!@#$%^sFxH&+58~A');
+
+//   private static Iv = CryptoTS.enc.Utf8.parse('!@#$%^sFxH&+58~A');
+
+//   /**
+//    *
+//    * @param value string value
+//    * @returns
+//    */
+//   static Encryption(value: string): string {
+//     try {
+//       const utf8String = CryptoTS.enc.Utf8.parse(value);
+//       return CryptoTS.AES.encrypt(utf8String, RSAService.key, {
+//         iv: RSAService.Iv,
+//         mode: CryptoTS.mode.CBC,
+//         padding: CryptoTS.pad.PKCS7
+//       }) as unknown as string;  
+//     } catch (error) {
+//       logEntry("RSAService - Encryption","Caught in exception "+error);
+//       return "";
+//     }
+    
+//   }
+
+//   /**
+//    *
+//    * @param value
+//    * @returns
+//    */
+//   static Decryption(value: string): string {
+//     try {
+
+//       const bytes = CryptoTS.AES.decrypt(value.toString(), RSAService.key, {
+//         iv: RSAService.Iv,
+//         mode: CryptoTS.mode.CBC,
+//         padding: CryptoTS.pad.PKCS7
+//       });
+  
+//       return bytes.toString(CryptoTS.enc.Utf8);
+  
+//     } catch (error) {
+
+//       logEntry("RSAService - Decryption","Caught in exception "+error);
+//       return "";
+
+//     }
+
+//   }
+
+//   /**
+//    *
+//    * @param value
+//    * @returns
+//    */
+//   static EncryptionToBas64(value: string): string {
+//     try {
+//       const utf8String = CryptoTS.enc.Utf8.parse(value);
+//     let encryptredString: string = '';
+
+//     encryptredString = CryptoTS.AES.encrypt(utf8String, RSAService.key, {
+//       iv: RSAService.Iv,
+//       mode: CryptoTS.mode.CBC,
+//       padding: CryptoTS.pad.PKCS7
+//     }) as unknown as string;
+
+//     return btoa(encryptredString);
+//     } catch (error) {
+//       logEntry("RSAService - EncryptionToBas64","Caught in exception "+error);
+//       return "";
+//     }
+    
+//   }
+// }
