@@ -86,7 +86,7 @@ export class _Express {
   }
 
   connectToDB() {
-    MongoDB.ConnectDB()
+    // MongoDB.ConnectDB()
   }
 
   listen() {
