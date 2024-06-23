@@ -1,31 +1,9 @@
 import { Api, getPostParamData } from "src/common/ApiCall";
-import { TParam } from "src/common/ApiCall";
 
 export class _Login {
     email: string = "";
 
     password: string = "";
-
-    static LoginUser = async (
-        objLogin: _Login,
-        onSuccess: (res: any) => void,
-        onFail: (err: any) => void
-    ) => {
-        try {
-            let _Param = new TParam();
-            _Param.Broker = "GuestBroker";
-            _Param.function = "CreateUser";
-            _Param.data = objLogin;
-            const res = await Api.get(_Param);
-            if (res.error === "") {
-                onSuccess(res.data);
-            } else {
-                onFail(res.error);
-            }
-        } catch (error) {
-            onFail(error);
-        }
-    };
 }
 
 export class _Register {
@@ -53,12 +31,30 @@ export class Auth {
 
             const res = await Api.post(_Param, objRegister);
             if (res.error === "") {
-                onsuccess(res.data)
+                onsuccess(res.data);
             } else {
-                onFail(res.error)
+                onFail(res.error);
             }
         } catch (error: any) {
-            onFail(error.message);
+            onFail(error);
+        }
+    };
+
+    public static Login = async (
+        objLogin: _Login,
+        onsuccess: (res: any) => void,
+        onFail: (err: any) => void
+    ) => {
+        try {
+            const _Param = getPostParamData("ManagerBroker", "ManagerLogin");
+            const res = await Api.post(_Param, objLogin);
+            if (res.error === "") {
+                onsuccess(res.data);
+            } else {
+                onFail(res.error);
+            }
+        } catch (error: any) {
+            onFail(error);
         }
     };
 }

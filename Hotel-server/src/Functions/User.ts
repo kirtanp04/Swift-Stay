@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Response';
 import { TParam } from '../types/Type';
-import { Crypt, HttpStatusCodes } from '../common';
+import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
 import { Login, User, UserClass } from '../models/UserModel';
 
 const _CreateGuestAccount: string = 'CreateGuestAccount';
@@ -22,8 +22,11 @@ export class UserFunction {
         } else if (objParam.function === _CreateGuestAccount) {
             const _res = await Functions.CreateGuestAccount(req, res, next, objParam);
             this.objUserResponse = _res;
+        } else if (objParam.function === _ManagerLogin) {
+            const _res = await Functions.ManagerLogin(req, res, next, objParam);
+            this.objUserResponse = _res;
         } else {
-            this.objUserResponse = GetUserErrorObj('Server error: Wrong Function.', HttpStatusCodes.BAD_REQUEST);
+            this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
         }
 
         return this.objUserResponse;
@@ -152,6 +155,47 @@ class Functions {
     };
 
     static ManagerLogin = async (req: Request, res: Response, next: NextFunction, objParam: TParam): Promise<UserResponse> => {
-        return this.objUserResponse;
+        try {
+            const { email, password } = objParam.data;
+
+            const isUser = await User.findOne({ email: email });
+
+            if (isUser) {
+                const isVerifiePass = await Crypt.compareHash(isUser.password, password);
+
+                if (isVerifiePass.error === '') {
+                    if (isUser.role !== 'guest') {
+                        const getToken = await Jwt.SignJwt({ email: isUser.email, name: isUser.name, profileImg: isUser.profileImg });
+                        if (getToken.error === '') {
+                            const setCookie = Storage.setCookie('Auth', getToken.data, res);
+
+                            if (setCookie.error === '') {
+                                this.objUserResponse = GetUserSuccessObj(
+                                    { email: isUser.email, name: isUser.name, profile: isUser.profileImg },
+                                    HttpStatusCodes.ACCEPTED
+                                );
+                            } else {
+                                this.objUserResponse = GetUserErrorObj('Server error: not able to setcookie', HttpStatusCodes.BAD_REQUEST);
+                            }
+                        } else {
+                            this.objUserResponse = GetUserErrorObj(getToken.error, HttpStatusCodes.BAD_REQUEST);
+                        }
+                    } else {
+                        this.objUserResponse = GetUserErrorObj(
+                            'You cannot use your guest account for login.',
+                            HttpStatusCodes.NOT_ACCEPTABLE
+                        );
+                    }
+                } else {
+                    this.objUserResponse = GetUserErrorObj('Invalid Credentials. Enter correct password', HttpStatusCodes.NOT_ACCEPTABLE);
+                }
+            } else {
+                this.objUserResponse = GetUserErrorObj('No User has been found. Create new account.', HttpStatusCodes.NOT_FOUND);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
     };
 }

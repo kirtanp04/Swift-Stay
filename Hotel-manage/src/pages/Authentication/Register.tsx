@@ -15,6 +15,7 @@ import FormTextFiels from "src/components/Form/FormTextField";
 import Page from "src/components/Page";
 import * as yup from "yup";
 import { Auth, _Register } from "./AuthMgr";
+import { GoogleLogin } from "@react-oauth/google";
 
 const registerSchema = yup.object().shape({
   _id: yup.string(),
@@ -88,7 +89,6 @@ export default function Register() {
                   type="email"
                 />
               </InputWrapper>
-
               <InputWrapper>
                 <FormTextFiels
                   name="password"
@@ -111,6 +111,7 @@ export default function Register() {
                 variant="outlined"
                 type="number"
               />
+              ;
             </FieldWrapper>
           </DialogContent>
           <Divider orientation="horizontal" flexItem />
@@ -143,7 +144,7 @@ const InputWrapper = styled(Box)(({ theme }) => ({
   alignItems: "center",
 
   gap: "1rem",
-  [theme.breakpoints.down("md")]: {
+  [theme.breakpoints.down("sm")]: {
     flexDirection: "column",
   },
 }));

@@ -11,7 +11,7 @@ const Loadable = (Component: ElementType) => (props: any) => {
   );
 };
 
-// const Login = Loadable(lazy(() => import("src/pages/Authentication/Login")));
+const Login = Loadable(lazy(() => import("src/pages/Authentication/Login")));
 const SignUp = Loadable(
   lazy(() => import("src/pages/Authentication/Register"))
 );
@@ -20,8 +20,10 @@ export default function Router() {
   return useRoutes([
     {
       path: "/",
-      element: <SignUp />,
+      element: <Outlet />,
       children: [
+        { path: "/", element: <Login />, index: true },
+        { path: "register", element: <SignUp /> },
         { path: "about-us", element: <>About</> },
         { path: "contact-us", element: <>About</> },
       ],

@@ -1,72 +1,91 @@
-import { Box, Typography, styled } from "@mui/material";
-import { useState } from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  styled,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 import FormProvider from "src/components/Form/FormProvider";
+import FormTextFiels from "src/components/Form/FormTextField";
 import Page from "src/components/Page";
-import { _Login } from "./AuthMgr";
+import * as yup from "yup";
+import { Auth, _Login } from "./AuthMgr";
+
+const loginSchema = yup.object().shape({
+  email: yup
+    .string()
+    .email("Email must be a valid email")
+    .required("Email is required"),
+  password: yup.string().required("Password is required"),
+});
 
 export default function Login() {
-  const [useName, setUseName] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const _Method = useForm({});
-
-  const Send = () => {};
-
+  const _Method = useForm<_Login>({
+    defaultValues: new _Login(),
+    resolver: yupResolver(loginSchema) as any,
+  });
   const { handleSubmit } = _Method;
+
+  const onLogin = async (objLogin: _Login) => {
+    await Auth.Login(
+      objLogin,
+      (res) => {
+        console.log(res);
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
+  };
   return (
     <Page title="Login">
-      <RootStyle>
-        <Wrapper>
-          <Heading>Sign in to your account.</Heading>
-          <FieldWrapper>
-            {/* <FormProvider methods={_Method} onSubmit={handleSubmit(() => {})}>
-              kp
-            </FormProvider> */}
-            <input
-              type="text"
-              value={useName}
-              onChange={(e) => setUseName(e.target.value)}
-            />
-            <input
-              type="text"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button onClick={Send} style={{ width: 50, height: 20 }}></button>
-          </FieldWrapper>
-        </Wrapper>
-      </RootStyle>
+      <Dialog open={true} maxWidth="xs" fullWidth>
+        <DialogTitle> Login</DialogTitle>
+        <Divider orientation="horizontal" flexItem sx={{ mt: 2 }} />
+        <FormProvider
+          methods={_Method}
+          onSubmit={handleSubmit(onLogin)}
+          sx={{ height: "100%", width: "100%" }}
+        >
+          <DialogContent>
+            <FieldWrapper>
+              <InputWrapper>
+                <FormTextFiels
+                  name="email"
+                  label="Email"
+                  fullWidth
+                  variant="outlined"
+                  type="email"
+                />
+              </InputWrapper>
+
+              <InputWrapper>
+                <FormTextFiels
+                  name="password"
+                  label="Password"
+                  fullWidth
+                  variant="outlined"
+                  type="password"
+                />
+              </InputWrapper>
+            </FieldWrapper>
+          </DialogContent>
+          <Divider orientation="horizontal" flexItem />
+          <DialogActions>
+            <Button variant="outlined" type="submit">
+              Login
+            </Button>
+          </DialogActions>
+        </FormProvider>
+      </Dialog>
     </Page>
   );
 }
-
-const RootStyle = styled(Box)(() => ({
-  height: "100%",
-  width: "100%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "red",
-  zIndex: 20000,
-}));
-
-const Wrapper = styled(Box)(({ theme }) => ({
-  height: 500,
-  width: 500,
-  borderRadius: "2rem",
-  border: `1px solid ${theme.palette.divider}`,
-  display: "flex",
-  alignItems: "center",
-  flexDirection: "column",
-  backgroundColor: theme.palette.background.paper,
-  padding: "1rem",
-}));
-
-const Heading = styled(Typography)(({ theme }) => ({
-  textAlign: "start",
-  fontSize: "1.5rem",
-  color: theme.palette.text.primary,
-}));
 
 const FieldWrapper = styled(Box)(() => ({
   width: "100%",
@@ -74,6 +93,18 @@ const FieldWrapper = styled(Box)(() => ({
   display: "flex",
   alignItems: "center",
   flexDirection: "column",
-  marginTop: "1rem",
+  marginTop: "0.5rem",
   gap: "0.5rem",
+  height: "100%",
+}));
+
+const InputWrapper = styled(Box)(({ theme }) => ({
+  width: "100%",
+  display: "flex",
+  alignItems: "center",
+
+  gap: "1rem",
+  [theme.breakpoints.down("sm")]: {
+    flexDirection: "column",
+  },
 }));
