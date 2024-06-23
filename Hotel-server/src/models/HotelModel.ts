@@ -2,6 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 export class HotelClass {
     _id: string = '';
+    adminID: any = '';
     name: string = '';
     address: string = '';
     city: string = '';
@@ -17,6 +18,7 @@ export class HotelClass {
 }
 
 const HotelSchema = new Schema<HotelClass>({
+    adminID: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: [true, 'Hotel name is required.'] },
     address: { type: String, required: [true, 'Hotel address is required.'] },
     city: { type: String, required: [true, 'city is required.'] },

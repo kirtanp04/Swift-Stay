@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosCall = axios.create({
-    baseURL: "http://localhost:4500/swiftstay/guest/api/",
+    baseURL: "http://localhost:8080/swiftstay/guest/api/",
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json;charset=UTF-8',

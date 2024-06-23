@@ -1,153 +1,117 @@
 import Cryptr from 'cryptr';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
 import { SecrtKey } from '../env';
-import { Convert } from './Convert';
+
+import * as CryptoTS from 'crypto-ts';
 import { ProjectResponse, errorPath } from './Response';
+import { Convert } from './Convert';
+// import { logEntry } from 'src/logging/logger';
 
 export class Crypt {
+    private static key = CryptoTS.enc.Utf8.parse('knjbvuigbuvhuy84578953686578ty78');
 
-    private static _cryptr = new Cryptr('knjbvuigbuvhuy84578953686578ty78', {
-        saltLength: 10,
-        encoding: 'base64',
-    });
+    private static Iv = CryptoTS.enc.Utf8.parse('knjbvuigbuvhuy84578953686578ty78');
 
-
-    static Encryption(value: any): ProjectResponse {
-
-        let _res: ProjectResponse = new ProjectResponse();
-
+    static Decryption(value: string): ProjectResponse {
+        let _res = new ProjectResponse();
         try {
-            let StringData: ProjectResponse = new ProjectResponse()
-            if (isTypeString(value)) {
+            const encryptedString = atob(value);
 
-                StringData.data = value
+            const decrypted = CryptoTS.AES.decrypt(encryptedString, Crypt.key, {
+                iv: Crypt.Iv,
+                mode: CryptoTS.mode.CBC,
+                padding: CryptoTS.pad.PKCS7,
+            });
 
-            } else {
-                StringData = Convert.toString(value);
-            }
-
-            if (StringData.error === '') {
-
-
-                const EncryptedData: string = this._cryptr.encrypt(StringData.data);
-
-                if (EncryptedData) {
-                    _res.data = EncryptedData;
+            const decryptedData = decrypted.toString(CryptoTS.enc.Utf8);
+            if (decryptedData) {
+                const parseObj = Convert.toParse(decryptedData);
+                if (parseObj.error === '') {
+                    _res.data = parseObj.data;
                 } else {
-                    _res.error = 'Server Error: Not able to encrypt data';
+                    _res.error = parseObj.error;
                 }
-
-
             } else {
-                _res.error = errorPath('common/Crypt', 'Encryption', 32) + StringData.error;
+                _res.error = errorPath('common/Crypt', 'Decryption', 35) + 'Not able to decrypt the data';
             }
         } catch (error: any) {
-            _res.error = errorPath('common/Crypt', 'Encryption', 35) + error;
+            _res.error = errorPath('common/Crypt', 'Decryption', 38) + error.message;
         } finally {
             return _res;
         }
     }
 
-    static Decryption(encryptedValue: string): ProjectResponse {
-        let _res: ProjectResponse = new ProjectResponse();
-
+    static Encryption(value: any): ProjectResponse {
+        let _res = new ProjectResponse();
         try {
-            const DecryptedData: any = this._cryptr.decrypt(encryptedValue);
+            const objString = Convert.toString(value);
 
-            if (DecryptedData) {
+            if (objString.error === '') {
+                const utf8String = CryptoTS.enc.Utf8.parse(objString.data);
 
-                const parseObj = Convert.toParse(DecryptedData)
+                const encrypted = CryptoTS.AES.encrypt(utf8String, Crypt.key, {
+                    iv: Crypt.Iv,
+                    mode: CryptoTS.mode.CBC,
+                    padding: CryptoTS.pad.PKCS7,
+                });
 
-                if (parseObj.error === '') {
-
-                    _res.data = parseObj.data;
-
+                const encryptedData = btoa(encrypted.toString());
+                if (encryptedData) {
+                    _res.data = encryptedData;
                 } else {
-
-                    _res.error = errorPath('common/Crypt', 'Decryption', 56) + parseObj.error
+                    _res.error = errorPath('common/Crypt', 'Decryption', 62) + 'Not able to encrypt the data';
                 }
-
-
             } else {
-                _res.error = 'Server Error: Not able to decrypt data';
+                _res.error = objString.error;
             }
         } catch (error: any) {
-            _res.error = errorPath('common/Crypt', 'Decryption', 55) + error;
+            _res.error = errorPath('common/Crypt', 'Decryption', 68) + error.message;
         } finally {
             return _res;
         }
     }
 
     static async hashValue(value: any): Promise<ProjectResponse> {
-
         let _res: ProjectResponse = new ProjectResponse();
 
         try {
-            // let StringData: ProjectResponse = new ProjectResponse()
-            // if (isTypeString(value)) {
+            const hashData = await bcrypt.hash(value, 10);
 
-            //     StringData.data = value
-
-            // } else {
-            //     StringData = Convert.toString(value);
-            // }
-
-            // if (StringData.error === '') {
-
-            await bcrypt.hash(value, 10, (err, hash) => {
-                if (err) {
-                    _res.error = errorPath('common/Crypt', 'hashValue', 99) + err
-                } else {
-                    _res.data = hash
-                }
-            })
-
-
-            // } else {
-            //     _res.error = errorPath('common/Crypt', 'hashValue', 107) + StringData.error;
-            // }
+            if (hashData) {
+                _res.data = hashData;
+            } else {
+                _res.error = errorPath('common/Crypt', 'hashValue', 83) + 'Not able to hash data';
+            }
         } catch (error: any) {
-            _res.error = errorPath('common/Crypt', 'hashValue', 110) + error;
+            _res.error = errorPath('common/Crypt', 'hashValue', 86) + error;
         } finally {
             return _res;
         }
     }
 
     static async compareHash(hashValue: string, originalValue: any): Promise<ProjectResponse> {
-
         let _res: ProjectResponse = new ProjectResponse();
 
         try {
+            const isSuccess = await bcrypt.compare(originalValue, hashValue);
 
-
-            await bcrypt.compare(originalValue, hashValue, (err, hash) => {
-                if (err) {
-                    _res.error = errorPath('common/Crypt', 'compareHash', 134) + err
-                } else {
-                    _res.data = 'Success: compare HashValue'
-                }
-            })
-
-
-
+            if (isSuccess) {
+                _res.data = isSuccess;
+            } else {
+                _res.error = errorPath('common/Crypt', 'compareHash', 101) + 'Hash value did not match';
+            }
         } catch (error: any) {
-            _res.error = errorPath('common/Crypt', 'compareHash', 145) + error;
+            _res.error = errorPath('common/Crypt', 'compareHash', 104) + error;
         } finally {
             return _res;
         }
     }
 }
 
-
-
-
-
 export function isTypeString(value: unknown): boolean {
-
     if (typeof value === 'string') {
-        return true
+        return true;
     } else {
-        return false
+        return false;
     }
-
 }

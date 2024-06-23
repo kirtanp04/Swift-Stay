@@ -10,13 +10,7 @@ export default function Login() {
   const [password, setPassword] = useState<string>("");
   const _Method = useForm({});
 
-  const Send = () => {
-    _Login.LoginUser(
-      { email: useName, password: password },
-      (res) => {},
-      (err) => {}
-    );
-  };
+  const Send = () => {};
 
   const { handleSubmit } = _Method;
   return (

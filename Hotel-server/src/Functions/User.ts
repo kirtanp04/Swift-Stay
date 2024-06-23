@@ -2,48 +2,50 @@ import { NextFunction, Request, Response } from 'express';
 import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Response';
 import { TParam } from '../types/Type';
 import { Crypt, HttpStatusCodes } from '../common';
-import { User, UserClass } from '../Models/UserModel';
+import { Login, User, UserClass } from '../models/UserModel';
+
+const _CreateGuestAccount: string = 'CreateGuestAccount';
+
+const _CreateManagerAccount: string = 'CreateManagerAccount';
+
+const _GuestLogin: string = 'GuestLogin';
+
+const _ManagerLogin: string = 'ManagerLogin';
 
 export class UserFunction {
-    protected _CreateUser: string = 'CreateUser';
+    private static objUserResponse: UserResponse = new UserResponse();
 
-    protected _UserLogin: string = 'UserLogin';
-
-    // ----------------------------------------------------------------
-    protected req: Request | undefined = undefined;
-
-    protected res: Response | undefined = undefined;
-
-    protected next: NextFunction | undefined = undefined;
-
-    // ----------------------------------------------------------------
-
-    objUserResponse: UserResponse = new UserResponse();
-
-    constructor(paramObj: TParam, req: Request, res: Response, next: NextFunction) {
-        this.req = req;
-
-        this.res = res;
-
-        this.next = next;
-
-        if (paramObj.function === this._CreateUser) {
-            this.CreateUser();
+    static findFunction = async (objParam: TParam, req: Request, res: Response, next: NextFunction): Promise<UserResponse> => {
+        if (objParam.function === _CreateManagerAccount) {
+            const _res = await Functions.CreateManagerAccount(req, res, next, objParam);
+            this.objUserResponse = _res;
+        } else if (objParam.function === _CreateGuestAccount) {
+            const _res = await Functions.CreateGuestAccount(req, res, next, objParam);
+            this.objUserResponse = _res;
+        } else {
+            this.objUserResponse = GetUserErrorObj('Server error: Wrong Function.', HttpStatusCodes.BAD_REQUEST);
         }
 
-        if (paramObj.function === this._UserLogin) {
-            this.UserLogin();
-        }
-    }
+        return this.objUserResponse;
+    };
+}
 
-    protected async CreateUser() {
-        const { createdAt, email, name, password, phone, profileImg, role } = this.req?.body as UserClass;
+class Functions {
+    private static objUserResponse: UserResponse = new UserResponse();
+
+    static CreateGuestAccount = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        objParam: TParam
+    ): Promise<UserResponse> => {
+        const { createdAt, email, name, password, phone, profileImg, role } = objParam.data as UserClass;
 
         try {
             const isUser = await User.findOne({ email: email });
 
             if (isUser) {
-                this.objUserResponse = GetUserErrorObj('User already exist. Enter another user name.', 403);
+                this.objUserResponse = GetUserErrorObj('Email ID already exist. Enter another Email ID.', HttpStatusCodes.BAD_REQUEST);
             } else {
                 const objHashPass = await Crypt.hashValue(password);
 
@@ -65,8 +67,91 @@ export class UserFunction {
                 }
             }
         } catch (error: any) {
-            this.objUserResponse = GetUserErrorObj(error, HttpStatusCodes.BAD_REQUEST);
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
         }
-    }
-    protected async UserLogin() { }
+    };
+
+    static GuestLogin = async (req: Request, res: Response, next: NextFunction, objParam: TParam): Promise<UserResponse> => {
+        const { email, password } = req.body as Login;
+
+        try {
+            const isUser = await User.findOne({ email: email });
+
+            if (!isUser) {
+                this.objUserResponse = GetUserErrorObj('User not found, try to login with another Email ID.', HttpStatusCodes.NOT_FOUND);
+            } else {
+                const isVerifiedPassword = await Crypt.compareHash(isUser.password, password);
+
+                if (isVerifiedPassword) {
+                    if (isUser.role === 'admin') {
+                        this.objUserResponse = GetUserErrorObj(
+                            'You cannot login through your admin account. Use your guest account.',
+                            HttpStatusCodes.NOT_ACCEPTABLE
+                        );
+                    } else {
+                        this.objUserResponse = GetUserSuccessObj('login: Success');
+                    }
+                } else {
+                    this.objUserResponse = GetUserErrorObj('Wrong credentials, enter correct password.', HttpStatusCodes.NOT_ACCEPTABLE);
+                }
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    static CreateManagerAccount = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+        objParam: TParam
+    ): Promise<UserResponse> => {
+        try {
+            const { createdAt, email, name, password, phone, profileImg, role } = objParam.data as UserClass;
+
+            const isUser = await User.findOne({ email: email });
+
+            if (isUser) {
+                if (isUser.role === 'guest') {
+                    this.objUserResponse = GetUserErrorObj(
+                        'You cannot use Email ID which is already been registerd in Guest account. Enter another Email ID.',
+                        HttpStatusCodes.BAD_REQUEST
+                    );
+                } else {
+                    this.objUserResponse = GetUserErrorObj('Email ID already exist. Enter another Email ID.', HttpStatusCodes.BAD_REQUEST);
+                }
+            } else {
+                const objHashPass = await Crypt.hashValue(password);
+
+                if (objHashPass.error !== '') {
+                    this.objUserResponse = GetUserErrorObj(objHashPass.error, HttpStatusCodes.BAD_REQUEST);
+                } else {
+                    const newUser = await User.create({
+                        name,
+                        email,
+                        password: objHashPass.data,
+                        profileImg,
+                        phone,
+                        role,
+                        createdAt,
+                    });
+                    newUser.save();
+
+                    this.objUserResponse = GetUserSuccessObj('User has been created', HttpStatusCodes.CREATED);
+                }
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    static ManagerLogin = async (req: Request, res: Response, next: NextFunction, objParam: TParam): Promise<UserResponse> => {
+        return this.objUserResponse;
+    };
 }

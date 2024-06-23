@@ -1,96 +1,106 @@
 import axiosCall from "src/service/axios";
-import { ProjectResponse } from "./Response";
 import { Crypt } from "./Crypt";
-import { Jwt } from "./JWT";
-
+import { ProjectResponse } from "./Response";
 
 export class TParam {
-    Broker: string = ''
+  Broker: string = "";
 
-    function: string = ''
+  function: string = "";
 
-    data: any
+  data: any = "";
 }
 
+export const getPostParamData = (
+  _BrokerName: string,
+  _functionName: string
+): TParam => {
+  let _postParam = new TParam();
+  _postParam.Broker = _BrokerName;
+  _postParam.function = _functionName;
+  return _postParam;
+};
 
 export class Api {
+  static async get(_Param: TParam): Promise<ProjectResponse> {
+    let _res = new ProjectResponse();
+    try {
+      const encryptData = Crypt.Encryption(_Param);
 
-    static async get(_Param: TParam): Promise<ProjectResponse> {
-        let _res = new ProjectResponse()
-        try {
-            debugger
+      if (encryptData.error === "") {
+        const response = await axiosCall.get(encryptData.data);
+        // console.log(response)
+      } else {
+        _res.error = encryptData.error;
+      }
+    } catch (error: any) {
+      _res.error = error.message;
+    } finally {
+      return _res;
+    }
+  }
+  static async post(_Param: TParam, data: any): Promise<ProjectResponse> {
+    let _res = new ProjectResponse();
 
-            const _objEncrypt = Jwt.SignJwt(_Param)
+    try {
+      let newParam = new TParam();
+      newParam.Broker = _Param.Broker;
+      newParam.function = _Param.function;
+      const encryptParamData = Crypt.Encryption(newParam);
 
-            if (_objEncrypt.error === '') {
+      if (encryptParamData.error === "") {
+        const encryptedData = Crypt.Encryption(data);
 
-                const response = await axiosCall.get(_objEncrypt.data)
-                console.log(response)
-
+        if (encryptedData.error === "") {
+          const response = await axiosCall.post(encryptParamData.data, {
+            data: encryptedData.data,
+          });
+          if (response) {
+            const objDecryptRes = Crypt.Decryption(response.data);
+            if (objDecryptRes.data.isError === false) {
+              _res.data = objDecryptRes.data.data;
             } else {
-                _res.error = _objEncrypt.error
+              _res.error = objDecryptRes.data.Message;
             }
-
-        } catch (error) {
-
-            _res.error = error
-
-        } finally {
-            return _res
+          } else {
+            _res.error = "Getting response Undefine";
+          }
+        } else {
+          _res.error = encryptedData.error;
         }
+      } else {
+        _res.error = encryptParamData.error;
+      }
+    } catch (error: any) {
+      const objDecrypterr = Crypt.Decryption(error.response.data);
+      if (objDecrypterr.error === "") {
+        _res.error = objDecrypterr.data.Message;
+      } else {
+        _res.error = "Not able to decrypt api error";
+      }
+    } finally {
+      return _res;
     }
-    static async post(_Param: TParam, data: any): Promise<ProjectResponse> {
-        let _res = new ProjectResponse()
+  }
 
-        try {
-            const _objEncrypt = Crypt.Encryption(_Param)
-            if (_objEncrypt.error === '') {
+  static async protectedGet(_Param: TParam): Promise<ProjectResponse> {
+    let _res = new ProjectResponse();
 
-                const response = await axiosCall.post(_objEncrypt.data, { data })
-                console.log(response)
-
-            } else {
-                _res.error = _objEncrypt.error
-            }
-
-        } catch (error) {
-
-            _res.error = error
-
-        } finally {
-            return _res
-        }
+    try {
+    } catch (error) {
+      _res.error = error;
+    } finally {
+      return _res;
     }
+  }
 
-    static async protectedGet(_Param: TParam): Promise<ProjectResponse> {
-        let _res = new ProjectResponse()
+  static async protectedPost(_Param: TParam): Promise<ProjectResponse> {
+    let _res = new ProjectResponse();
 
-        try {
-
-
-
-        } catch (error) {
-
-            _res.error = error
-
-        } finally {
-            return _res
-        }
+    try {
+    } catch (error) {
+      _res.error = error;
+    } finally {
+      return _res;
     }
-
-    static async protectedPost(_Param: TParam): Promise<ProjectResponse> {
-        let _res = new ProjectResponse()
-
-        try {
-
-
-
-        } catch (error) {
-
-            _res.error = error
-
-        } finally {
-            return _res
-        }
-    }
+  }
 }

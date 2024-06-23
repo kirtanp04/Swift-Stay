@@ -1,5 +1,11 @@
 import mongoose, { Schema } from 'mongoose';
 
+export class Login {
+    email: string = "";
+
+    password: string = "";
+}
+
 export class UserClass {
     _id: string = '';
     name: string = '';

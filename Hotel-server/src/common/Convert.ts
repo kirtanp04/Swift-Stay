@@ -1,18 +1,25 @@
 import { ProjectResponse, errorPath } from './Response';
 
+// import { ProjectResponse } from "./Response";
+
 export class Convert {
     static toString = (value: any): ProjectResponse => {
         let _res: ProjectResponse = new ProjectResponse();
         try {
-            const stringData: string = JSON.stringify(value);
-
-            if (stringData) {
-                _res.data = stringData;
+            let StringData: ProjectResponse = new ProjectResponse();
+            if (isTypeString(value)) {
+                StringData.data = value;
             } else {
-                _res.error = 'Server Error: Error While Converting to String';
+                StringData.data = JSON.stringify(value);
+            }
+
+            if (StringData) {
+                _res.data = StringData.data;
+            } else {
+                _res.error = errorPath('common/Convert', 'toString', 19) + ' Error While Converting to String';
             }
         } catch (error: any) {
-            _res.error = errorPath('common/Convert', 'toString', 15) + error;
+            _res.error = errorPath('common/Convert', 'toString', 22) + error.message;
         } finally {
             return _res;
         }
@@ -21,17 +28,25 @@ export class Convert {
     static toParse = (value: string): ProjectResponse => {
         let _res: ProjectResponse = new ProjectResponse();
         try {
-            const parseData = JSON.parse(JSON.stringify(value));
+            const parseData = JSON.parse(value);
 
             if (parseData) {
                 _res.data = parseData;
             } else {
-                _res.error = 'Server Error: Not able to Parse Value';
+                _res.error = errorPath('common/Convert', 'toParse', 36) + ' Not able to Parse Value';
             }
         } catch (error: any) {
-            _res.error = errorPath('common/Convert', 'toParse', 32) + error;
+            _res.error = errorPath('common/Convert', 'toParse', 39) + error.message;
         } finally {
             return _res;
         }
     };
+}
+
+export function isTypeString(value: unknown): boolean {
+    if (typeof value === 'string') {
+        return true;
+    } else {
+        return false;
+    }
 }

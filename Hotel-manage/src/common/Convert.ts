@@ -28,7 +28,7 @@ export class Convert {
     static toParse = (value: string): ProjectResponse => {
         let _res: ProjectResponse = new ProjectResponse();
         try {
-            const parseData = JSON.parse(JSON.stringify(value));
+            const parseData = JSON.parse(value);
 
             if (parseData) {
                 _res.data = parseData;

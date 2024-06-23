@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosCall = axios.create({
-    baseURL: "http://localhost:4500/swiftstay/manage/api/",
+    baseURL: "http://localhost:8080/swiftstay/manager/api/",
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json;charset=UTF-8',
@@ -9,6 +9,7 @@ const axiosCall = axios.create({
     maxContentLength: 10000000,
     maxBodyLength: 10000000,
     timeout: 30000, // 30 seconds timeout
+    withCredentials: true
 });
 
 axiosCall.interceptors.response.use(

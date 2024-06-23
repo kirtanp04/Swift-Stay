@@ -17,7 +17,9 @@ GuestBrokerRouter.get('/:param', (req: Request, res: Response, next: NextFunctio
     console.log(param)
 
 
-    // const objDecrypt = Crypt.Decryption(param);
+    const objDecrypt = Crypt.Decryption(param);
+
+    console.log(objDecrypt)
     // const paramObj = objDecrypt.data as TParam;
 
     // if (paramObj.Broker === _GuestBroker) {
