@@ -13,7 +13,7 @@
 - **Protection**
 
   - cors
-  - cryptr -> for encrypt & decrypt
+  - crypto ts -> for encrypt & decrypt
   - dotenv
   - helmet -> for header protection
   - jsonwebtoken
@@ -36,12 +36,15 @@
 - React-router-dom
 - Material UI
 - axios
+- react-hook-form
+
+- **Validation**
+
+  - Yup
 
 - **Protection**
 
-  - cryptr -> for encrypt & decrypt
-  - item2
-  - item3
+  - crypto ts -> for encrypt & decrypt
 
 - **Scaling / optimization**
   - Lazy Load
