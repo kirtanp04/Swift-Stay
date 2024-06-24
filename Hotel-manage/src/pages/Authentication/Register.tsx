@@ -1,3 +1,4 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
   Button,
@@ -9,13 +10,11 @@ import {
   styled,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider from "src/components/Form/FormProvider";
 import FormTextFiels from "src/components/Form/FormTextField";
 import Page from "src/components/Page";
 import * as yup from "yup";
 import { Auth, _Register } from "./AuthMgr";
-import { GoogleLogin } from "@react-oauth/google";
 
 const registerSchema = yup.object().shape({
   _id: yup.string(),

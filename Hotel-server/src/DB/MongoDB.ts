@@ -5,7 +5,7 @@ export class MongoDB {
     static ConnectDB = async () => {
         let _userRes = new UserResponse();
         try {
-            await mongoose.connect(process.env.MNOGO_URL!).then(() => {
+            await mongoose.connect('mongodb+srv://kirtanp04:OyBd0kVg6JZxkvpy@hotelcluster.exs9nof.mongodb.net/Stay_Swift').then(() => {
                 _userRes.isError = false;
                 _userRes.data = 'Database Connection: Success';
             });

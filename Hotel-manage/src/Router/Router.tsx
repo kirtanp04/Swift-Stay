@@ -14,26 +14,13 @@ const Loadable = (Component: ElementType) => (props: any) => {
 };
 
 const Login = Loadable(lazy(() => import("src/pages/Authentication/Login")));
+const Layout = Loadable(lazy(() => import("src/layout/SideMenu")));
 const SignUp = Loadable(
   lazy(() => import("src/pages/Authentication/Register"))
 );
 
 export default function Router() {
   return useRoutes([
-    // {
-    //   path: "swiftstay",
-    //   element: (
-    //     <LoginGaurd>
-    //       <Login />
-    //     </LoginGaurd>
-    //   ),
-    //   children: [
-    //     { path: "register", element: <SignUp /> },
-    //     { path: "about-us", element: <>About</> },
-    //     { path: "contact-us", element: <>About</> },
-    //   ],
-    // },
-
     {
       path: "/",
       element: <Outlet />,
@@ -57,8 +44,7 @@ export default function Router() {
       path: "swiftstay",
       element: (
         <AuthGaurd>
-          {/* header */}
-          <Outlet />
+          <Layout />
         </AuthGaurd>
       ),
       children: [
