@@ -1,9 +1,7 @@
+import jwt from 'jsonwebtoken';
 import { SecrtKey } from '../env';
 import { Crypt } from './Crypt';
 import { ProjectResponse, errorPath } from './Response';
-import fs from 'fs'
-import path from 'path'
-import jwt from 'jsonwebtoken';
 
 
 // const privateKey = fs.readFileSync(path.join(__dirname, 'private_key.pem'), 'utf8');

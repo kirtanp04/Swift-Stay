@@ -5,6 +5,10 @@
       "import/resolver": {
         "node": {
           "paths": ["src"]
+        },
+        "typescript": {
+          "alwaysTryTypes": true,
+          "project": "./tsconfig.json"
         }
       }
     },
@@ -16,8 +20,9 @@
       {
         "files": ["*.ts"],
         "parserOptions": {
-          "project": ["tsconfig.json"],
-          "createDefaultProgram": true
+          "project": "./tsconfig.json",
+          "createDefaultProgram": true,
+          "sourceType": "module"
         },
         "extends": ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
         "rules": {

@@ -3,6 +3,8 @@ import { ProjectResponse } from "./Response";
 import { Convert } from "./Convert";
 // import { logEntry } from 'src/logging/logger';
 
+// const key = process.env.ENCRYPTION_KEY;
+
 export class Crypt {
     private static key = CryptoTS.enc.Utf8.parse(
         "knjbvuigbuvhuy84578953686578ty78"
@@ -15,7 +17,6 @@ export class Crypt {
     static Decryption(value: string): ProjectResponse {
         let _res = new ProjectResponse();
         try {
-            debugger
             const encryptedString = atob(value);
 
             const decrypted = CryptoTS.AES.decrypt(encryptedString, Crypt.key, {
@@ -41,7 +42,6 @@ export class Crypt {
             return _res;
         }
     }
-
 
     static Encryption(value: any): ProjectResponse {
         let _res = new ProjectResponse();
@@ -72,5 +72,4 @@ export class Crypt {
             return _res;
         }
     }
-
 }

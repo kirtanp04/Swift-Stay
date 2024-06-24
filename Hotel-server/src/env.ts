@@ -1,7 +1,7 @@
 export const SecrtKey = {
-    ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
+    ENCRYPTION_KEY: 'khlhkGJG6786Guy54^$65GVjhr67%$^&5jg76%^&$=0-89Jghujt75',
 
-    JWT_KEY: process.env.JWT_KEY,
+    JWT_KEY: 'khkhiJGHJIghjkgujg^$%^46Gcf54^&$^&456HJf675467$^&44fyh%6HFV',
 
     Environment: 'production',
 

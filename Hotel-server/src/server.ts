@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
-import 'dotenv/config';
+require('dotenv').config()
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import compression from 'compression'
@@ -27,6 +27,8 @@ export class _Express {
 
 
   middleware() {
+
+
 
     _app.use(cors({
       credentials: true,
@@ -56,16 +58,7 @@ export class _Express {
 
     _app.use(cookieParser())
 
-    _app.use(compression({
-      level: 9,
-      threshold: '10kb',
-      filter: (req: Request, res: Response) => {
-        if (req.headers['x-no-compression']) {
-          return false
-        }
-        return compression.filter(req, res)
-      }
-    }))
+
   }
 
   route() {

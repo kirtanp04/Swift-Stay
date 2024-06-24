@@ -1,6 +1,8 @@
 import { ElementType, Suspense, lazy } from "react";
 import { Navigate, Outlet, useRoutes } from "react-router-dom";
 import LoadingPage from "src/components/LoadingPage";
+import AuthGaurd from "src/guard/AuthGaurd";
+import LoginGaurd from "src/guard/LoginGaurd";
 // import LoadingPage from "../components/LoadingPage";
 
 const Loadable = (Component: ElementType) => (props: any) => {
@@ -18,28 +20,53 @@ const SignUp = Loadable(
 
 export default function Router() {
   return useRoutes([
+    // {
+    //   path: "swiftstay",
+    //   element: (
+    //     <LoginGaurd>
+    //       <Login />
+    //     </LoginGaurd>
+    //   ),
+    //   children: [
+    //     { path: "register", element: <SignUp /> },
+    //     { path: "about-us", element: <>About</> },
+    //     { path: "contact-us", element: <>About</> },
+    //   ],
+    // },
+
     {
       path: "/",
       element: <Outlet />,
       children: [
-        { path: "/", element: <Login />, index: true },
+        {
+          path: "",
+          element: (
+            <LoginGaurd>
+              <Login />
+            </LoginGaurd>
+          ),
+          index: true,
+        },
         { path: "register", element: <SignUp /> },
-        { path: "about-us", element: <>About</> },
-        { path: "contact-us", element: <>About</> },
+        { path: "about", element: <>About</> },
+        { path: "contact", element: <>About</> },
       ],
     },
 
     {
-      path: "k",
+      path: "swiftstay",
       element: (
-        <>
+        <AuthGaurd>
+          {/* header */}
           <Outlet />
-        </>
+        </AuthGaurd>
       ),
       children: [
-        { element: <Navigate to="k/index" replace />, index: true },
-        { path: "index", element: <>ab</> },
-        { path: "list", element: <>cg</> },
+        {
+          element: <Navigate to="/swiftstay/dashboard" replace />,
+          index: true,
+        },
+        { path: "dashboard", element: <>progress</> },
       ],
     },
   ]);

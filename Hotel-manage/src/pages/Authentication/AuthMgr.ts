@@ -19,7 +19,6 @@ export class _Register {
 }
 
 export class Auth {
-    static login = async () => { };
 
     public static Register = async (
         objRegister: _Register,

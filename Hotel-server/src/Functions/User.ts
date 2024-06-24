@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Response';
 import { TParam } from '../types/Type';
 import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
-import { Login, User, UserClass } from '../models/UserModel';
+import { Login, User, UserClass } from '../Models/UserModel';
 
 const _CreateGuestAccount: string = 'CreateGuestAccount';
 
@@ -24,6 +24,9 @@ export class UserFunction {
             this.objUserResponse = _res;
         } else if (objParam.function === _ManagerLogin) {
             const _res = await Functions.ManagerLogin(req, res, next, objParam);
+            this.objUserResponse = _res;
+        } else if (objParam.function === _GuestLogin) {
+            const _res = await Functions.GuestLogin(req, res, next, objParam);
             this.objUserResponse = _res;
         } else {
             this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
@@ -90,7 +93,7 @@ class Functions {
                 if (isVerifiedPassword) {
                     if (isUser.role === 'admin') {
                         this.objUserResponse = GetUserErrorObj(
-                            'You cannot login through your admin account. Use your guest account.',
+                            'You cannot login through your admin account. Use your guest account / Create new one.',
                             HttpStatusCodes.NOT_ACCEPTABLE
                         );
                     } else {

@@ -19,6 +19,17 @@ export const getPostParamData = (
   _postParam.function = _functionName;
   return _postParam;
 };
+export const getGETParamData = (
+  _BrokerName: string,
+  _functionName: string,
+  _data: any
+): TParam => {
+  let _getParam = new TParam();
+  _getParam.Broker = _BrokerName;
+  _getParam.function = _functionName;
+  _getParam.data = _data
+  return _getParam;
+};
 
 export class Api {
   static async get(_Param: TParam): Promise<ProjectResponse> {
@@ -28,12 +39,17 @@ export class Api {
 
       if (encryptData.error === "") {
         const response = await axiosCall.get(encryptData.data);
-        // console.log(response)
+        console.log(response)
       } else {
         _res.error = encryptData.error;
       }
     } catch (error: any) {
-      _res.error = error.message;
+      const objDecrypterr = Crypt.Decryption(error.response.data);
+      if (objDecrypterr.error === "") {
+        _res.error = objDecrypterr.data.Message;
+      } else {
+        _res.error = "Not able to decrypt api error";
+      }
     } finally {
       return _res;
     }
@@ -42,10 +58,7 @@ export class Api {
     let _res = new ProjectResponse();
 
     try {
-      let newParam = new TParam();
-      newParam.Broker = _Param.Broker;
-      newParam.function = _Param.function;
-      const encryptParamData = Crypt.Encryption(newParam);
+      const encryptParamData = Crypt.Encryption(_Param);
 
       if (encryptParamData.error === "") {
         const encryptedData = Crypt.Encryption(data);
@@ -86,8 +99,13 @@ export class Api {
     let _res = new ProjectResponse();
 
     try {
-    } catch (error) {
-      _res.error = error;
+    } catch (error: any) {
+      const objDecrypterr = Crypt.Decryption(error.response.data);
+      if (objDecrypterr.error === "") {
+        _res.error = objDecrypterr.data.Message;
+      } else {
+        _res.error = "Not able to decrypt api error";
+      }
     } finally {
       return _res;
     }
@@ -97,8 +115,13 @@ export class Api {
     let _res = new ProjectResponse();
 
     try {
-    } catch (error) {
-      _res.error = error;
+    } catch (error: any) {
+      const objDecrypterr = Crypt.Decryption(error.response.data);
+      if (objDecrypterr.error === "") {
+        _res.error = objDecrypterr.data.Message;
+      } else {
+        _res.error = "Not able to decrypt api error";
+      }
     } finally {
       return _res;
     }
