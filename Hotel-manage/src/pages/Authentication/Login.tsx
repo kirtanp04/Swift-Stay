@@ -10,14 +10,12 @@ import {
   styled,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
-import { Storage } from "src/common/Storage";
 import FormProvider from "src/components/Form/FormProvider";
 import FormTextFiels from "src/components/Form/FormTextField";
 import Page from "src/components/Page";
-import { TUser } from "src/context/AuthContex";
 import useAuth from "src/hooks/useAuth";
 import * as yup from "yup";
-import { Auth, _Login } from "./AuthMgr";
+import { _Login } from "./AuthMgr";
 
 const loginSchema = yup.object().shape({
   email: yup
@@ -33,24 +31,10 @@ export default function Login() {
     resolver: yupResolver(loginSchema) as any,
   });
   const { handleSubmit } = _Method;
-  const { UpdateUser } = useAuth();
+  const { LoginManager } = useAuth();
 
   const onLogin = async (objLogin: _Login) => {
-    await Auth.Login(
-      objLogin,
-      (res) => {
-        let _user = new TUser();
-        _user.email = res.email;
-        _user.name = res.name;
-        _user.profileImg = res.profile;
-        Storage.setToSessionStorage("Auth", _user);
-        UpdateUser("userInfo", _user);
-        UpdateUser("isAuthenticated", true);
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
+    await LoginManager(objLogin);
   };
   return (
     <Page title="Login">

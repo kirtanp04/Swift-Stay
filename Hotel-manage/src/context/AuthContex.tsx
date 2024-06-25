@@ -1,9 +1,34 @@
+import { useTheme } from "@mui/material";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { Storage } from "src/common/Storage";
+import { Auth, _Login } from "src/pages/Authentication/AuthMgr";
+import showMessage from "src/util/ShowMessage";
+import { StoreError } from "src/util/StoreError";
 
 type Props = {
   children: ReactNode;
 };
+
+// enum Types {
+//   Processing = "PROCESSING",
+//   Login = "LOGIN",
+//   Logout = "LOGOUT",
+//   Register = "REGISTER",
+// }
+
+// type Payload = {
+//   [Types.Processing]: {
+//     isAuthenticated: boolean;
+//     user: TUser;
+//   };
+//   [Types.Login]: {
+//     user: TUser;
+//   };
+//   [Types.Logout]: undefined;
+//   [Types.Register]: {
+//     user: TUser;
+//   };
+// };
 
 export class TUser {
   email: string = "";
@@ -22,15 +47,19 @@ export class TAuth {
 type _TUser = {
   user: TAuth;
   UpdateUser: <K extends keyof TAuth>(propertyName: K, value: TAuth[K]) => void;
+  LoginManager: (objLoginDetail: _Login) => void;
 };
 
 const CreateAuthContext = createContext<_TUser>({
   user: new TAuth(),
   UpdateUser: () => null,
+  LoginManager: () => null,
 });
 
 function AuthContexProvider({ children }: Props) {
   const [user, setUser] = useState<TAuth>(new TAuth());
+  const theme = useTheme();
+  // const [state, dispatch] = useReducer(UserReducer, initialState);
 
   useEffect(() => {
     const Authdata = Storage.getFromSessionStorage("Auth");
@@ -55,12 +84,29 @@ function AuthContexProvider({ children }: Props) {
     setUser({ ...user, [propertyName]: value });
   };
 
-  //   const ManageAuthUser = () => {};
+  const LoginManager = async (objLogindetail: _Login): Promise<void> => {
+    await Auth.Login(
+      objLogindetail,
+      (res) => {
+        let _user = new TUser();
+        _user.email = res.email;
+        _user.name = res.name;
+        _user.profileImg = res.profile;
+        UpdateUser("userInfo", _user);
+        UpdateUser("isAuthenticated", true);
+        Storage.setToSessionStorage("Auth", _user);
+      },
+      (err) => {
+        StoreError("login", err);
+        showMessage(err, theme, () => {});
+      }
+    );
+  };
   return (
-    <CreateAuthContext.Provider value={{ user, UpdateUser }}>
+    <CreateAuthContext.Provider value={{ user, UpdateUser, LoginManager }}>
       {children}
     </CreateAuthContext.Provider>
   );
 }
 
-export { CreateAuthContext, AuthContexProvider };
+export { AuthContexProvider, CreateAuthContext };

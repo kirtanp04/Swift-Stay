@@ -30,7 +30,6 @@ export default function Page({ title, description, children }: Props) {
 }
 
 const RootStyle = styled(Box)(() => ({
-  // height: "100vh",
   width: "100%",
   display: "flex",
   flexDirection: "column",

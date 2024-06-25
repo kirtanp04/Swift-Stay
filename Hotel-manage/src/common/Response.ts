@@ -21,11 +21,11 @@ export class UserResponse {
 
 
 
-export const errorPath = (fileName: string, functionName: string, lineNumber: number): string => {
-    let _errorPath: string
-    _errorPath = `Server Error: File name: ${fileName}  / Function: ${functionName} / Line: ${lineNumber} `
-    return _errorPath
-}
+// export const errorPath = (fileName: string, functionName: string, lineNumber: number): string => {
+//     let _errorPath: string
+//     _errorPath = `Server Error: File name: ${fileName}  / Function: ${functionName} / Line: ${lineNumber} `
+//     return _errorPath
+// }
 
 // export const GetUserErrorObj = (errMess: string, statusCode?: number): UserResponse => {
 
