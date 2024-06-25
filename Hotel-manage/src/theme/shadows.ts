@@ -29,9 +29,11 @@ interface CustomShadowOptions {
 declare module '@mui/material/styles' {
   interface Theme {
     customShadows: CustomShadowOptions;
+    themeColor: string
   }
   interface ThemeOptions {
     customShadows?: CustomShadowOptions;
+    themeColor: string
   }
 }
 

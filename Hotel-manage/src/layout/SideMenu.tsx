@@ -34,6 +34,7 @@ const SideMenuWrapper = styled(Box)(({ theme }) => ({
   padding: "0.7rem 1rem",
   borderRadius: "20px",
   backgroundColor: theme.palette.background.neutral,
+  border: `1px solid ${theme.palette.text.secondary}`,
 }));
 
 const OutletWrapper = styled(Box)(({ theme }) => ({
@@ -44,4 +45,5 @@ const OutletWrapper = styled(Box)(({ theme }) => ({
   width: "100%",
   padding: "0.7rem 1.2rem",
   borderRadius: "20px",
+  border: `1px solid ${theme.palette.text.secondary}`,
 }));

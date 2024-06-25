@@ -14,18 +14,18 @@ export default function Page({ title, description, children }: Props) {
   const _description: string = description || descriptionContent;
   const { pathname } = useLocation();
   return (
-    <main>
-      <RootStyle>
-        <Helmet>
-          <meta charSet="utf-8" />
-          <title>{title} | Swift Stay</title>
-          <link rel="canonical" href={pathname} />
-          <meta name="description" content={_description} />
-        </Helmet>
+    // <main>
+    <RootStyle>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>{title} | Swift Stay</title>
+        <link rel="canonical" href={pathname} />
+        <meta name="description" content={_description} />
+      </Helmet>
 
-        {children}
-      </RootStyle>
-    </main>
+      {children}
+    </RootStyle>
+    // </main>
   );
 }
 
@@ -34,4 +34,6 @@ const RootStyle = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
+  height: "100%",
+  // padding: "1rem",
 }));

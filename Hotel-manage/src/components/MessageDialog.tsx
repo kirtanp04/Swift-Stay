@@ -21,7 +21,7 @@ const MessageDialog = ({
 }: MessageDialogProps) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogContent sx={{ maxHeight: 600, height: "auto", minHeight: 200 }}>
+      <DialogContent sx={{ maxHeight: 600, height: "auto", minHeight: 80 }}>
         <Scrollbar sx={{ height: "100%" }}>
           <DialogContentText>{message}</DialogContentText>
         </Scrollbar>

@@ -1,6 +1,6 @@
 
 
-export const Path = {
+export const CommonPath = {
     login: '/',
     signUp: '/register',
     aboutus: '/about',
@@ -8,6 +8,19 @@ export const Path = {
 }
 
 const rootPath = '/swiftstay'
-export const DashboardPath = {
-    root: rootPath + '/dashboard'
+
+export const Path = {
+    dashboard: rootPath + '/dashboard',
+    hotel: {
+        root: rootPath + '/hotels',
+    },
+    room: {
+        root: rootPath + '/rooms'
+    },
+    booking: {
+        root: rootPath + '/bookings'
+    },
+    review: {
+        root: rootPath + '/reviews'
+    },
 }

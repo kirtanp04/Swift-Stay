@@ -29,6 +29,7 @@ export default function ThemeProvider({ children }: Props) {
     () => ({
       palette: mode === "light" ? palette.light : palette.dark,
       // typography,
+      themeColor: "red",
       breakpoints,
       shape: { borderRadius: 8 },
       shadows: mode === "light" ? shadows.light : shadows.dark,

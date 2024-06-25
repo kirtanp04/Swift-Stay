@@ -6,9 +6,12 @@ import {
   styled,
   useTheme,
 } from "@mui/material";
+import { NavLink } from "react-router-dom";
+import { Path } from "src/Router/path";
 import { TMenuList } from "src/Types";
 import {
   BookingIcon,
+  ChatIcon,
   GraphIcon,
   HotelIcon,
   LogoutIcon,
@@ -24,6 +27,76 @@ type Props = {};
 export default function SideMenuContent({}: Props) {
   const { user } = useAuth();
   const theme = useTheme();
+
+  const MenuList: TMenuList[] = [
+    {
+      name: "Dashboard",
+      icon: (
+        <GraphIcon
+          height={25}
+          width={25}
+          IconColor={theme.palette.text.primary}
+        />
+      ),
+      path: Path.dashboard,
+    },
+    {
+      name: "Hotels",
+      icon: (
+        <HotelIcon
+          height={25}
+          width={25}
+          IconColor={theme.palette.text.primary}
+        />
+      ),
+      path: Path.hotel.root,
+    },
+    {
+      name: "Rooms",
+      icon: (
+        <RoomIcon
+          height={25}
+          width={25}
+          IconColor={theme.palette.text.primary}
+        />
+      ),
+      path: Path.room.root,
+    },
+    {
+      name: "Bookings",
+      icon: (
+        <BookingIcon
+          height={25}
+          width={25}
+          IconColor={theme.palette.text.primary}
+        />
+      ),
+      path: Path.booking.root,
+    },
+    {
+      name: "Reviews",
+      icon: (
+        <ReviewIcon
+          height={25}
+          width={25}
+          IconColor={theme.palette.text.primary}
+        />
+      ),
+      path: Path.review.root,
+    },
+    {
+      name: "Chats",
+      icon: (
+        <ChatIcon
+          height={25}
+          width={25}
+          IconColor={theme.palette.text.primary}
+        />
+      ),
+      path: "/",
+    },
+  ];
+
   return (
     <RootStyle>
       <UserDetailWrapper>
@@ -34,20 +107,32 @@ export default function SideMenuContent({}: Props) {
         </UserContentWrapper>
       </UserDetailWrapper>
       <ListWrapper>
+        {/* <Divider flexItem /> */}
         <ScrollBar sx={{ height: "100%", width: "100%" }}>
           <EList>
             {MenuList.map((objListItem, index) => (
-              <ListItemWrapper
-                key={index}
-                sx={{
-                  "&:hover": {
-                    background: theme.palette.background.neutral,
-                  },
-                }}
-              >
-                {objListItem.icon}
-                <ListText>{objListItem.name}</ListText>
-              </ListItemWrapper>
+              <NavLink to={objListItem.path} style={{ textDecoration: "none" }}>
+                {({ isActive }) => (
+                  <ListItemWrapper
+                    key={index}
+                    sx={{
+                      "&:hover": {
+                        background: theme.palette.background.neutral,
+                      },
+                      background: isActive
+                        ? theme.palette.background.default
+                        : "transparent",
+                      border: isActive
+                        ? `1px solid ${theme.palette.text.secondary}`
+                        : "0px solid transparent",
+                    }}
+                    //   onClick={() => navigate(objListItem.path)}
+                  >
+                    {objListItem.icon}
+                    <ListText>{objListItem.name}</ListText>
+                  </ListItemWrapper>
+                )}
+              </NavLink>
             ))}
           </EList>
         </ScrollBar>
@@ -78,6 +163,7 @@ const UserDetailWrapper = styled(Box)(({ theme }) => ({
   borderRadius: "10px",
   backgroundColor: theme.palette.background.default,
   overflowY: "hidden",
+  border: `1px solid ${theme.palette.text.secondary}`,
 }));
 
 const UserContentWrapper = styled(Box)(() => ({
@@ -120,7 +206,6 @@ const EList = styled(List)(() => ({
   justifyContent: "center",
   width: "100%",
   gap: "0.9rem",
-  // alignItems: "center",
 }));
 
 const ListItemWrapper = styled(Box)(() => ({
@@ -140,31 +225,3 @@ const ListText = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.primary,
   marginLeft: "2rem",
 }));
-
-const MenuList: TMenuList[] = [
-  {
-    name: "Dashboard",
-    icon: <GraphIcon height={25} width={25} />,
-    path: "/",
-  },
-  {
-    name: "Hotels",
-    icon: <HotelIcon height={25} width={25} />,
-    path: "/",
-  },
-  {
-    name: "Rooms",
-    icon: <RoomIcon height={25} width={25} />,
-    path: "/",
-  },
-  {
-    name: "Bookings",
-    icon: <BookingIcon height={25} width={25} />,
-    path: "/",
-  },
-  {
-    name: "Reviews",
-    icon: <ReviewIcon height={25} width={25} />,
-    path: "/",
-  },
-];

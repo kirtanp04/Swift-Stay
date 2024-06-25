@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { DashboardPath } from "src/Router/path";
+import { Path } from "src/Router/path";
 import useAuth from "src/hooks/useAuth";
 
 type Props = {
@@ -13,7 +13,7 @@ export default function LoginGaurd({ children }: Props) {
   } = useAuth();
 
   if (isAuthenticated) {
-    return <Navigate to={DashboardPath.root} />;
+    return <Navigate to={Path.dashboard} />;
   }
 
   return <>{children}</>;
