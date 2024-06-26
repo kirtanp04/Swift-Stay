@@ -1,4 +1,3 @@
-import { Divider } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -26,8 +25,14 @@ const MessageDialog = ({
           <DialogContentText>{message}</DialogContentText>
         </Scrollbar>
       </DialogContent>
-      <Divider flexItem orientation="horizontal" />
-      <DialogActions>
+      {/* <Divider flexItem orientation="horizontal" /> */}
+      <DialogActions
+        sx={{
+          "& .MuiDialogActions-root": {
+            padding: "16px !important",
+          },
+        }}
+      >
         <Button onClick={onOK} color="primary" variant="outlined">
           OK
         </Button>

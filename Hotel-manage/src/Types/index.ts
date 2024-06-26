@@ -12,5 +12,6 @@ export interface TMenuList {
 export interface StorageError {
     module: string,
     error: any,
-    date: Date
+    date: Date,
+    ID?: string
 }

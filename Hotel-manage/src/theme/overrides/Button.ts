@@ -11,12 +11,12 @@ export default function Button(theme: Theme) {
           '&:hover': {
             boxShadow: 'none',
           },
-          
+
         },
         sizeLarge: {
           height: 48,
         },
-       
+
         // contained
         containedInherit: {
           color: theme.palette.grey[800],
@@ -45,7 +45,7 @@ export default function Button(theme: Theme) {
         },
         // outlined
         outlinedInherit: {
-         
+
           border: `1px solid ${theme.palette.grey[500_32]}`,
           '&:hover': {
             backgroundColor: theme.palette.action.hover,

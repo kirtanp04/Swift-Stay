@@ -23,4 +23,5 @@ export const Path = {
     review: {
         root: rootPath + '/reviews'
     },
+    errorLogs: rootPath + '/errorlogs'
 }

@@ -12,6 +12,7 @@ import { TMenuList } from "src/Types";
 import {
   BookingIcon,
   ChatIcon,
+  ErrorLogIcon,
   GraphIcon,
   HotelIcon,
   LogoutIcon,
@@ -95,6 +96,17 @@ export default function SideMenuContent({}: Props) {
       ),
       path: "/",
     },
+    {
+      name: "Error logs",
+      icon: (
+        <ErrorLogIcon
+          height={25}
+          width={25}
+          IconColor={theme.palette.text.primary}
+        />
+      ),
+      path: Path.errorLogs,
+    },
   ];
 
   return (
@@ -126,7 +138,6 @@ export default function SideMenuContent({}: Props) {
                         ? `1px solid ${theme.palette.text.secondary}`
                         : "0px solid transparent",
                     }}
-                    //   onClick={() => navigate(objListItem.path)}
                   >
                     {objListItem.icon}
                     <ListText>{objListItem.name}</ListText>
