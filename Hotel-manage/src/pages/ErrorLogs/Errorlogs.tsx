@@ -1,14 +1,11 @@
-import { Box } from "@mui/material";
-import { styled } from "@mui/material";
+import { Box, Button, styled } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useId, useState } from "react";
 import { StorageError } from "src/Types";
+import { RefreshIcon } from "src/assets/iconify";
 import Page from "src/components/Page";
 
 type Props = {};
-// module: string,
-//     error: any,
-//     date: Date
 
 export default function Errorlogs({}: Props) {
   const [Errors, setErrors] = useState<StorageError[]>([]);
@@ -28,15 +25,33 @@ export default function Errorlogs({}: Props) {
       setErrors(arrError);
     }
   }, []);
+  const ClearErrorLogs = () => {
+    const errorlogs = localStorage.getItem("Error");
+
+    if (errorlogs) {
+      localStorage.removeItem("Error");
+      setErrors([]);
+    }
+  };
   return (
     <Page title="Error logs">
       <RootStyle>
+        <Header>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon height={20} width={20} />}
+            onClick={ClearErrorLogs}
+          >
+            Clear Logs
+          </Button>
+        </Header>
         <DataGrid
           columnVisibilityModel={{
             ID: false,
           }}
           getRowId={(row) => row.ID!}
-          loading={Errors.length === 0}
+          rowSelection={false}
+          //   loading={Errors.length === 0}
           hideFooter
           rows={Errors}
           columns={[
@@ -72,4 +87,15 @@ const RootStyle = styled(Box)(() => ({
   width: "100%",
   display: "flex",
   justifyContent: "center",
+  flexDirection: "column",
+  gap: "1rem",
+  paddingTop: "0.5rem",
+}));
+
+const Header = styled(Box)(() => ({
+  width: "100%",
+  height: 50,
+  display: "flex",
+  alignItems: "center",
+  //   padding: "1rem",
 }));
