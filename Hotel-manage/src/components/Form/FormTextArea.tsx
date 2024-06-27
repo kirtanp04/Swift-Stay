@@ -1,23 +1,28 @@
 // form
 import { Controller, FieldValues, useFormContext } from "react-hook-form";
 // @mui
-import { TextField, TextFieldProps, styled } from "@mui/material";
+import { TextareaAutosize, TextareaAutosizeProps, styled } from "@mui/material";
 
 // ----------------------------------------------------------------------
 
 type Props<T extends FieldValues> = {
   name: keyof T;
-} & TextFieldProps;
+} & TextareaAutosizeProps;
 
-export const MUITextField = styled(TextField)(({ theme }) => ({
+const MUITextArea = styled(TextareaAutosize)(({ theme }) => ({
+  borderRadius: "8px",
+  backgroundColor: "transparent",
   [theme.breakpoints.down("sm")]: {
-    "& .MuiInputBase-input": {
-      fontSize: "0.6rem",
-    },
+    fontSize: "0.6rem",
   },
+
+  fontFamily: ["Roboto", "Helvetica", "Arial", "sans-serif"],
+  border: `1px solid ${theme.palette.text.disabled}`,
+  padding: "0.7rem",
+  fontSize: "1rem",
 }));
 
-export default function FormTextFiels<T extends FieldValues>({
+export default function FormTextArea<T extends FieldValues>({
   name,
   ...other
 }: Props<T>) {
@@ -27,8 +32,8 @@ export default function FormTextFiels<T extends FieldValues>({
     <Controller
       name={name}
       control={control}
-      render={({ field, fieldState: { error } }) => (
-        <MUITextField
+      render={({ field, fieldState: { error } }: any) => (
+        <MUITextArea
           {...field}
           fullWidth
           error={!!error}

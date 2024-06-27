@@ -1,7 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
-  Button,
   Dialog,
   DialogActions,
   DialogContent,
@@ -10,9 +9,11 @@ import {
   styled,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
+import { LoginIcon } from "src/assets/iconify";
 import FormProvider from "src/components/Form/FormProvider";
 import FormTextFiels from "src/components/Form/FormTextField";
 import Page from "src/components/Page";
+import { RESIconButton } from "src/components/RESIconButton";
 import useAuth from "src/hooks/useAuth";
 import * as yup from "yup";
 import { _Login } from "./AuthMgr";
@@ -71,9 +72,14 @@ export default function Login() {
           </DialogContent>
           <Divider orientation="horizontal" flexItem />
           <DialogActions>
-            <Button variant="outlined" type="submit">
+            <RESIconButton
+              iconposition="start"
+              starticon={<LoginIcon />}
+              variant="outlined"
+              type="submit"
+            >
               Login
-            </Button>
+            </RESIconButton>
           </DialogActions>
         </FormProvider>
       </Dialog>

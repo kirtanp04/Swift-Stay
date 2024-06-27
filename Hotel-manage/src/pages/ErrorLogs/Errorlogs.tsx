@@ -1,15 +1,16 @@
 import { Box, Button, styled } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import { StorageError } from "src/Types";
 import { RefreshIcon } from "src/assets/iconify";
+import GridHeader from "src/components/GridHeader";
 import Page from "src/components/Page";
+import { MUIDataGrid } from "src/components/mui/MUIDataGrid";
+import { uuid } from "src/util/uuid";
 
 type Props = {};
 
 export default function Errorlogs({}: Props) {
   const [Errors, setErrors] = useState<StorageError[]>([]);
-  const ID = useId();
 
   useEffect(() => {
     const stringifyError = localStorage.getItem("Error");
@@ -19,7 +20,7 @@ export default function Errorlogs({}: Props) {
       for (let index = 0; index < arrError.length; index++) {
         const element = arrError[index];
 
-        element.ID = ID;
+        element.ID = uuid();
       }
 
       setErrors(arrError);
@@ -36,7 +37,7 @@ export default function Errorlogs({}: Props) {
   return (
     <Page title="Error logs">
       <RootStyle>
-        <Header>
+        <GridHeader>
           <Button
             variant="outlined"
             startIcon={<RefreshIcon height={20} width={20} />}
@@ -44,14 +45,13 @@ export default function Errorlogs({}: Props) {
           >
             Clear Logs
           </Button>
-        </Header>
-        <DataGrid
+        </GridHeader>
+        <MUIDataGrid
           columnVisibilityModel={{
             ID: false,
           }}
           getRowId={(row) => row.ID!}
           rowSelection={false}
-          //   loading={Errors.length === 0}
           hideFooter
           rows={Errors}
           columns={[
@@ -90,12 +90,4 @@ const RootStyle = styled(Box)(() => ({
   flexDirection: "column",
   gap: "1rem",
   paddingTop: "0.5rem",
-}));
-
-const Header = styled(Box)(() => ({
-  width: "100%",
-  height: 50,
-  display: "flex",
-  alignItems: "center",
-  //   padding: "1rem",
 }));

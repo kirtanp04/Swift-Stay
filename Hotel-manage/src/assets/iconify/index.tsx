@@ -1,3 +1,4 @@
+import { alpha, useTheme } from "@mui/material";
 import { SVGProps } from "react";
 
 interface Props extends SVGProps<SVGSVGElement> {
@@ -211,6 +212,96 @@ export function RefreshIcon({ IconColor, ...other }: Props) {
       <path
         fill={IconColor ? IconColor : "currentColor"}
         d="M12 20q-3.35 0-5.675-2.325T4 12t2.325-5.675T12 4q1.725 0 3.3.712T18 6.75V4h2v7h-7V9h4.2q-.8-1.4-2.187-2.2T12 6Q9.5 6 7.75 7.75T6 12t1.75 4.25T12 18q1.925 0 3.475-1.1T17.65 14h2.1q-.7 2.65-2.85 4.325T12 20"
+      ></path>
+    </svg>
+  );
+}
+
+export function EditIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="m18.988 2.012l3 3L19.701 7.3l-3-3zM8 16h3l7.287-7.287l-3-3L8 13z"
+      />
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="M19 19H8.158c-.026 0-.053.01-.079.01c-.033 0-.066-.009-.1-.01H5V5h6.847l2-2H5c-1.103 0-2 .896-2 2v14c0 1.104.897 2 2 2h14a2 2 0 0 0 2-2v-8.668l-2 2z"
+      />
+    </svg>
+  );
+}
+
+export function DeleteIcon({ IconColor, ...other }: Props) {
+  const theme = useTheme();
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : alpha(theme.palette.error.main, 0.5)}
+        d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4zm2 2h6V4H9zM6.074 8l.857 12H17.07l.857-12zM10 10a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1"
+      />
+    </svg>
+  );
+}
+
+export function PlusIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="M19 12.998h-6v6h-2v-6H5v-2h6v-6h2v6h6z"
+      />
+    </svg>
+  );
+}
+
+export function CloseIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"
+      />
+    </svg>
+  );
+}
+
+export function LoginIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="M12 21v-2h7V5h-7V3h7q.825 0 1.413.588T21 5v14q0 .825-.587 1.413T19 21zm-2-4l-1.375-1.45l2.55-2.55H3v-2h8.175l-2.55-2.55L10 7l5 5z"
       ></path>
     </svg>
   );

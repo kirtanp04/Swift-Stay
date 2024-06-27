@@ -9,27 +9,6 @@ type Props = {
   children: ReactNode;
 };
 
-// enum Types {
-//   Processing = "PROCESSING",
-//   Login = "LOGIN",
-//   Logout = "LOGOUT",
-//   Register = "REGISTER",
-// }
-
-// type Payload = {
-//   [Types.Processing]: {
-//     isAuthenticated: boolean;
-//     user: TUser;
-//   };
-//   [Types.Login]: {
-//     user: TUser;
-//   };
-//   [Types.Logout]: undefined;
-//   [Types.Register]: {
-//     user: TUser;
-//   };
-// };
-
 export class TUser {
   email: string = "";
   profileImg: string = "";
@@ -59,7 +38,26 @@ const CreateAuthContext = createContext<_TUser>({
 function AuthContexProvider({ children }: Props) {
   const [user, setUser] = useState<TAuth>(new TAuth());
   const theme = useTheme();
-  // const [state, dispatch] = useReducer(UserReducer, initialState);
+
+  const checkUserToken = () => {
+    const Authdata = Storage.getFromSessionStorage("Auth");
+    if (Authdata.error !== "") {
+      setUser(new TAuth());
+      return;
+    }
+  };
+
+  useEffect(() => {
+    let _TimeInterval: any;
+
+    _TimeInterval = setInterval(() => {
+      checkUserToken();
+    }, 1500);
+
+    return () => {
+      clearInterval(_TimeInterval);
+    };
+  }, []);
 
   useEffect(() => {
     const Authdata = Storage.getFromSessionStorage("Auth");
