@@ -42,7 +42,11 @@ function AuthContexProvider({ children }: Props) {
   const checkUserToken = () => {
     const Authdata = Storage.getFromSessionStorage("Auth");
     if (Authdata.error !== "") {
-      setUser(new TAuth());
+      setUser({
+        isProcessing: false,
+        isAuthenticated: false,
+        userInfo: new TUser(),
+      });
       return;
     }
   };
@@ -72,6 +76,7 @@ function AuthContexProvider({ children }: Props) {
         ...user,
         isProcessing: false,
       });
+      // showMessage("You must login to access.", theme, () => {});
     }
   }, []);
 
@@ -90,8 +95,7 @@ function AuthContexProvider({ children }: Props) {
         _user.email = res.email;
         _user.name = res.name;
         _user.profileImg = res.profile;
-        UpdateUser("userInfo", _user);
-        UpdateUser("isAuthenticated", true);
+        setUser({ ...user, isAuthenticated: true, userInfo: _user });
         Storage.setToSessionStorage("Auth", _user);
       },
       (err) => {

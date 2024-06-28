@@ -12,5 +12,6 @@ export class HotelClass {
     website: string = 'www.kirtanp04.com';
     description: string = 'Nice';
     amenities: string[] = ['Hotel'];
+    images: ArrayBuffer[] = [];
     createdAt: Date = new Date();
 }

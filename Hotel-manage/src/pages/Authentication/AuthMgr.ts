@@ -1,5 +1,11 @@
 import { Api, getPostParamData } from "src/common/ApiCall";
 
+enum enumUserRole {
+    guest = 'guest',
+
+    admin = 'admin'
+}
+
 export class _Login {
     email: string = "";
 
@@ -14,7 +20,7 @@ export class _Register {
     confirmPassword: string = "";
     profileImg: string = "";
     phone: string = "";
-    role: "guest" | "admin" = "admin";
+    role: enumUserRole = enumUserRole.admin;
     createdAt: Date = new Date();
 }
 
@@ -28,12 +34,14 @@ export class Auth {
         try {
             const _Param = getPostParamData("ManagerBroker", "CreateManagerAccount");
 
-            const res = await Api.post(_Param, objRegister);
-            if (res.error === "") {
-                onsuccess(res.data);
-            } else {
-                onFail(res.error);
-            }
+            await Api.post(_Param, objRegister, (res) => {
+                if (res.error === "") {
+                    onsuccess(res.data);
+                } else {
+                    onFail(res.error);
+                }
+            });
+
         } catch (error: any) {
             onFail(error);
         }
@@ -46,12 +54,14 @@ export class Auth {
     ) => {
         try {
             const _Param = getPostParamData("ManagerBroker", "ManagerLogin");
-            const res = await Api.post(_Param, objLogin);
-            if (res.error === "") {
-                onsuccess(res.data);
-            } else {
-                onFail(res.error);
-            }
+            await Api.post(_Param, objLogin, (res) => {
+                if (res.error === "") {
+                    onsuccess(res.data);
+                } else {
+                    onFail(res.error);
+                }
+            });
+
         } catch (error: any) {
             onFail(error);
         }

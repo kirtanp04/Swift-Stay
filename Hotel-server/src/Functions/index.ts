@@ -1,4 +1,4 @@
-import { HotelFunction } from './Hotel'
+import { PropertyFunction } from './Property'
 import { UserFunction } from './User'
 
-export { HotelFunction, UserFunction }
+export { PropertyFunction, UserFunction }

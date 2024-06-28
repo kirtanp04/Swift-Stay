@@ -4,13 +4,14 @@ type Props = {
   progress: number;
 };
 
-export default function PercentageLoading({ progress }: Props) {
+const PercentageLoading = ({ progress }: Props) => {
   return (
     <LoaderWrapper>
       <LinearProgress value={progress} />
     </LoaderWrapper>
   );
-}
+};
+export default PercentageLoading;
 
 const LoaderWrapper = styled(Box)(() => ({
   position: "absolute",

@@ -1,15 +1,22 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Divider,
   styled,
+  useTheme,
 } from "@mui/material";
 import { useFieldArray, useForm } from "react-hook-form";
-import { CloseCircleIcon, CloseIcon, PlusIcon } from "src/assets/iconify";
+import {
+  CloseCircleIcon,
+  CloseIcon,
+  PlusIcon,
+  UpdateIcon,
+} from "src/assets/iconify";
 import FormProvider from "src/components/Form/FormProvider";
 import FormTextArea from "src/components/Form/FormTextArea";
 import FormTextFiels from "src/components/Form/FormTextField";
@@ -17,6 +24,9 @@ import { RESIconButton } from "src/components/RESIconButton";
 import Scrollbar from "src/components/Scrollbar";
 import * as yup from "yup";
 import { HotelClass } from "./DataObject";
+import { useState } from "react";
+import UploadHotelImage from "./UploadHotelImage";
+import showMessage from "src/util/ShowMessage";
 
 type Props = {
   onClose: () => void;
@@ -39,6 +49,14 @@ const AddHotelSchema = yup.object().shape({
 });
 
 export default function AddHotelDialog({ onClose, objHotel }: Props) {
+  const [showUploadImageDialog, setShowUploadImageDialog] =
+    useState<boolean>(false);
+
+  const [ImageList, setImageList] = useState<any[]>([]);
+  const theme = useTheme();
+
+  //------------------------------- Form
+
   const _Method = useForm<HotelClass>({
     defaultValues: objHotel,
     resolver: yupResolver(AddHotelSchema) as any,
@@ -49,11 +67,33 @@ export default function AddHotelDialog({ onClose, objHotel }: Props) {
     name: "amenities",
   });
 
+  //---------------------------------------------
+
+  const openUploadImageDialog = () => {
+    setShowUploadImageDialog(true);
+  };
+  const closeUploadImageDialog = () => {
+    setShowUploadImageDialog(false);
+  };
+
+  const SaveImageList = (ImageList: any[]) => {
+    setImageList(ImageList);
+  };
+
   const onAddHotel = (objHotelData: HotelClass) => {
-    if (objHotelData._id === "") {
-      // new one
+    if (ImageList.length >= 1 || objHotelData.images.length >= 1) {
+      if (objHotelData._id === "") {
+        ImageList.forEach((objImage) =>
+          objHotelData.images.push(objImage.bufferFile)
+        );
+
+        console.log(objHotelData);
+        // new one
+      } else {
+        // update
+      }
     } else {
-      // update
+      showMessage("Select atleast One Hotel Image", theme, () => {});
     }
   };
   return (
@@ -218,6 +258,14 @@ export default function AddHotelDialog({ onClose, objHotel }: Props) {
         </DialogContent>
         <Divider orientation="horizontal" flexItem />
         <DialogActions>
+          <Button
+            onClick={openUploadImageDialog}
+            startIcon={<UpdateIcon />}
+            variant="outlined"
+            sx={{ marginRight: "auto" }}
+          >
+            Upload Image
+          </Button>
           <RESIconButton
             iconposition="start"
             starticon={<PlusIcon />}
@@ -229,7 +277,7 @@ export default function AddHotelDialog({ onClose, objHotel }: Props) {
           <RESIconButton
             iconposition="start"
             starticon={<CloseIcon />}
-            variant="outlined"
+            variant="contained"
             type="submit"
             onClick={onClose}
           >
@@ -237,6 +285,13 @@ export default function AddHotelDialog({ onClose, objHotel }: Props) {
           </RESIconButton>
         </DialogActions>
       </FormProvider>
+
+      {showUploadImageDialog && (
+        <UploadHotelImage
+          onClose={closeUploadImageDialog}
+          onSaveImages={SaveImageList}
+        />
+      )}
     </Dialog>
   );
 }

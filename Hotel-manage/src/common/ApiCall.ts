@@ -32,13 +32,23 @@ export const getGETParamData = (
 };
 
 export class Api {
-  static async get(_Param: TParam): Promise<ProjectResponse> {
+  static async get(_Param: TParam, onResponse: (res: ProjectResponse) => void, onProgress?: (progress: number) => void) {
     let _res = new ProjectResponse();
     try {
       const encryptData = Crypt.Encryption(_Param);
 
       if (encryptData.error === "") {
-        const response = await axiosCall.get(encryptData.data);
+        const response = await axiosCall.get(encryptData.data, {
+          onDownloadProgress: (progressEvent) => {
+            const total = progressEvent.total;
+            const current = progressEvent.loaded;
+            const percentCompleted = Math.floor((current / total!) * 100);
+            if (onProgress !== undefined) {
+
+              onProgress(percentCompleted)
+            }
+          },
+        });
         console.log(response)
       } else {
         _res.error = encryptData.error;
@@ -51,10 +61,10 @@ export class Api {
         _res.error = "Not able to decrypt api error";
       }
     } finally {
-      return _res;
+      onResponse(_res)
     }
   }
-  static async post(_Param: TParam, data: any): Promise<ProjectResponse> {
+  static async post(_Param: TParam, data: any, onResponse: (res: ProjectResponse) => void) {
     let _res = new ProjectResponse();
 
     try {
@@ -91,11 +101,11 @@ export class Api {
         _res.error = "Not able to decrypt api error";
       }
     } finally {
-      return _res;
+      onResponse(_res);
     }
   }
 
-  static async protectedGet(_Param: TParam): Promise<ProjectResponse> {
+  static async protectedGet(_Param: TParam, onResponse: (res: ProjectResponse) => void) {
     let _res = new ProjectResponse();
 
     try {
@@ -107,11 +117,11 @@ export class Api {
         _res.error = "Not able to decrypt api error";
       }
     } finally {
-      return _res;
+      onResponse(_res);
     }
   }
 
-  static async protectedPost(_Param: TParam): Promise<ProjectResponse> {
+  static async protectedPost(_Param: TParam, onResponse: (res: ProjectResponse) => void) {
     let _res = new ProjectResponse();
 
     try {
@@ -123,7 +133,7 @@ export class Api {
         _res.error = "Not able to decrypt api error";
       }
     } finally {
-      return _res;
+      onResponse(_res);
     }
   }
 }

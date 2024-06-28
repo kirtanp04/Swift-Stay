@@ -11,7 +11,7 @@ export default function Button(theme: Theme) {
           '&:hover': {
             boxShadow: 'none',
           },
-
+          textTransform: "capitalize",
         },
         sizeLarge: {
           height: 48,

@@ -1,3 +1,9 @@
+export enum enumUserRole {
+    guest = 'guest',
+
+    admin = 'admin'
+}
+
 export class Login {
     email: string = ''
 
@@ -11,6 +17,6 @@ export class Register {
     password: string = '';
     profileImg: string = '';
     phone: string = '';
-    role: 'guest' | 'admin' = 'admin';
+    role: enumUserRole = enumUserRole.guest;
     createdAt: Date = new Date();
 }

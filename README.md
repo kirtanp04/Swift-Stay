@@ -37,6 +37,7 @@
 - Material UI
 - axios
 - react-hook-form
+- react-dropzone
 
 - **Validation**
 

@@ -21,8 +21,18 @@ const MessageDialog = ({
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogContent sx={{ maxHeight: 600, height: "auto", minHeight: 80 }}>
-        <Scrollbar sx={{ height: "100%" }}>
-          <DialogContentText>{message}</DialogContentText>
+        <Scrollbar
+          sx={{
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <DialogContentText style={{ textAlign: "center" }}>
+            {message}
+          </DialogContentText>
         </Scrollbar>
       </DialogContent>
       {/* <Divider flexItem orientation="horizontal" /> */}

@@ -1,5 +1,11 @@
 import mongoose, { Schema } from 'mongoose';
 
+export enum enumUserRole {
+    guest = 'guest',
+
+    admin = 'admin'
+}
+
 export class Login {
     email: string = "";
 
@@ -13,7 +19,7 @@ export class UserClass {
     password: string = '';
     profileImg: string = '';
     phone: string = '';
-    role: 'guest' | 'admin' = 'admin';
+    role: enumUserRole = enumUserRole.guest;
     createdAt: Date = new Date();
 }
 
@@ -40,7 +46,7 @@ const UserSchema = new Schema<UserClass>({
     },
     role: {
         type: String,
-        enum: ['guest', 'admin'],
+        enum: [enumUserRole.guest, enumUserRole.admin],
         required: true,
     },
     createdAt: {

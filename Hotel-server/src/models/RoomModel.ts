@@ -1,9 +1,10 @@
 import mongoose, { Schema } from 'mongoose';
-import { HotelClass } from './HotelModel';
+import { PropertyClass } from './HotelModel';
+
 
 export class RoomClass {
     _id: string = '';
-    hotel: HotelClass = new HotelClass()
+    hotel: PropertyClass = new PropertyClass()
     roomNumber: string = ''
     type: string = '' // e.g., single, double, suite
     description: string = ''
@@ -14,8 +15,8 @@ export class RoomClass {
 }
 
 const RoomSchema = new Schema<RoomClass>({
-    hotel: { type: mongoose.Schema.Types.ObjectId, ref: 'Hotel', required: true },
-    roomNumber: { type: String, required: [true, 'Hotel room number is required'] },
+    hotel: { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true },
+    roomNumber: { type: String, required: [true, 'Property room number is required'] },
     type: { type: String, required: [true, ' Room type is required'] }, // e.g., single, double, suite
     description: { type: String },
     amenities: [String],
@@ -25,3 +26,13 @@ const RoomSchema = new Schema<RoomClass>({
 });
 
 export const Room = mongoose.model<RoomClass>('Room', RoomSchema);
+
+
+// propertyId: { type: Schema.Types.ObjectId, ref: 'Property', required: true },
+// roomNumber: { type: String, required: true },
+// type: { type: String, required: true }, // e.g., single, double, suite
+// description: { type: String },
+// capacity: { type: Number, default: 2 }, // maximum occupancy
+// price: { type: Number, required: true },
+// amenities: [{ type: String }],
+// isAvailable: { type: Boolean, default: true },

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { UserResponse } from "../common";
 import { TParam } from "../types/Type";
 
-export class HotelFunction {
+export class PropertyFunction {
     protected _CreateHotel: string = 'CreateHotel';
 
     protected _GetAllHotels: string = 'GetAllHotels';

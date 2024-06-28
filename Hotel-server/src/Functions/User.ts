@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Response';
 import { TParam } from '../types/Type';
 import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
-import { Login, User, UserClass } from '../Models/UserModel';
+import { Login, User, UserClass, enumUserRole } from '../Models/UserModel';
 
 const _CreateGuestAccount: string = 'CreateGuestAccount';
 
@@ -48,7 +48,7 @@ class Functions {
         const { createdAt, email, name, password, phone, profileImg, role } = objParam.data as UserClass;
 
         try {
-            const isUser = await User.findOne({ email: email });
+            const isUser: UserClass | null = await User.findOne({ email: email });
 
             if (isUser) {
                 this.objUserResponse = GetUserErrorObj('Email ID already exist. Enter another Email ID.', HttpStatusCodes.BAD_REQUEST);
@@ -83,7 +83,7 @@ class Functions {
         const { email, password } = req.body as Login;
 
         try {
-            const isUser = await User.findOne({ email: email });
+            const isUser: UserClass | null = await User.findOne({ email: email });
 
             if (!isUser) {
                 this.objUserResponse = GetUserErrorObj('User not found, try to login with another Email ID.', HttpStatusCodes.NOT_FOUND);
@@ -91,7 +91,7 @@ class Functions {
                 const isVerifiedPassword = await Crypt.compareHash(isUser.password, password);
 
                 if (isVerifiedPassword) {
-                    if (isUser.role === 'admin') {
+                    if (isUser.role === enumUserRole.admin) {
                         this.objUserResponse = GetUserErrorObj(
                             'You cannot login through your admin account. Use your guest account / Create new one.',
                             HttpStatusCodes.NOT_ACCEPTABLE
@@ -119,10 +119,10 @@ class Functions {
         try {
             const { createdAt, email, name, password, phone, profileImg, role } = objParam.data as UserClass;
 
-            const isUser = await User.findOne({ email: email });
+            const isUser: UserClass | null = await User.findOne({ email: email });
 
             if (isUser) {
-                if (isUser.role === 'guest') {
+                if (isUser.role === enumUserRole.guest) {
                     this.objUserResponse = GetUserErrorObj(
                         'You cannot use Email ID which is already been registerd in Guest account. Enter another Email ID.',
                         HttpStatusCodes.BAD_REQUEST
@@ -161,13 +161,13 @@ class Functions {
         try {
             const { email, password } = objParam.data;
 
-            const isUser = await User.findOne({ email: email });
+            const isUser: UserClass | null = await User.findOne({ email: email });
 
             if (isUser) {
                 const isVerifiePass = await Crypt.compareHash(isUser.password, password);
 
                 if (isVerifiePass.error === '') {
-                    if (isUser.role !== 'guest') {
+                    if (isUser.role !== enumUserRole.guest) {
                         const getToken = await Jwt.SignJwt({ email: isUser.email, name: isUser.name, profileImg: isUser.profileImg });
                         if (getToken.error === '') {
                             const setCookie = Storage.setCookie('Auth', getToken.data, res);

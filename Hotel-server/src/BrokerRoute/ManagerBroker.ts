@@ -8,7 +8,7 @@ import { GetUserErrorObj, HttpStatusCodes } from '../common';
 const ManagerBrokerRouter: Router = express.Router();
 
 const _ManagerBroker: string = 'ManagerBroker';
-const _ManagerHotelBroker: string = 'ManagerHotelBroker';
+const _ManagerPropertyBroker: string = 'ManagerPropertyBroker';
 const _ManagerRoomBroker: string = 'ManagerRoomBroker';
 
 ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +25,7 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
       // return SendResponseToUser(_UserFunction.objUserResponse, next);
     }
 
-    if (paramObj.Broker === _ManagerHotelBroker) {
+    if (paramObj.Broker === _ManagerPropertyBroker) {
       //
     }
   } else {
@@ -50,7 +50,7 @@ ManagerBrokerRouter.post('/:param', async (req: Request, res: Response, next: Ne
         return SendResponseToUser(_res, next);
       }
 
-      if (paramObj.Broker === _ManagerHotelBroker) {
+      if (paramObj.Broker === _ManagerPropertyBroker) {
         //
       }
     } else {

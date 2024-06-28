@@ -4,9 +4,9 @@ import { PlusIcon } from "src/assets/iconify";
 import GridHeader from "src/components/GridHeader";
 import Page from "src/components/Page";
 import { MUIDataGrid } from "src/components/mui/MUIDataGrid";
+import useAuth from "src/hooks/useAuth";
 import AddHotelDialog from "./AddHotelDialog";
 import { HotelClass } from "./DataObject";
-import useAuth from "src/hooks/useAuth";
 
 type Props = {};
 
@@ -18,6 +18,10 @@ export default function HotelList({}: Props) {
       userInfo: { email },
     },
   } = useAuth();
+  // const theme = useTheme();
+  // useEffect(() => {
+  //   showPercentageLoading(66, theme);
+  // }, []);
 
   const onAddNewHotel = () => {
     let _newObjHotel = new HotelClass();

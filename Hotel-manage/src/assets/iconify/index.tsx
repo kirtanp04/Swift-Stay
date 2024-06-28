@@ -324,3 +324,54 @@ export function LoginIcon({ IconColor, ...other }: Props) {
     </svg>
   );
 }
+
+export function UpdateIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="m12 16.5l4-4h-3v-9h-2v9H8zm9-13h-6v1.99h6v14.03H3V5.49h6V3.5H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-14c0-1.1-.9-2-2-2"
+      ></path>
+    </svg>
+  );
+}
+
+export function SaveIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="M21 7v12q0 .825-.587 1.413T19 21H5q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h12zm-2 .85L16.15 5H5v14h14zM12 18q1.25 0 2.125-.875T15 15t-.875-2.125T12 12t-2.125.875T9 15t.875 2.125T12 18m-6-8h9V6H6zM5 7.85V19V5z"
+      ></path>
+    </svg>
+  );
+}
+
+export function PencilEditIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="m16.828 1.416l5.755 5.755L7.755 22H2v-5.756zm0 8.681l2.927-2.926l-2.927-2.927l-2.926 2.927zm-4.34-1.512L4 17.074V20h2.926l8.488-8.488z"
+      ></path>
+    </svg>
+  );
+}
