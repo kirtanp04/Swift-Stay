@@ -11,8 +11,8 @@ const rootPath = '/swiftstay'
 
 export const Path = {
     dashboard: rootPath + '/dashboard',
-    hotel: {
-        root: rootPath + '/hotels',
+    property: {
+        root: rootPath + '/properties',
     },
     room: {
         root: rootPath + '/rooms'

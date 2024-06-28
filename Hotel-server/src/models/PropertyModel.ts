@@ -1,6 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 
-enum enumPropertyType {
+export enum enumPropertyType {
     Hotel = 'Hotel',
 
     Resort = 'Resort',
@@ -25,7 +25,7 @@ export class PropertyClass {
     website: string = '';
     description: string = '';
     amenities: string[] = [];
-    images: any[] = [];
+    images: string[] = [];
     createdAt: Date = new Date();
 }
 
@@ -43,7 +43,7 @@ const PropertySchema = new Schema<PropertyClass>({
     website: { type: String },
     description: { type: String },
     amenities: [String],
-    images: [ArrayBuffer],
+    images: [String],
     createdAt: { type: Date },
 });
 

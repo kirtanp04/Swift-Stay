@@ -42,7 +42,7 @@ export default function SideMenuContent({}: Props) {
       path: Path.dashboard,
     },
     {
-      name: "Hotels",
+      name: "Property",
       icon: (
         <HotelIcon
           height={25}
@@ -50,7 +50,7 @@ export default function SideMenuContent({}: Props) {
           IconColor={theme.palette.text.primary}
         />
       ),
-      path: Path.hotel.root,
+      path: Path.property.root,
     },
     {
       name: "Rooms",

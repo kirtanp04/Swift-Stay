@@ -1,7 +1,7 @@
 import { Param } from "src/Constant";
 import { Api, getPostParamData } from "src/common/ApiCall";
 
-enum enumUserRole {
+export enum enumUserRole {
     guest = 'guest',
 
     admin = 'admin'

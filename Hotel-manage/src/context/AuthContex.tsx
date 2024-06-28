@@ -13,6 +13,7 @@ export class TUser {
   email: string = "";
   profileImg: string = "";
   name: string = "";
+  role: string = "";
 }
 
 export class TAuth {
@@ -95,6 +96,7 @@ function AuthContexProvider({ children }: Props) {
         _user.email = res.email;
         _user.name = res.name;
         _user.profileImg = res.profile;
+        _user.role = res.role;
         setUser({ ...user, isAuthenticated: true, userInfo: _user });
         Storage.setToSessionStorage("Auth", _user);
       },

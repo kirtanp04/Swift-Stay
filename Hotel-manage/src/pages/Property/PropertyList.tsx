@@ -5,14 +5,14 @@ import GridHeader from "src/components/GridHeader";
 import Page from "src/components/Page";
 import { MUIDataGrid } from "src/components/mui/MUIDataGrid";
 import useAuth from "src/hooks/useAuth";
-import AddHotelDialog from "./AddHotelDialog";
-import { HotelClass } from "./DataObject";
+import AddPropertyDialog from "./AddPropertyDialog";
+import { PropertyClass } from "./DataObject";
 
 type Props = {};
 
 export default function HotelList({}: Props) {
   const [openAddHotelDialog, setOpenAddHotelDialog] = useState<boolean>(false);
-  const [objHotel, setObjHotel] = useState<HotelClass>(new HotelClass());
+  const [objHotel, setObjHotel] = useState<PropertyClass>(new PropertyClass());
   const {
     user: {
       userInfo: { email },
@@ -24,7 +24,7 @@ export default function HotelList({}: Props) {
   // }, []);
 
   const onAddNewHotel = () => {
-    let _newObjHotel = new HotelClass();
+    let _newObjHotel = new PropertyClass();
     _newObjHotel.adminID = email;
     setObjHotel(_newObjHotel);
     setOpenAddHotelDialog(true);
@@ -33,7 +33,7 @@ export default function HotelList({}: Props) {
     setOpenAddHotelDialog(false);
   };
   return (
-    <Page title="Hotels">
+    <Page title="Property">
       <RootStyle>
         <GridHeader>
           <Button
@@ -41,7 +41,7 @@ export default function HotelList({}: Props) {
             variant="outlined"
             startIcon={<PlusIcon height={20} width={20} />}
           >
-            Add New Hotel
+            Add New Property
           </Button>
         </GridHeader>
         <MUIDataGrid
@@ -61,6 +61,11 @@ export default function HotelList({}: Props) {
             {
               field: "name",
               headerName: "Name",
+              flex: 1,
+            },
+            {
+              field: "propertyType",
+              headerName: "Property type",
               flex: 1,
             },
             {
@@ -98,7 +103,10 @@ export default function HotelList({}: Props) {
       </RootStyle>
 
       {openAddHotelDialog && (
-        <AddHotelDialog onClose={closeAddHotelDialogBox} objHotel={objHotel} />
+        <AddPropertyDialog
+          onClose={closeAddHotelDialogBox}
+          objHotel={objHotel}
+        />
       )}
     </Page>
   );

@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import LoadingPage from "src/components/LoadingPage";
 import useAuth from "src/hooks/useAuth";
+import { enumUserRole } from "src/pages/Authentication/AuthMgr";
 import Login from "src/pages/Authentication/Login";
 
 type Props = {
@@ -10,7 +11,11 @@ type Props = {
 
 export default function AuthGaurd({ children }: Props) {
   const {
-    user: { isAuthenticated, isProcessing },
+    user: {
+      isAuthenticated,
+      isProcessing,
+      userInfo: { role },
+    },
   } = useAuth();
 
   const { pathname } = useLocation();
@@ -30,9 +35,16 @@ export default function AuthGaurd({ children }: Props) {
     return <Login />;
   }
 
-  if (requestedLocation && pathname !== requestedLocation) {
-    setRequestedLocation(null);
-    return <Navigate to={requestedLocation} />;
+  if (role === enumUserRole.admin) {
+    if (requestedLocation && pathname !== requestedLocation) {
+      setRequestedLocation(null);
+      return <Navigate to={requestedLocation} />;
+    }
+  } else {
+    if (requestedLocation && pathname !== requestedLocation) {
+      setRequestedLocation(null);
+    }
+    return <Login />;
   }
 
   return <>{children}</>;
