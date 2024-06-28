@@ -1,7 +1,7 @@
-export interface TParam {
-    Broker: string
+export class TParam {
+    Broker: string = ''
 
-    function: string
+    function: string = ''
 
     data: any
 }

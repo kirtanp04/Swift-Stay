@@ -1,3 +1,4 @@
+import { Param } from "src/Constant";
 import { Api, getPostParamData } from "src/common/ApiCall";
 
 enum enumUserRole {
@@ -32,7 +33,7 @@ export class Auth {
         onFail: (err: any) => void
     ) => {
         try {
-            const _Param = getPostParamData("ManagerBroker", "CreateManagerAccount");
+            const _Param = getPostParamData(Param.broker.manager.Auth, Param.function.manager.register);
 
             await Api.post(_Param, objRegister, (res) => {
                 if (res.error === "") {
@@ -53,7 +54,7 @@ export class Auth {
         onFail: (err: any) => void
     ) => {
         try {
-            const _Param = getPostParamData("ManagerBroker", "ManagerLogin");
+            const _Param = getPostParamData(Param.broker.manager.Auth, Param.function.manager.login);
             await Api.post(_Param, objLogin, (res) => {
                 if (res.error === "") {
                     onsuccess(res.data);

@@ -4,12 +4,13 @@ import { SendResponseToUser } from '../middleware/UserResponse';
 import { TParam } from '../types/Type';
 import * as Functions from '../Functions';
 import { GetUserErrorObj, HttpStatusCodes } from '../common';
+import { Param } from '../Constant'
 
 const ManagerBrokerRouter: Router = express.Router();
 
-const _ManagerBroker: string = 'ManagerBroker';
-const _ManagerPropertyBroker: string = 'ManagerPropertyBroker';
-const _ManagerRoomBroker: string = 'ManagerRoomBroker';
+const _ManagerAuthBroker: string = Param.broker.manager.Auth;
+const _ManagerPropertyBroker: string = Param.broker.manager.Property;
+const _ManagerRoomBroker: string = Param.broker.manager.Room;
 
 ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
   const { param } = req.params;
@@ -18,7 +19,7 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
   if (objDecrypt.error === '') {
     const paramObj: TParam = objDecrypt.data;
 
-    if (paramObj.Broker === _ManagerBroker) {
+    if (paramObj.Broker === _ManagerAuthBroker) {
       const _res = await Functions.UserFunction.findFunction(paramObj, req, res, next);
       // const _UserFunction = new Functions.UserFunction(paramObj, req, res, next);
       // console.log(_UserFunction)
@@ -45,7 +46,7 @@ ManagerBrokerRouter.post('/:param', async (req: Request, res: Response, next: Ne
 
       paramObj.data = decryptResBody.data;
 
-      if (paramObj.Broker === _ManagerBroker) {
+      if (paramObj.Broker === _ManagerAuthBroker) {
         const _res = await Functions.UserFunction.findFunction(paramObj, req, res, next);
         return SendResponseToUser(_res, next);
       }

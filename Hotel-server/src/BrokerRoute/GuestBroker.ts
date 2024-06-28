@@ -3,13 +3,14 @@ import { Crypt } from '../common/Crypt';
 import { SendResponseToUser } from '../middleware/UserResponse';
 import { TParam } from '../types/Type';
 import * as Functions from '../Functions'
+import { Param } from '../Constant';
 
 
 const GuestBrokerRouter: Router = express.Router();
 
-const _GuestBroker: string = 'GuestBroker';
-const _GuestHotelBroker: string = 'GuestHotelBroker';
-const _GuestRoomBroker: string = 'GuestRoomBroker';
+const _GuestAuthBroker: string = Param.broker.guest.Auth;
+const _GuestPropertyBroker: string = Param.broker.guest.Property;
+const _GuestRoomBroker: string = Param.broker.guest.Room;
 
 GuestBrokerRouter.get('/:param', (req: Request, res: Response, next: NextFunction) => {
     const { param } = req.params;

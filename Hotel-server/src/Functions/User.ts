@@ -3,30 +3,39 @@ import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Resp
 import { TParam } from '../types/Type';
 import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
 import { Login, User, UserClass, enumUserRole } from '../Models/UserModel';
+import { Param } from '../Constant';
 
-const _CreateGuestAccount: string = 'CreateGuestAccount';
 
-const _CreateManagerAccount: string = 'CreateManagerAccount';
 
-const _GuestLogin: string = 'GuestLogin';
+const _CreateGuestAccount: string = Param.function.guest.register;
 
-const _ManagerLogin: string = 'ManagerLogin';
+const _CreateManagerAccount: string = Param.function.manager.register;
+
+const _GuestLogin: string = Param.function.guest.login;
+
+const _ManagerLogin: string = Param.function.manager.login;
 
 export class UserFunction {
     private static objUserResponse: UserResponse = new UserResponse();
 
     static findFunction = async (objParam: TParam, req: Request, res: Response, next: NextFunction): Promise<UserResponse> => {
+        let _Function = new Functions();
+        _Function.req = req;
+        _Function.res = res;
+        _Function.next = next;
+        _Function.objParam = objParam;
+
         if (objParam.function === _CreateManagerAccount) {
-            const _res = await Functions.CreateManagerAccount(req, res, next, objParam);
+            const _res = await _Function.CreateManagerAccount();
             this.objUserResponse = _res;
         } else if (objParam.function === _CreateGuestAccount) {
-            const _res = await Functions.CreateGuestAccount(req, res, next, objParam);
+            const _res = await _Function.CreateGuestAccount();
             this.objUserResponse = _res;
         } else if (objParam.function === _ManagerLogin) {
-            const _res = await Functions.ManagerLogin(req, res, next, objParam);
+            const _res = await _Function.ManagerLogin();
             this.objUserResponse = _res;
         } else if (objParam.function === _GuestLogin) {
-            const _res = await Functions.GuestLogin(req, res, next, objParam);
+            const _res = await _Function.GuestLogin();
             this.objUserResponse = _res;
         } else {
             this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
@@ -37,15 +46,18 @@ export class UserFunction {
 }
 
 class Functions {
-    private static objUserResponse: UserResponse = new UserResponse();
+    private objUserResponse: UserResponse = new UserResponse();
 
-    static CreateGuestAccount = async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-        objParam: TParam
-    ): Promise<UserResponse> => {
-        const { createdAt, email, name, password, phone, profileImg, role } = objParam.data as UserClass;
+    public req: Request | null = null;
+
+    public res: Response | null = null;
+
+    public next: NextFunction | null = null;
+
+    public objParam: TParam = new TParam();
+
+    public CreateGuestAccount = async (): Promise<UserResponse> => {
+        const { createdAt, email, name, password, phone, profileImg, role } = this.objParam!.data as UserClass;
 
         try {
             const isUser: UserClass | null = await User.findOne({ email: email });
@@ -79,8 +91,8 @@ class Functions {
         }
     };
 
-    static GuestLogin = async (req: Request, res: Response, next: NextFunction, objParam: TParam): Promise<UserResponse> => {
-        const { email, password } = req.body as Login;
+    public GuestLogin = async (): Promise<UserResponse> => {
+        const { email, password } = this.objParam!.data as Login;
 
         try {
             const isUser: UserClass | null = await User.findOne({ email: email });
@@ -110,14 +122,9 @@ class Functions {
         }
     };
 
-    static CreateManagerAccount = async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-        objParam: TParam
-    ): Promise<UserResponse> => {
+    public CreateManagerAccount = async (): Promise<UserResponse> => {
         try {
-            const { createdAt, email, name, password, phone, profileImg, role } = objParam.data as UserClass;
+            const { createdAt, email, name, password, phone, profileImg, role } = this.objParam!.data as UserClass;
 
             const isUser: UserClass | null = await User.findOne({ email: email });
 
@@ -157,9 +164,9 @@ class Functions {
         }
     };
 
-    static ManagerLogin = async (req: Request, res: Response, next: NextFunction, objParam: TParam): Promise<UserResponse> => {
+    public ManagerLogin = async (): Promise<UserResponse> => {
         try {
-            const { email, password } = objParam.data;
+            const { email, password } = this.objParam!.data;
 
             const isUser: UserClass | null = await User.findOne({ email: email });
 
@@ -170,7 +177,7 @@ class Functions {
                     if (isUser.role !== enumUserRole.guest) {
                         const getToken = await Jwt.SignJwt({ email: isUser.email, name: isUser.name, profileImg: isUser.profileImg });
                         if (getToken.error === '') {
-                            const setCookie = Storage.setCookie('Auth', getToken.data, res);
+                            const setCookie = Storage.setCookie('Auth', getToken.data, this.res!);
 
                             if (setCookie.error === '') {
                                 this.objUserResponse = GetUserSuccessObj(

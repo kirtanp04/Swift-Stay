@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { PropertyClass } from './HotelModel';
+import { PropertyClass } from './PropertyModel';
 
 
 export class RoomClass {
