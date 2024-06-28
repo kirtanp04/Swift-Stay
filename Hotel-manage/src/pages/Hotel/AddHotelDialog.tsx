@@ -9,7 +9,7 @@ import {
   styled,
 } from "@mui/material";
 import { useFieldArray, useForm } from "react-hook-form";
-import { CloseIcon, PlusIcon } from "src/assets/iconify";
+import { CloseCircleIcon, CloseIcon, PlusIcon } from "src/assets/iconify";
 import FormProvider from "src/components/Form/FormProvider";
 import FormTextArea from "src/components/Form/FormTextArea";
 import FormTextFiels from "src/components/Form/FormTextField";
@@ -31,10 +31,7 @@ const AddHotelSchema = yup.object().shape({
   zipCode: yup.string().min(4).required("ZipCode is required"),
   phone: yup.string().required("Phone is required"),
   website: yup.string().required("Website is required"),
-  amenities: yup
-    .array()
-    .of(yup.string().required("Amenity is required"))
-    .min(1, "At least one amenity is required"),
+  amenities: yup.array().of(yup.string().required("Amenity is required")),
   email: yup
     .string()
     .email("Email must be a valid email")
@@ -47,15 +44,12 @@ export default function AddHotelDialog({ onClose, objHotel }: Props) {
     resolver: yupResolver(AddHotelSchema) as any,
   });
   const { handleSubmit, control } = _Method;
-  const { fields } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     control,
     name: "amenities",
-    rules: { minLength: 1 },
   });
 
   const onAddHotel = (objHotelData: HotelClass) => {
-    console.log(objHotelData);
-
     if (objHotelData._id === "") {
       // new one
     } else {
@@ -66,12 +60,13 @@ export default function AddHotelDialog({ onClose, objHotel }: Props) {
     <Dialog open={true} maxWidth="sm" fullWidth>
       <DialogTitle>Add Hotel</DialogTitle>
       <Divider orientation="horizontal" flexItem sx={{ mt: 2 }} />
-      <FormProvider
-        methods={_Method}
-        onSubmit={handleSubmit(onAddHotel)}
-        sx={{ height: "100%", width: "100%" }}
-      >
-        <DialogContent sx={{ height: 600 }}>
+      <FormProvider methods={_Method} onSubmit={handleSubmit(onAddHotel)}>
+        <DialogContent
+          sx={{
+            height: { sm: 400, md: 450, xl: 500 },
+            maxHeight: { sm: 400, md: 450, xl: 500 },
+          }}
+        >
           <Scrollbar sx={{ height: "100%" }}>
             <FieldWrapper>
               <InputWrapper>
@@ -186,20 +181,35 @@ export default function AddHotelDialog({ onClose, objHotel }: Props) {
               </InputWrapper>
             </FieldWrapper>
 
-            <FieldWrapper>
+            <FieldWrapper
+              sx={{
+                flexWrap: "wrap",
+              }}
+            >
               {fields.map((field, index) => (
-                <FormTextFiels
-                  label="Amenitie"
-                  name={`amenities.${index}.value`}
-                  key={field + index}
-                  sx={{ width: "9rem" }}
-                />
+                <Box key={field.id} position={"relative"}>
+                  <FormTextFiels
+                    label="Amenitie"
+                    name={`amenities.${index}`}
+                    sx={{ width: "9rem" }}
+                  />
+                  <CloseCircleIcon
+                    style={{
+                      position: "absolute",
+                      right: -4,
+                      top: -8,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => remove(index)}
+                  />
+                </Box>
               ))}
 
               <RESIconButton
                 iconposition="start"
                 starticon={<PlusIcon />}
                 variant="outlined"
+                onClick={() => append("")}
               >
                 Add Amenities
               </RESIconButton>
