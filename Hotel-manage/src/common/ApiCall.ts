@@ -1,6 +1,8 @@
 import axiosCall from "src/service/axios";
 import { Crypt } from "./Crypt";
 import { ProjectResponse } from "./Response";
+import { Storage } from "./Storage";
+import { enumUserRole } from "src/pages/Authentication/AuthMgr";
 
 export class TParam {
   Broker: string = "";
@@ -121,10 +123,20 @@ export class Api {
     }
   }
 
-  static async protectedPost(_Param: TParam, onResponse: (res: ProjectResponse) => void) {
+  static async protectedPost(_Param: TParam, data: any, onResponse: (res: ProjectResponse) => void) {
     let _res = new ProjectResponse();
 
     try {
+      const objRes = Storage.getFromSessionStorage('Auth')
+
+      if (objRes.error === '') {
+        if (objRes.data.role !== enumUserRole.admin) {
+
+        }
+      } else {
+        _res.error = 'You are not Authorized to perform this task. Login first'
+      }
+
     } catch (error: any) {
       const objDecrypterr = Crypt.Decryption(error.response.data);
       if (objDecrypterr.error === "") {

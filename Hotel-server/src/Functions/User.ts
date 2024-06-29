@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Response';
 import { TParam } from '../types/Type';
 import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
-import { Login, User, UserClass, enumUserRole } from '../models/UserModel';
+import { Login, User, UserClass, enumUserRole } from '../Models/UserModel';
 import { Param } from '../Constant';
 
 

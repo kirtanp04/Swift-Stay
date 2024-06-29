@@ -1,4 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
+import { RoomClass } from './RoomModel';
 
 export enum enumPropertyType {
     Hotel = 'Hotel',
@@ -26,6 +27,7 @@ export class PropertyClass {
     description: string = '';
     amenities: string[] = [];
     images: string[] = [];
+    rooms: RoomClass[] = []
     createdAt: Date = new Date();
 }
 
@@ -42,6 +44,7 @@ const PropertySchema = new Schema<PropertyClass>({
     email: { type: String, required: [true, 'email is required.'] },
     website: { type: String },
     description: { type: String },
+    rooms: [{ type: Schema.Types.ObjectId, ref: 'Room' }],
     amenities: [String],
     images: [String],
     createdAt: { type: Date },

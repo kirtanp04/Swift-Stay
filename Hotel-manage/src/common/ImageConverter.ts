@@ -7,6 +7,8 @@ export default class ImageConverter {
             reader.onload = () => resolve(reader.result as string);
             reader.onerror = error => reject(error);
         });
+
+
     }
 
     static base64ToBuffer(base64: string): ArrayBuffer {

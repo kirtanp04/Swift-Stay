@@ -26,7 +26,7 @@ import { RESIconButton } from "src/components/RESIconButton";
 import Scrollbar from "src/components/Scrollbar";
 import showMessage from "src/util/ShowMessage";
 import * as yup from "yup";
-import { PropertyClass, enumPropertyType } from "./DataObject";
+import { PropertyApi, PropertyClass, enumPropertyType } from "./DataObject";
 import UploadPropertyImage from "./UploadPropertyImage";
 
 type Props = {
@@ -85,12 +85,15 @@ export default function AddPropertyDialog({ onClose, objHotel }: Props) {
   const onAddHotel = (objHotelData: PropertyClass) => {
     if (ImageList.length >= 1 || objHotelData.images.length >= 1) {
       if (objHotelData._id === "") {
-        ImageList.forEach(
-          (objImage) => objHotelData.images.push(objImage.bufferFile)
-          // JSON.stringify(objImage.bufferFile)
+        ImageList.forEach((objImage) =>
+          objHotelData.images.push(objImage.File[0])
         );
 
-        console.log(objHotelData);
+        PropertyApi.addNewProperty(
+          objHotelData,
+          (res) => {},
+          (err) => {}
+        );
         // new one
       } else {
         // update

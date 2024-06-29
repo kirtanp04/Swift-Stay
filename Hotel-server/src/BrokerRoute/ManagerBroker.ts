@@ -52,6 +52,9 @@ ManagerBrokerRouter.post('/:param', async (req: Request, res: Response, next: Ne
       }
 
       if (paramObj.Broker === _ManagerPropertyBroker) {
+
+        const _res = await Functions.PropertyFunction.findFunction(paramObj, req, res, next)
+        return SendResponseToUser(_res, next);
         //
       }
     } else {

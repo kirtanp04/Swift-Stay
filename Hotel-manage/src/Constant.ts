@@ -30,7 +30,12 @@ export const Param = {
     function: {
         manager: {
             register: 'CreateManagerAccount',
-            login: 'ManagerLogin'
+            login: 'ManagerLogin',
+            Property: {
+                AddProperty: 'ManagerAddProperty',
+                GetSingleProperty: 'ManagerGetSingleProperty',
+                GetAllProperty: 'ManagerGetAllProperty',
+            },
         },
         guest: {
             register: 'CreateGuestAccount',

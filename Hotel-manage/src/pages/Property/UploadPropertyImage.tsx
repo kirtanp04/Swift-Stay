@@ -13,7 +13,6 @@ import {
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { CloseCircleIcon, CloseIcon, SaveIcon } from "src/assets/iconify";
-import ImageConverter from "src/common/ImageConverter";
 import Scrollbar from "src/components/Scrollbar";
 import showMessage from "src/util/ShowMessage";
 
@@ -22,28 +21,56 @@ type Props = {
   onSaveImages: (imageList: any[]) => void;
 };
 
+async function audioToBase64(audioFile: any) {
+  return new Promise((resolve, reject) => {
+    let reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = (e: any) => resolve(e.target.result);
+    reader.readAsDataURL(audioFile);
+  });
+}
+
 export default function UploadPropertyImage({ onClose, onSaveImages }: Props) {
   const [saveImage, setSaveImage] = useState<any[]>([]);
   const theme = useTheme();
+
   useEffect(() => {
     return () => saveImage.forEach((file) => URL.revokeObjectURL(file.preview));
   }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
-      "image/*": [],
+      "image/jpeg": [".jpeg", ".jpg"],
+      "image/png": [".png"],
     },
-    onDrop: (acceptedFiles) => onDrop(acceptedFiles),
+    maxSize: 3 * 1024 * 1024, // 3MB,
+    onDrop: <T extends File>(acceptedFiles: T[]) => onDrop(acceptedFiles),
+    // onDropRejected: (fileRejections: FileRejection[]) =>
+    //   onDropRejected(fileRejections),
   });
 
+  // const onDropRejected = (fileRejections: FileRejection[]) => {
+  //   fileRejections.forEach((file) => {
+  //     file.errors.forEach((err: FileError) => {
+  //       if (err.code === "file-too-large") {
+  //         showMessage(err.message, theme, () => {});
+  //       }
+  //       if (err.code === "file-invalid-type") {
+  //         showMessage(err.message, theme, () => {});
+  //       }
+  //     });
+  //   });
+  // };
+
   const onDrop = useCallback(
-    (acceptedFiles: any) => {
+    (acceptedFiles: File[]) => {
       setSaveImage([
         {
-          bufferFile: acceptedFiles.map(
-            async (file: any) => await ImageConverter.fileToBuffer(file)
+          File: acceptedFiles.map(
+            async (file: File) => file
+            // await ImageConverter.toBase64(file).then((base64) => base64)
           ),
-          preview: acceptedFiles.map((file: any) => URL.createObjectURL(file)),
+          preview: acceptedFiles.map((file: File) => URL.createObjectURL(file)),
         },
         ...saveImage,
       ]);
