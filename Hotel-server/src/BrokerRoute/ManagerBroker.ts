@@ -27,6 +27,8 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
     }
 
     if (paramObj.Broker === _ManagerPropertyBroker) {
+      const _res = await Functions.PropertyFunction.findFunction(paramObj, req, res, next)
+      return SendResponseToUser(_res, next);
       //
     }
   } else {
@@ -57,6 +59,10 @@ ManagerBrokerRouter.post('/:param', async (req: Request, res: Response, next: Ne
         return SendResponseToUser(_res, next);
         //
       }
+
+      const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
+      return SendResponseToUser(errMess, next);
+
     } else {
       const errMess = GetUserErrorObj('Server error: Not able to decrypt body', HttpStatusCodes.BAD_REQUEST);
       return SendResponseToUser(errMess, next);

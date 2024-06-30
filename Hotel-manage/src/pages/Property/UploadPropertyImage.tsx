@@ -10,7 +10,7 @@ import {
   styled,
   useTheme,
 } from "@mui/material";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { CloseCircleIcon, CloseIcon, SaveIcon } from "src/assets/iconify";
 import Scrollbar from "src/components/Scrollbar";
@@ -18,25 +18,26 @@ import showMessage from "src/util/ShowMessage";
 
 type Props = {
   onClose: () => void;
-  onSaveImages: (imageList: any[]) => void;
+  onSaveImages: (imageList: string[]) => void;
+  imageList: string[];
 };
 
-async function audioToBase64(audioFile: any) {
+async function fileToBase64(File: any) {
   return new Promise((resolve, reject) => {
     let reader = new FileReader();
     reader.onerror = reject;
     reader.onload = (e: any) => resolve(e.target.result);
-    reader.readAsDataURL(audioFile);
+    reader.readAsDataURL(File);
   });
 }
 
-export default function UploadPropertyImage({ onClose, onSaveImages }: Props) {
-  const [saveImage, setSaveImage] = useState<any[]>([]);
+export default function UploadPropertyImage({
+  onClose,
+  onSaveImages,
+  imageList,
+}: Props) {
+  const [saveImage, setSaveImage] = useState<string[]>(imageList);
   const theme = useTheme();
-
-  useEffect(() => {
-    return () => saveImage.forEach((file) => URL.revokeObjectURL(file.preview));
-  }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -64,24 +65,18 @@ export default function UploadPropertyImage({ onClose, onSaveImages }: Props) {
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      setSaveImage([
-        {
-          File: acceptedFiles.map(
-            async (file: File) => file
-            // await ImageConverter.toBase64(file).then((base64) => base64)
-          ),
-          preview: acceptedFiles.map((file: File) => URL.createObjectURL(file)),
-        },
-        ...saveImage,
-      ]);
+      acceptedFiles.forEach(
+        async (file: File) =>
+          await fileToBase64(file).then((base64: any) =>
+            setSaveImage([base64, ...saveImage])
+          )
+      );
     },
     [saveImage]
   );
 
   const removeImage = (preview: string) => {
-    const filterImageList = saveImage.filter(
-      (objImg) => objImg.preview !== preview
-    );
+    const filterImageList = saveImage.filter((objImg) => objImg !== preview);
     setSaveImage(filterImageList);
   };
 
@@ -119,7 +114,7 @@ export default function UploadPropertyImage({ onClose, onSaveImages }: Props) {
                   <ImageWrapper>
                     <InnerThumb>
                       <Image
-                        src={img.preview}
+                        src={img}
                         // onLoad={() => {
                         //   URL.revokeObjectURL(img);
                         // }}
@@ -132,7 +127,7 @@ export default function UploadPropertyImage({ onClose, onSaveImages }: Props) {
                         IconColor={theme.palette.info.main}
                       />
                     </EditBtnWrapper> */}
-                    <CancleBtnWrapper onClick={() => removeImage(img.preview)}>
+                    <CancleBtnWrapper onClick={() => removeImage(img)}>
                       <CloseCircleIcon height={"100%"} width={"100%"} />
                     </CancleBtnWrapper>
                   </ImageWrapper>

@@ -29,12 +29,16 @@ export const getGETParamData = (
   let _getParam = new TParam();
   _getParam.Broker = _BrokerName;
   _getParam.function = _functionName;
-  _getParam.data = _data
+  _getParam.data = _data;
   return _getParam;
 };
 
 export class Api {
-  static async get(_Param: TParam, onResponse: (res: ProjectResponse) => void, onProgress?: (progress: number) => void) {
+  static async get(
+    _Param: TParam,
+    onResponse: (res: ProjectResponse) => void,
+    onProgress?: (progress: number) => void
+  ) {
     let _res = new ProjectResponse();
     try {
       const encryptData = Crypt.Encryption(_Param);
@@ -46,12 +50,11 @@ export class Api {
             const current = progressEvent.loaded;
             const percentCompleted = Math.floor((current / total!) * 100);
             if (onProgress !== undefined) {
-
-              onProgress(percentCompleted)
+              onProgress(percentCompleted);
             }
           },
         });
-        console.log(response)
+        console.log(response);
       } else {
         _res.error = encryptData.error;
       }
@@ -63,10 +66,14 @@ export class Api {
         _res.error = "Not able to decrypt api error";
       }
     } finally {
-      onResponse(_res)
+      onResponse(_res);
     }
   }
-  static async post(_Param: TParam, data: any, onResponse: (res: ProjectResponse) => void) {
+  static async post(
+    _Param: TParam,
+    data: any,
+    onResponse: (res: ProjectResponse) => void
+  ) {
     let _res = new ProjectResponse();
 
     try {
@@ -79,6 +86,7 @@ export class Api {
           const response = await axiosCall.post(encryptParamData.data, {
             data: encryptedData.data,
           });
+
           if (response) {
             const objDecryptRes = Crypt.Decryption(response.data);
             if (objDecryptRes.data.isError === false) {
@@ -107,10 +115,54 @@ export class Api {
     }
   }
 
-  static async protectedGet(_Param: TParam, onResponse: (res: ProjectResponse) => void) {
+  static async protectedGet(
+    _Param: TParam,
+    onResponse: (res: ProjectResponse) => void,
+    onProgress?: (progress: number) => void
+  ) {
     let _res = new ProjectResponse();
 
     try {
+      const objRes = Storage.getFromSessionStorage("Auth");
+      if (objRes.error === "") {
+        if (objRes.data.role === enumUserRole.admin) {
+          const encryptParamData = Crypt.Encryption(_Param);
+          if (encryptParamData.error === "") {
+            const response = await axiosCall.get(encryptParamData.data, {
+              onDownloadProgress: (progressEvent) => {
+                const total = progressEvent.total;
+                const current = progressEvent.loaded;
+
+                if (total && current) {
+                  const percentCompleted = Math.floor((current / total) * 100);
+                  if (onProgress !== undefined) {
+
+                    onProgress(percentCompleted);
+                  }
+                }
+              },
+            });
+            if (response) {
+              const objDecryptRes = Crypt.Decryption(response.data);
+              if (objDecryptRes.data.isError === false) {
+                _res.data = objDecryptRes.data.data;
+              } else {
+                _res.error = objDecryptRes.data.Message;
+              }
+            } else {
+              _res.error = "Getting response Undefine";
+            }
+          } else {
+            _res.error = encryptParamData.error;
+          }
+        } else {
+          _res.error =
+            "Your are not allowed to perform this call as you are not an admin. First login through admin account.";
+        }
+      } else {
+        _res.error =
+          "You are not authenticated to perform this call. Login to your account first.";
+      }
     } catch (error: any) {
       const objDecrypterr = Crypt.Decryption(error.response.data);
       if (objDecrypterr.error === "") {
@@ -123,20 +175,51 @@ export class Api {
     }
   }
 
-  static async protectedPost(_Param: TParam, data: any, onResponse: (res: ProjectResponse) => void) {
+  static async protectedPost(
+    _Param: TParam,
+    data: any,
+    onResponse: (res: ProjectResponse) => void
+  ) {
     let _res = new ProjectResponse();
+    const objRes = Storage.getFromSessionStorage("Auth");
 
     try {
-      const objRes = Storage.getFromSessionStorage('Auth')
+      if (objRes.error === "") {
+        if (objRes.data.role === enumUserRole.admin) {
+          const encryptParamData = Crypt.Encryption(_Param);
 
-      if (objRes.error === '') {
-        if (objRes.data.role !== enumUserRole.admin) {
+          if (encryptParamData.error === "") {
+            const encryptedData = Crypt.Encryption(data);
 
+            if (encryptedData.error === "") {
+              const response = await axiosCall.post(encryptParamData.data, {
+                data: encryptedData.data,
+              });
+
+              if (response) {
+                const objDecryptRes = Crypt.Decryption(response.data);
+                if (objDecryptRes.data.isError === false) {
+                  _res.data = objDecryptRes.data.data;
+                } else {
+                  _res.error = objDecryptRes.data.Message;
+                }
+              } else {
+                _res.error = "Getting response Undefine";
+              }
+            } else {
+              _res.error = encryptedData.error;
+            }
+          } else {
+            _res.error = encryptParamData.error;
+          }
+        } else {
+          _res.error =
+            "Your are not allowed to perform this call as you are not an admin. First login through admin account.";
         }
       } else {
-        _res.error = 'You are not Authorized to perform this task. Login first'
+        _res.error =
+          "You are not authenticated to perform this call. Login to your account first.";
       }
-
     } catch (error: any) {
       const objDecrypterr = Crypt.Decryption(error.response.data);
       if (objDecrypterr.error === "") {

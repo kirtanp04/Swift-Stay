@@ -23,5 +23,6 @@ if (cluster.isPrimary) {
 else {
     const _Server = new server_1._Express();
     _Server.Port = 8080;
+    _Server.connectToDB();
     _Server.listen();
 }

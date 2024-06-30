@@ -1,7 +1,8 @@
-import { Api, getPostParamData } from "src/common/ApiCall";
+import { Api, getGETParamData, getPostParamData } from "src/common/ApiCall";
 import { RoomClass } from "../room/DataObject";
 import { Param } from "src/Constant";
 import { ProjectResponse } from "src/common/Response";
+import { StoreError } from "src/util/StoreError";
 
 export enum enumPropertyType {
     Hotel = "Hotel",
@@ -31,6 +32,7 @@ export class PropertyClass {
     images: string[] = [];
     rooms: RoomClass[] = [];
     createdAt: Date = new Date();
+    updatedAt: Date = new Date();
 }
 
 export class PropertyApi {
@@ -44,15 +46,92 @@ export class PropertyApi {
                 Param.broker.manager.Property,
                 Param.function.manager.Property.AddProperty
             );
-            await Api.post(_Param, objProperty, (res: ProjectResponse) => {
+            await Api.protectedPost(_Param, objProperty, (res: ProjectResponse) => {
                 if (res.error === "") {
                     onsuccess(res.data);
                 } else {
+                    StoreError('Adding Property', res.error)
                     onFail(res.error);
                 }
             });
         } catch (error: any) {
-            onFail(error);
+            StoreError('Adding Property', error.message)
+            onFail(error.message);
         }
     };
+
+    static getAllProperty = async (
+        adminEmail: string,
+        onsuccess: (res: any) => void,
+        onFail: (err: any) => void,
+        onProgress?: (progressValue: number) => void
+    ) => {
+        try {
+            const _Param = getGETParamData(
+                Param.broker.manager.Property,
+                Param.function.manager.Property.GetAllProperty,
+                adminEmail
+            );
+
+            await Api.protectedGet(_Param, (res) => {
+                if (res.error === "") {
+                    onsuccess(res.data);
+                } else {
+                    StoreError('Getting All Property', res.error)
+                    onFail(res.error);
+                }
+            }, (progressValue) => {
+                if (onProgress !== undefined) {
+                    onProgress(progressValue)
+                }
+            });
+
+        } catch (error: any) {
+            StoreError('Adding Property', error.message)
+            onFail(error.message);
+        }
+
+    };
+
+    static updateProperty = async (
+        objProperty: PropertyClass,
+        onsuccess: (res: any) => void,
+        onFail: (err: any) => void
+    ) => {
+        try {
+            const _Param = getPostParamData(
+                Param.broker.manager.Property,
+                Param.function.manager.Property.UpdateProperty
+            );
+            await Api.protectedPost(_Param, objProperty, (res: ProjectResponse) => {
+                if (res.error === "") {
+                    onsuccess(res.data);
+                } else {
+                    StoreError('Adding Property', res.error)
+                    onFail(res.error);
+                }
+            });
+        } catch (error: any) {
+            StoreError('Adding Property', error.message)
+            onFail(error.message);
+        }
+    };
+
+    static deleteProperty = async (adminID: string, PropertyID: string, onsuccess: (res: any) => void, onfail: (err: any) => void) => {
+        const _Param = getGETParamData(Param.broker.manager.Property, Param.function.manager.Property.DeleteProperty, { adminID: adminID, PropertyID: PropertyID })
+        try {
+            await Api.protectedGet(_Param, (res) => {
+                if (res.error === '') {
+                    onsuccess(res.data)
+                } else {
+                    StoreError('Deleting Property', res.error)
+                    onfail(res.error)
+                }
+            })
+        } catch (error: any) {
+            StoreError('Adding Property', error.message)
+            onfail(error.message)
+        }
+
+    }
 }

@@ -375,3 +375,47 @@ export function PencilEditIcon({ IconColor, ...other }: Props) {
     </svg>
   );
 }
+
+export function LightModeIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 64 64"
+      {...other}
+    >
+      <circle cx={32} cy={32.12} r={31.875} fill="#f5eb35"></circle>
+      <g fill="#e0cf35">
+        <circle cx={29.32} cy={53.02} r={9.226}></circle>
+        <path d="M41.904 24.487a3.918 3.918 0 1 1-7.836-.002a3.918 3.918 0 0 1 7.836.002"></path>
+        <circle cx={5.967} cy={36.54} r={3.845}></circle>
+        <circle cx={6.313} cy={18.917} r={2.195}></circle>
+        <path d="M20.967 19.656a3.433 3.433 0 1 1-6.866 0a3.433 3.433 0 0 1 6.866 0"></path>
+        <circle cx={42.896} cy={11.07} r={4.835}></circle>
+      </g>
+    </svg>
+  );
+}
+
+export function DarkModeIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 64 64"
+      {...other}
+    >
+      <circle cx={32} cy={32} r={32} fill="#405866"></circle>
+      <g fill="#4f6977">
+        <circle cx={29.31} cy={52.982} r={9.262}></circle>
+        <path d="M41.943 24.333a3.936 3.936 0 0 1-7.869 0a3.934 3.934 0 0 1 7.869 0"></path>
+        <circle cx={5.863} cy={36.434} r={3.86}></circle>
+        <circle cx={6.211} cy={18.742} r={2.204}></circle>
+        <circle cx={17.477} cy={19.481} r={3.446}></circle>
+        <path d="M47.792 10.867a4.853 4.853 0 1 1-9.706 0a4.853 4.853 0 0 1 9.706 0"></path>
+      </g>
+    </svg>
+  );
+}

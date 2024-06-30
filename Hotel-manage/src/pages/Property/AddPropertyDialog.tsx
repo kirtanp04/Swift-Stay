@@ -15,6 +15,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import {
   CloseCircleIcon,
   CloseIcon,
+  LoadingAnimation,
   PlusIcon,
   UpdateIcon,
 } from "src/assets/iconify";
@@ -31,7 +32,7 @@ import UploadPropertyImage from "./UploadPropertyImage";
 
 type Props = {
   onClose: () => void;
-  objHotel: PropertyClass;
+  objProperty: PropertyClass;
 };
 
 const AddHotelSchema = yup.object().shape({
@@ -50,17 +51,19 @@ const AddHotelSchema = yup.object().shape({
     .required("Public Email is required"),
 });
 
-export default function AddPropertyDialog({ onClose, objHotel }: Props) {
+export default function AddPropertyDialog({ onClose, objProperty }: Props) {
   const [showUploadImageDialog, setShowUploadImageDialog] =
     useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const [ImageList, setImageList] = useState<any[]>([]);
+  const [_objProperty, setObjProperty] = useState<PropertyClass>(objProperty);
+
   const theme = useTheme();
 
   //------------------------------- Form
 
   const _Method = useForm<PropertyClass>({
-    defaultValues: objHotel,
+    defaultValues: objProperty,
     resolver: yupResolver(AddHotelSchema) as any,
   });
   const { handleSubmit, control } = _Method;
@@ -79,24 +82,41 @@ export default function AddPropertyDialog({ onClose, objHotel }: Props) {
   };
 
   const SaveImageList = (ImageList: any[]) => {
-    setImageList(ImageList);
+    setObjProperty({ ..._objProperty, images: ImageList });
   };
 
   const onAddHotel = (objHotelData: PropertyClass) => {
-    if (ImageList.length >= 1 || objHotelData.images.length >= 1) {
+    if (_objProperty.images.length >= 1 || objHotelData.images.length >= 1) {
+      objHotelData.images = [];
+      _objProperty.images.forEach((img) => objHotelData.images.push(img));
       if (objHotelData._id === "") {
-        ImageList.forEach((objImage) =>
-          objHotelData.images.push(objImage.File[0])
-        );
-
+        setLoading(true);
         PropertyApi.addNewProperty(
           objHotelData,
-          (res) => {},
-          (err) => {}
+          (res) => {
+            setLoading(false);
+            showMessage(res, theme, () => onClose());
+          },
+          (err) => {
+            setLoading(false);
+            showMessage(err, theme, () => {});
+          }
         );
-        // new one
       } else {
         // update
+
+        setLoading(true);
+        PropertyApi.updateProperty(
+          objHotelData,
+          (res) => {
+            setLoading(false);
+            showMessage(res, theme, () => onClose());
+          },
+          (err) => {
+            setLoading(false);
+            showMessage(err, theme, () => {});
+          }
+        );
       }
     } else {
       showMessage("Select atleast One Hotel Image", theme, () => {});
@@ -104,7 +124,9 @@ export default function AddPropertyDialog({ onClose, objHotel }: Props) {
   };
   return (
     <Dialog open={true} maxWidth="sm" fullWidth>
-      <DialogTitle>Add Property</DialogTitle>
+      <DialogTitle>
+        {_objProperty._id === "" ? "Add Property" : "Update Property"}
+      </DialogTitle>
       <Divider orientation="horizontal" flexItem sx={{ mt: 2 }} />
       <FormProvider methods={_Method} onSubmit={handleSubmit(onAddHotel)}>
         <DialogContent
@@ -289,7 +311,7 @@ export default function AddPropertyDialog({ onClose, objHotel }: Props) {
           </Button>
           <RESIconButton
             iconposition="start"
-            starticon={<PlusIcon />}
+            starticon={loading ? <LoadingAnimation /> : <PlusIcon />}
             variant="outlined"
             type="submit"
           >
@@ -311,6 +333,7 @@ export default function AddPropertyDialog({ onClose, objHotel }: Props) {
         <UploadPropertyImage
           onClose={closeUploadImageDialog}
           onSaveImages={SaveImageList}
+          imageList={_objProperty.images}
         />
       )}
     </Dialog>

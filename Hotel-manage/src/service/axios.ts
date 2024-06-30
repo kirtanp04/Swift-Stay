@@ -5,11 +5,12 @@ const axiosCall = axios.create({
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json;charset=UTF-8',
+
     },
     maxContentLength: 10000000,
     maxBodyLength: 10000000,
     timeout: 30000, // 30 seconds timeout
-    withCredentials: true
+    withCredentials: true,
 });
 
 axiosCall.interceptors.response.use(

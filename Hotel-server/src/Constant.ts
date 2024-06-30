@@ -21,6 +21,8 @@ export const Param = {
                 AddProperty: 'ManagerAddProperty',
                 GetSingleProperty: 'ManagerGetSingleProperty',
                 GetAllProperty: 'ManagerGetAllProperty',
+                DeleteProperty: 'ManagerDeleteProperty',
+                UpdateProperty: 'ManagerUpdateProperty'
             },
         },
         guest: {
@@ -29,3 +31,16 @@ export const Param = {
         },
     },
 };
+
+
+export const CacheKey = {
+    user: {
+        property: '#@User#@Property#@',
+        room: '#@User#@Room#@',
+    },
+    manager: {
+        property: (emailID: string) => `#@Manager#@${emailID}#@Property#@`,
+        room: (emailID: string) => `#@Manager#@${emailID}#@Room#@`,
+    }
+
+}

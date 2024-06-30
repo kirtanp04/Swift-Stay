@@ -42,7 +42,7 @@ const OutletWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   flex: 1,
   backgroundColor: theme.palette.background.neutral,
-  width: "100%",
+  width: "calc(100vw - 300px)",
   padding: "0.7rem 1.2rem",
   borderRadius: "20px",
   border: `1px solid ${theme.palette.text.secondary}`,

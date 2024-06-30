@@ -4,8 +4,7 @@ interface TProps {
   children: ReactNode;
 }
 
-
-const InitialValue: string = 'dark'
+const InitialValue: string = "dark";
 
 const ThemeContext = createContext<{
   mode: string;
@@ -15,15 +14,13 @@ const ThemeContext = createContext<{
   ChangeMode: () => null,
 });
 
-
-
 function ThemeSettingCTXProvider({ children }: TProps) {
   const [mode, setMode] = useState<string>(InitialValue);
 
-  const ChangeMode = (modeName:'dark'|'light') =>{
-    setMode(modeName)
-  }
-  
+  const ChangeMode = (modeName: "dark" | "light") => {
+    debugger;
+    setMode(modeName);
+  };
 
   return (
     <ThemeContext.Provider value={{ mode, ChangeMode }}>
@@ -33,4 +30,3 @@ function ThemeSettingCTXProvider({ children }: TProps) {
 }
 
 export { ThemeContext, ThemeSettingCTXProvider };
-

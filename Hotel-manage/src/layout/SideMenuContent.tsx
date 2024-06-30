@@ -2,7 +2,9 @@ import {
   Box,
   Divider,
   List,
+  Tooltip,
   Typography,
+  Zoom,
   styled,
   useTheme,
 } from "@mui/material";
@@ -12,9 +14,11 @@ import { TMenuList } from "src/Types";
 import {
   BookingIcon,
   ChatIcon,
+  DarkModeIcon,
   ErrorLogIcon,
   GraphIcon,
   HotelIcon,
+  LightModeIcon,
   LogoutIcon,
   ReviewIcon,
   RoomIcon,
@@ -22,12 +26,14 @@ import {
 import ScrollBar from "src/components/Scrollbar";
 import MUIAvatar from "src/components/mui/MUIAvatar";
 import useAuth from "src/hooks/useAuth";
+import useThemeSetting from "src/hooks/useThemesetting";
 
 type Props = {};
 
 export default function SideMenuContent({}: Props) {
   const { user } = useAuth();
   const theme = useTheme();
+  const { mode, ChangeMode } = useThemeSetting();
 
   const MenuList: TMenuList[] = [
     {
@@ -149,6 +155,27 @@ export default function SideMenuContent({}: Props) {
         </ScrollBar>
       </ListWrapper>
       <Divider flexItem />
+      <ThemeWrapper>
+        {mode === "dark" ? (
+          <Tooltip title="Turn to Light mode" arrow TransitionComponent={Zoom}>
+            <LightModeIcon
+              height={25}
+              width={25}
+              style={{ cursor: "pointer" }}
+              onClick={() => ChangeMode("light")}
+            />
+          </Tooltip>
+        ) : (
+          <Tooltip title="Turn to Light mode" arrow TransitionComponent={Zoom}>
+            <DarkModeIcon
+              height={25}
+              width={25}
+              style={{ cursor: "pointer" }}
+              onClick={() => ChangeMode("dark")}
+            />
+          </Tooltip>
+        )}
+      </ThemeWrapper>
       <ListItemWrapper sx={{ backgroundColor: theme.palette.error.main }}>
         <LogoutIcon height={25} width={25} />
         <ListText>Logout</ListText>
@@ -235,4 +262,12 @@ const ListText = styled(Typography)(({ theme }) => ({
   fontSize: "1rem",
   color: theme.palette.text.primary,
   marginLeft: "2rem",
+}));
+
+const ThemeWrapper = styled(Box)(() => ({
+  width: "100%",
+  height: 80,
+  display: "flex",
+  justifyContent: "space-around",
+  alignItems: "center",
 }));

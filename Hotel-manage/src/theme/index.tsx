@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
 // @mui
 import { CssBaseline } from "@mui/material";
 import {
@@ -25,16 +25,20 @@ type Props = {
 export default function ThemeProvider({ children }: Props) {
   const { mode } = useThemeSetting();
 
+  const isLight = mode === "light";
+  useEffect(() => {
+    console.log(mode);
+  }, [mode]);
+
   const themeOptions: ThemeOptions = useMemo(
     () => ({
-      palette: mode === "light" ? palette.light : palette.dark,
+      palette: isLight ? palette.light : palette.dark,
       // typography,
       themeColor: "red",
       breakpoints,
       shape: { borderRadius: 8 },
-      shadows: mode === "light" ? shadows.light : shadows.dark,
-      customShadows:
-        mode === "light" ? customShadows.light : customShadows.dark,
+      shadows: isLight ? shadows.light : shadows.dark,
+      customShadows: isLight ? customShadows.light : customShadows.dark,
     }),
     [mode]
   );

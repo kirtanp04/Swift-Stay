@@ -63,10 +63,11 @@ export const MUIDataGrid = styled(DataGrid)(({ theme }) => ({
     //   display: 'none',
     // },
     '& .MuiDataGrid-columnsContainer, .MuiDataGrid-cell': {
-        borderBottom: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.background.paper : theme.palette.background.neutral}`,
+        borderBottom: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.grey[50012] : theme.palette.grey[50012]}`,
     },
     '& .MuiDataGrid-cell': {
-        borderRight: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.background.paper : theme.palette.background.paper}`,
+        borderRight: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.grey[50012] : theme.palette.grey[50012]}`,
+        backgroundColor: theme.palette.background.neutral
         // color: theme.palette.mode === 'light' ? 'rgba(0,0,0,.85)' : 'rgba(255,255,255,0.65)',
     },
     '& .MuiPaginationItem-root': {

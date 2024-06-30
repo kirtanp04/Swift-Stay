@@ -4,11 +4,11 @@ exports.SendResponseToUser = exports.UserResponseMiddWare = void 0;
 const Crypt_1 = require("../common/Crypt");
 const UserResponseMiddWare = (objRes, req, res, next) => {
     const encryptedData = Crypt_1.Crypt.Encryption(objRes);
-    if (encryptedData) {
-        res.status(objRes.statusCode).json(encryptedData);
+    if (encryptedData.error === '') {
+        res.status(objRes.statusCode).send(encryptedData.data);
     }
     else {
-        res.status(404).json({ message: 'Server Error: Not able to encrypt data while sending data from server.' });
+        res.status(404).send(encryptedData.error);
     }
 };
 exports.UserResponseMiddWare = UserResponseMiddWare;

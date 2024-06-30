@@ -4,11 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Jwt = void 0;
-const env_1 = require("src/env");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const Crypt_1 = require("./Crypt");
 const Response_1 = require("./Response");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const JWT_KEY = env_1.SecrtKey.JWT_KEY;
+// const privateKey = fs.readFileSync(path.join(__dirname, 'private_key.pem'), 'utf8');
+// const publicKey = fs.readFileSync(path.join(__dirname, 'public_key.pem'), 'utf8');
+const JWT_KEY = 'jbut*%$%^JHFR^$^$^&FC64';
 class Jwt {
 }
 exports.Jwt = Jwt;
@@ -17,35 +18,34 @@ Jwt.SignJwt = (data, expireIn) => {
     try {
         const objEncrypt = Crypt_1.Crypt.Encryption(data);
         if (objEncrypt.error === '') {
-            jsonwebtoken_1.default.sign({
+            const getToken = jsonwebtoken_1.default.sign({
                 data: objEncrypt.data,
-            }, JWT_KEY, { expiresIn: expireIn || '1h', algorithm: 'RS256' }, (error, token) => {
-                if (error) {
-                    _res.error = (0, Response_1.errorPath)('common/JWT', 'SignJwt', 22) + error;
-                }
-                if (token !== undefined) {
-                    _res.data = token;
-                }
-                else {
-                    _res.error = (0, Response_1.errorPath)('common/JWT', 'SignJwt', 27) + 'While Sign in JWT Getting token undefine';
-                }
+            }, JWT_KEY, {
+                expiresIn: expireIn || '1h',
+                //  algorithm: 'RS256' 
             });
+            if (getToken) {
+                _res.data = getToken;
+            }
+            else {
+                _res.error = 'Server Error not able to generate token';
+            }
         }
         else {
-            _res.error = (0, Response_1.errorPath)('common/JWT', 'SignJwt', 32) + objEncrypt.error;
+            _res.error = (0, Response_1.errorPath)('common/JWT', 'SignJwt', 33) + objEncrypt.error;
         }
     }
     catch (error) {
-        _res.error = (0, Response_1.errorPath)('common/JWT', 'SignJwt', 35) + error;
+        _res.error = (0, Response_1.errorPath)('common/JWT', 'SignJwt', 36) + error;
     }
     finally {
         return _res;
     }
 };
-Jwt.VerifyJwt = (token, key) => {
+Jwt.VerifyJwt = (token) => {
     let _res = new Response_1.ProjectResponse();
     try {
-        const decodedToken = jsonwebtoken_1.default.verify(token, key !== undefined ? key : JWT_KEY);
+        const decodedToken = jsonwebtoken_1.default.verify(token, JWT_KEY);
         if (decodedToken) {
             const objDecrypt = Crypt_1.Crypt.Decryption(decodedToken.data);
             if (objDecrypt.error === '') {
@@ -56,7 +56,7 @@ Jwt.VerifyJwt = (token, key) => {
             }
         }
         else {
-            _res.error = (0, Response_1.errorPath)('common/JWT', 'VerifyJwt', 57) + 'Not able to Decode Token, Might bo Wrong Key Provided.';
+            _res.error = (0, Response_1.errorPath)('common/JWT', 'VerifyJwt', 57) + 'Not able to Decode Token, Might bo Wrong Token/key Provided.';
         }
     }
     catch (error) {

@@ -1,32 +1,19 @@
-export const baseUrlName: string = '/'
-
-// helmet
-export const descriptionContent = 'Book the best hotels, resort, appartments and manymore all over India.'
-
-
-
-
-
-export const Param = {
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CacheKey = exports.Param = void 0;
+exports.Param = {
     broker: {
-
         manager: {
             Auth: 'ManagerAuthBroker',
             Property: 'ManagerPropertyBroker',
-            Room: 'ManagerRoomBroker'
+            Room: 'ManagerRoomBroker',
         },
-
         guest: {
-
             Auth: 'GuestAuthBroker',
             Property: 'GuestPropertyBroker',
-            Room: 'GuestRoomBroker'
-
-        }
-
+            Room: 'GuestRoomBroker',
+        },
     },
-
     function: {
         manager: {
             register: 'CreateManagerAccount',
@@ -35,13 +22,15 @@ export const Param = {
                 AddProperty: 'ManagerAddProperty',
                 GetSingleProperty: 'ManagerGetSingleProperty',
                 GetAllProperty: 'ManagerGetAllProperty',
-                DeleteProperty: 'ManagerDeleteProperty',
-                UpdateProperty: 'ManagerUpdateProperty'
             },
         },
         guest: {
             register: 'CreateGuestAccount',
-            login: 'GuestLogin'
-        }
-    }
-}
+            login: 'GuestLogin',
+        },
+    },
+};
+exports.CacheKey = {
+    property: '#@Property@#',
+    room: '#@Room@#',
+};
