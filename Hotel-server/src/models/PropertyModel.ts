@@ -1,5 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
 import { RoomClass } from './RoomModel';
+import { UserClass } from './UserModel';
 
 export enum enumPropertyType {
     Hotel = 'Hotel',
@@ -10,7 +11,7 @@ export enum enumPropertyType {
 
 export class PropertyClass {
     _id: string = '';
-    adminID: any = '';
+    adminID: any = new UserClass();
     name: string = '';
     propertyType: enumPropertyType = enumPropertyType.Hotel;
     address: string = '';
@@ -30,7 +31,7 @@ export class PropertyClass {
 }
 
 const PropertySchema = new Schema<PropertyClass>({
-    adminID: { type: String, ref: 'User', required: true },
+    adminID: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     name: { type: String, required: [true, 'Property name is required.'] },
     propertyType: { type: String, enum: Object.values(enumPropertyType), default: enumPropertyType.Hotel },
     address: { type: String, required: [true, 'Property address is required.'] },

@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response, Router } from 'express';
 import { Crypt } from '../common/Crypt';
 import { SendResponseToUser } from '../middleware/UserResponse';
 import { TParam } from '../types/Type';
-import * as Functions from '../Functions';
+import * as Functions from '../functions';
 import { GetUserErrorObj, HttpStatusCodes } from '../common';
 import { Param } from '../Constant'
 
@@ -56,6 +56,13 @@ ManagerBrokerRouter.post('/:param', async (req: Request, res: Response, next: Ne
       if (paramObj.Broker === _ManagerPropertyBroker) {
 
         const _res = await Functions.PropertyFunction.findFunction(paramObj, req, res, next)
+        return SendResponseToUser(_res, next);
+        //
+      }
+
+      if (paramObj.Broker === _ManagerRoomBroker) {
+
+        const _res = await Functions.RoomFunction.findFunction(paramObj, req, res, next)
         return SendResponseToUser(_res, next);
         //
       }

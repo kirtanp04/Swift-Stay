@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response, Router } from 'express';
 import { Crypt } from '../common/Crypt';
 import { SendResponseToUser } from '../middleware/UserResponse';
 import { TParam } from '../types/Type';
-import * as Functions from '../Functions'
+import * as Functions from '../functions'
 import { Param } from '../Constant';
 
 

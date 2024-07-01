@@ -3,7 +3,7 @@ import { Cache, GetUserErrorObj, GetUserSuccessObj, HttpStatusCodes, UserRespons
 import { TParam } from '../types/Type';
 import { Param, CacheKey } from '../Constant';
 import { Property as PropertyModel, PropertyClass } from '../models/PropertyModel';
-import { User, UserClass, enumUserRole } from '../models/UserModel';
+// import { User, UserClass, enumUserRole } from '';
 import { checkAdminVerification } from '../middleware/AdiminVerification';
 
 const _AddProperty = Param.function.manager.Property.AddProperty;
@@ -143,9 +143,9 @@ class Functions {
 
     public getAllProperty = async (): Promise<UserResponse> => {
         try {
-            const email = this.objParam!.data;
+            const id = this.objParam!.data;
 
-            const checkUser = await checkAdminVerification(email);
+            const checkUser = await checkAdminVerification(id);
 
             if (checkUser.error === '') {
                 const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
@@ -154,7 +154,8 @@ class Functions {
                     this.objUserResponse = GetUserSuccessObj(ManagerPropertyCache.data, HttpStatusCodes.OK);
 
                 } else {
-                    const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data.email });
+                    const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id })
+                    // const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id }).populate('rooms').exec()
                     if (allProperties.length > 0) {
                         Cache.SetCache(CacheKey.manager.property(checkUser.data.email), allProperties)
                         this.objUserResponse = GetUserSuccessObj(ManagerPropertyCache.data, HttpStatusCodes.OK);

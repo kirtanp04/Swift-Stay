@@ -18,6 +18,7 @@ const Layout = Loadable(lazy(() => import("src/layout/SideMenu"))); // side menu
 const PropertyList = Loadable(
   lazy(() => import("src/pages/Property/PropertyList"))
 );
+const RoomList = Loadable(lazy(() => import("src/pages/room/RoomList")));
 const Errorlogs = Loadable(lazy(() => import("src/pages/ErrorLogs/Errorlogs")));
 const SignUp = Loadable(
   lazy(() => import("src/pages/Authentication/Register"))
@@ -58,7 +59,7 @@ export default function Router() {
         },
         { path: "dashboard", element: <>dashboard</> },
         { path: "properties", element: <PropertyList /> },
-        { path: "rooms", element: <>rooms</> },
+        { path: "rooms", element: <RoomList /> },
         { path: "bookings", element: <>bookings</> },
         { path: "reviews", element: <>reviews</> },
         { path: "errorlogs", element: <Errorlogs /> },

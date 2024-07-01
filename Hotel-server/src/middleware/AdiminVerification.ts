@@ -1,11 +1,11 @@
 import { User, UserClass, enumUserRole } from '../models/UserModel';
 import { ProjectResponse } from '../common/Response';
 
-export const checkAdminVerification = async (email: string): Promise<ProjectResponse> => {
+export const checkAdminVerification = async (id: string): Promise<ProjectResponse> => {
     let _res = new ProjectResponse();
 
     try {
-        const checkUser = await User.findOne({ email: email });
+        const checkUser = await User.findOne({ _id: id });
 
         if (checkUser) {
 

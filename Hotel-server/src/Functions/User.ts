@@ -175,13 +175,13 @@ class Functions {
 
                 if (isVerifiePass.error === '') {
                     if (isUser.role !== enumUserRole.guest) {
-                        const getToken = await Jwt.SignJwt({ email: isUser.email, name: isUser.name, profileImg: isUser.profileImg, role: isUser.role });
+                        const getToken = await Jwt.SignJwt({ email: isUser.email, name: isUser.name, profileImg: isUser.profileImg, role: isUser.role, });
                         if (getToken.error === '') {
                             const setCookie = Storage.setCookie('Auth', getToken.data, this.res!);
 
                             if (setCookie.error === '') {
                                 this.objUserResponse = GetUserSuccessObj(
-                                    { email: isUser.email, name: isUser.name, profile: isUser.profileImg, role: isUser.role },
+                                    { email: isUser.email, name: isUser.name, profile: isUser.profileImg, role: isUser.role, id: isUser._id },
                                     HttpStatusCodes.ACCEPTED
                                 );
                             } else {

@@ -38,6 +38,11 @@ export const Param = {
                 DeleteProperty: 'ManagerDeleteProperty',
                 UpdateProperty: 'ManagerUpdateProperty'
             },
+            Room: {
+                AddRoom: 'ManagerAddRoom',
+                UpdateRoom: 'ManagerUpdateRoom',
+                DeleteRoom: 'ManagerDeleteRoom',
+            }
         },
         guest: {
             register: 'CreateGuestAccount',

@@ -61,7 +61,7 @@ export class PropertyApi {
     };
 
     static getAllProperty = async (
-        adminEmail: string,
+        adminID: string,
         onsuccess: (res: any) => void,
         onFail: (err: any) => void,
         onProgress?: (progressValue: number) => void
@@ -70,7 +70,7 @@ export class PropertyApi {
             const _Param = getGETParamData(
                 Param.broker.manager.Property,
                 Param.function.manager.Property.GetAllProperty,
-                adminEmail
+                adminID
             );
 
             await Api.protectedGet(_Param, (res) => {

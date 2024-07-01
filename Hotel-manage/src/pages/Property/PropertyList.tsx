@@ -27,7 +27,7 @@ export default function HotelList({}: Props) {
   );
   const {
     user: {
-      userInfo: { email },
+      userInfo: { id },
     },
   } = useAuth();
   const theme = useTheme();
@@ -41,7 +41,7 @@ export default function HotelList({}: Props) {
   const getAllProperty = () => {
     showLoading(theme, true);
     PropertyApi.getAllProperty(
-      email,
+      id,
       (res) => {
         setPropertyList(res);
         showLoading(theme, false);
@@ -60,7 +60,7 @@ export default function HotelList({}: Props) {
   const deleteProperty = (PropertyID: string) => {
     showLoading(theme, true);
     PropertyApi.deleteProperty(
-      email,
+      id,
       PropertyID,
       (res) => {
         showMessage(res, theme, () => {});
@@ -80,7 +80,7 @@ export default function HotelList({}: Props) {
 
   const onAddNewHotel = () => {
     let _newObjHotel = new PropertyClass();
-    _newObjHotel.adminID = email;
+    _newObjHotel.adminID = id;
     setObjPropert(_newObjHotel);
     setOpenAddHotelDialog(true);
   };
