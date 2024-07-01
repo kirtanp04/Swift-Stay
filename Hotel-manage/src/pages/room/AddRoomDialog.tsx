@@ -92,8 +92,15 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
     if (objRoom._id === "") {
       //new
 
-      RoomApi.addNewRoom(_objRoom);
-      console.log(_objRoom);
+      RoomApi.addNewRoom(
+        _objRoom,
+        (res) => {
+          showMessage(res, theme, () => {});
+        },
+        (err) => {
+          showMessage(err, theme, () => {});
+        }
+      );
     } else {
       //update
     }

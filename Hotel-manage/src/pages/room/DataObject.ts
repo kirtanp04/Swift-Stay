@@ -1,6 +1,7 @@
 import { Api, getPostParamData } from "src/common/ApiCall";
 import { PropertyClass } from "../Property/DataObject";
 import { Param } from "src/Constant";
+import { StoreError } from "src/util/StoreError";
 
 export enum enumRoomType {
     Single_Room = 'Single Room',
@@ -20,6 +21,7 @@ export class RoomClass {
     type: enumRoomType = enumRoomType.Single_Room // e.g., single, double, suite
     description: string = ''
     amenities: string[] = ['cricket']
+    images: string[] = []
     price: number = 0
     maxOccupancy: number = 0
     isAvailable: boolean = true
@@ -29,11 +31,17 @@ export class RoomClass {
 
 export class RoomApi {
 
-    static addNewRoom = async (objRoom: RoomClass) => {
+    static addNewRoom = async (objRoom: RoomClass, onsuccess: (res: any) => void,
+        onFail: (err: any) => void,) => {
         const _Param = getPostParamData(Param.broker.manager.Room, Param.function.manager.Room.AddRoom)
 
         await Api.protectedPost(_Param, objRoom, (res) => {
-            console.log(res)
+            if (res.error === "") {
+                onsuccess(res.data);
+            } else {
+                StoreError('Creating New Room', res.error)
+                onFail(res.error);
+            }
         })
     }
 }
