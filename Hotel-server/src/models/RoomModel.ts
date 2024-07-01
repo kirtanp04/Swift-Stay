@@ -20,6 +20,7 @@ export class RoomClass {
     type: enumRoomType = enumRoomType.Single_Room // e.g., single, double, suite
     description: string = ''
     amenities: string[] = []
+    images: string[] = []
     price: number = 0
     maxOccupancy: number = 0
     isAvailable: boolean = true
@@ -34,6 +35,7 @@ const RoomSchema = new Schema<RoomClass>({
     type: { type: String, enum: Object.values(enumRoomType), required: [true, ' Room type is required'], default: enumRoomType.Single_Room }, // e.g., single, double, suite
     description: { type: String },
     amenities: [String],
+    images: [String],
     price: { type: Number, required: [true, 'Room price is required'] },
     maxOccupancy: { type: Number, required: [true, 'Room max occupancy is required'] },
     isAvailable: { type: Boolean, default: true },

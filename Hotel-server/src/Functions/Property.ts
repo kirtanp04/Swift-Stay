@@ -154,8 +154,8 @@ class Functions {
                     this.objUserResponse = GetUserSuccessObj(ManagerPropertyCache.data, HttpStatusCodes.OK);
 
                 } else {
-                    const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id })
-                    // const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id }).populate('rooms').exec()
+                    // const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id })
+                    const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id }).populate('rooms').exec()
                     if (allProperties.length > 0) {
                         Cache.SetCache(CacheKey.manager.property(checkUser.data.email), allProperties)
                         this.objUserResponse = GetUserSuccessObj(ManagerPropertyCache.data, HttpStatusCodes.OK);
@@ -196,10 +196,10 @@ class Functions {
             } = this.objParam!.data as PropertyClass;
 
             const checkUser = await checkAdminVerification(adminID);
-            const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(adminID));
-            const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
 
             if (checkUser.error === '') {
+                const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
+                const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
                 const isUpdated = await PropertyModel.findOneAndUpdate({ _id: _id }, {
                     $set: {
                         address: address,
@@ -225,7 +225,7 @@ class Functions {
                         HttpStatusCodes.CREATED
                     );
                     if (ManagerPropertyCache.data !== '') {
-                        Cache.ClearCache(CacheKey.manager.property(adminID));
+                        Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                     }
                     if (UserPropertyCache.data !== '') {
                         Cache.ClearCache(CacheKey.user.property);
@@ -252,10 +252,10 @@ class Functions {
         try {
             const { adminID, PropertyID } = this.objParam.data
             const checkUser = await checkAdminVerification(adminID);
-            const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(adminID));
-            const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
 
             if (checkUser.error === '') {
+                const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
+                const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
 
                 const isDeleted = await PropertyModel.findByIdAndDelete({ _id: PropertyID })
 
@@ -265,7 +265,7 @@ class Functions {
                         HttpStatusCodes.OK
                     );
                     if (ManagerPropertyCache.data !== '') {
-                        Cache.ClearCache(CacheKey.manager.property(adminID));
+                        Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                     }
                     if (UserPropertyCache.data !== '') {
                         Cache.ClearCache(CacheKey.user.property);
