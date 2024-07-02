@@ -28,6 +28,7 @@ export const Param = {
                 AddRoom: 'ManagerAddRoom',
                 UpdateRoom: 'ManagerUpdateRoom',
                 DeleteRoom: 'ManagerDeleteRoom',
+                GetAllRoom: 'ManagerGetAllRoom'
             }
         },
         guest: {

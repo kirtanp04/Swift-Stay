@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
-require('dotenv').config()
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import compression from 'compression'
@@ -11,6 +10,7 @@ import { UserResponse } from './common/Response';
 import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
 import { MainApiLimit } from './middleware/RateLimitApi';
 import { MongoDB } from './DB/MongoDB';
+import dotenv from 'dotenv'
 
 const _app = express()
 
@@ -29,16 +29,6 @@ export class _Express {
   middleware() {
 
 
-
-    _app.use(cors({
-      credentials: true,
-      methods: 'GET,POST',
-      optionsSuccessStatus: 201,
-      origin: 'http://localhost:5173'
-    }));
-
-    _app.use(helmet())
-
     _app.use(compression({
       level: 9,
       threshold: 512,
@@ -49,6 +39,17 @@ export class _Express {
         return compression.filter(req, res)
       }
     }))
+
+    _app.use(cors({
+      credentials: true,
+      methods: 'GET,POST',
+      optionsSuccessStatus: 201,
+      origin: 'http://localhost:5173'
+    }));
+
+
+    _app.use(helmet())
+
 
     _app.use(bodyParser.json({ limit: '50mb' }));
 
@@ -78,9 +79,6 @@ export class _Express {
     _app.use(UserResponseMiddWare) // sending data to user middle ware
   }
 
-  connectToDB() {
-    MongoDB.ConnectDB()
-  }
 
   listen() {
     try {

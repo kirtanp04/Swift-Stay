@@ -5,6 +5,7 @@ import { Param, CacheKey } from '../Constant';
 import { Property as PropertyModel, PropertyClass } from '../models/PropertyModel';
 // import { User, UserClass, enumUserRole } from '';
 import { checkAdminVerification } from '../middleware/AdiminVerification';
+import { Room } from '../models/RoomModel';
 
 const _AddProperty = Param.function.manager.Property.AddProperty;
 const _GetSingleProperty = Param.function.manager.Property.GetSingleProperty;
@@ -79,7 +80,7 @@ class Functions {
             } = this.objParam!.data as PropertyClass;
 
             const checkUser = await checkAdminVerification(adminID);
-            const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(adminID));
+            const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
             const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
 
             if (checkUser.error === '') {
@@ -111,7 +112,7 @@ class Functions {
                         HttpStatusCodes.CREATED
                     );
                     if (ManagerPropertyCache.data !== '') {
-                        Cache.ClearCache(CacheKey.manager.property(adminID));
+                        Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                     }
                     if (UserPropertyCache.data !== '') {
                         Cache.ClearCache(CacheKey.user.property);
@@ -158,7 +159,7 @@ class Functions {
                     const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id }).populate('rooms').exec()
                     if (allProperties.length > 0) {
                         Cache.SetCache(CacheKey.manager.property(checkUser.data.email), allProperties)
-                        this.objUserResponse = GetUserSuccessObj(ManagerPropertyCache.data, HttpStatusCodes.OK);
+                        this.objUserResponse = GetUserSuccessObj(allProperties, HttpStatusCodes.OK);
 
                     }
                 }
@@ -256,26 +257,58 @@ class Functions {
             if (checkUser.error === '') {
                 const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
                 const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
+                const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(checkUser.data.email));
 
                 const isDeleted = await PropertyModel.findByIdAndDelete({ _id: PropertyID })
 
-                if (isDeleted) {
-                    this.objUserResponse = GetUserSuccessObj(
-                        `Success: Your ` + isDeleted.propertyType + isDeleted.name + ` has been Deleted.`,
-                        HttpStatusCodes.OK
-                    );
-                    if (ManagerPropertyCache.data !== '') {
-                        Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
-                    }
-                    if (UserPropertyCache.data !== '') {
-                        Cache.ClearCache(CacheKey.user.property);
+                if (isDeleted?.rooms.length! > 0) {
+                    const isRoomDelete = await Room.deleteMany({ _id: { $in: isDeleted?.rooms } })
+
+                    if (isRoomDelete) {
+                        this.objUserResponse = GetUserSuccessObj(
+                            `Success: Your ` + isDeleted!.propertyType + isDeleted!.name + ` has been Deleted.`,
+                            HttpStatusCodes.OK
+                        );
+                        if (ManagerPropertyCache.data !== '') {
+                            Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
+                        }
+                        if (UserPropertyCache.data !== '') {
+                            Cache.ClearCache(CacheKey.user.property);
+                        }
+                        if (ManagerRoomCache.data !== '') {
+                            Cache.ClearCache(CacheKey.manager.room(checkUser.data.email));
+                        }
+                        if (ManagerRoomCache.data !== '') {
+                            Cache.ClearCache(CacheKey.user.room);
+                        }
+                    } else {
+                        this.objUserResponse = GetUserErrorObj(
+                            `Server error not able to Delete Rooms of ` + isDeleted!.propertyType + isDeleted!.name + `. Create Manager account first. Might wrong credentials.`,
+                            HttpStatusCodes.BAD_REQUEST
+                        );
                     }
                 } else {
-                    this.objUserResponse = GetUserErrorObj(
-                        `Server error not able to Delete ` + isDeleted!.propertyType + isDeleted!.name + `. Create Manager account first. Might wrong credentials.`,
-                        HttpStatusCodes.BAD_REQUEST
-                    );
+                    if (isDeleted) {
+                        this.objUserResponse = GetUserSuccessObj(
+                            `Success: Your ` + isDeleted.propertyType + isDeleted.name + ` has been Deleted.`,
+                            HttpStatusCodes.OK
+                        );
+                        if (ManagerPropertyCache.data !== '') {
+                            Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
+                        }
+                        if (UserPropertyCache.data !== '') {
+                            Cache.ClearCache(CacheKey.user.property);
+                        }
+                    } else {
+                        this.objUserResponse = GetUserErrorObj(
+                            `Server error not able to Delete ` + isDeleted!.propertyType + isDeleted!.name + `. Create Manager account first. Might wrong credentials.`,
+                            HttpStatusCodes.BAD_REQUEST
+                        );
+                    }
                 }
+
+
+
 
             } else {
                 this.objUserResponse = GetUserErrorObj(checkUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
@@ -288,3 +321,6 @@ class Functions {
         }
     }
 }
+
+
+//const ids= ['hgihgiy','ojgorg','hrgrhguh'] her i want to delete all the room whose _id is indide this using mongoose operators not bu any js loop

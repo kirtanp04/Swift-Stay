@@ -1,4 +1,4 @@
-import { Api, getPostParamData } from "src/common/ApiCall";
+import { Api, getGETParamData, getPostParamData } from "src/common/ApiCall";
 import { PropertyClass } from "../Property/DataObject";
 import { Param } from "src/Constant";
 import { StoreError } from "src/util/StoreError";
@@ -17,7 +17,7 @@ export class RoomClass {
     _id: string = '';
     adminID: string = '';
     property: PropertyClass = new PropertyClass()
-    roomNumber: string = ''
+    roomNumber: number = 0
     type: enumRoomType = enumRoomType.Single_Room // e.g., single, double, suite
     description: string = ''
     amenities: string[] = ['cricket']
@@ -40,6 +40,20 @@ export class RoomApi {
                 onsuccess(res.data);
             } else {
                 StoreError('Creating New Room', res.error)
+                onFail(res.error);
+            }
+        })
+    }
+
+    static getAllRooms = async (adminID: string, onsuccess: (res: any) => void,
+        onFail: (err: any) => void,) => {
+        const _Param = getGETParamData(Param.broker.manager.Room, Param.function.manager.Room.GetAllRoom, adminID)
+
+        await Api.protectedGet(_Param, (res) => {
+            if (res.error === "") {
+                onsuccess(res.data);
+            } else {
+                StoreError('Getting all Room', res.error)
                 onFail(res.error);
             }
         })

@@ -1,7 +1,9 @@
+import { Typography } from "@mui/material";
 import { Box, Button, styled } from "@mui/material";
 import { useEffect, useState } from "react";
 import { StorageError } from "src/Types";
 import { RefreshIcon } from "src/assets/iconify";
+import { TimeFormatter } from "src/common/TimeFormater";
 import GridHeader from "src/components/GridHeader";
 import Page from "src/components/Page";
 import { MUIDataGrid } from "src/components/mui/MUIDataGrid";
@@ -47,6 +49,8 @@ export default function Errorlogs({}: Props) {
           </Button>
         </GridHeader>
         <MUIDataGrid
+          density="compact"
+          rowHeight={50}
           columnVisibilityModel={{
             ID: false,
           }}
@@ -72,8 +76,15 @@ export default function Errorlogs({}: Props) {
             },
             {
               field: "date",
-              headerName: "Date",
+              headerName: "Time",
               flex: 0.5,
+              renderCell: (param: any) => (
+                <TextWrapper>
+                  <Text>
+                    {TimeFormatter.formatTimeDifference(param.row.date)}
+                  </Text>
+                </TextWrapper>
+              ),
             },
           ]}
         />
@@ -81,6 +92,26 @@ export default function Errorlogs({}: Props) {
     </Page>
   );
 }
+
+const TextWrapper = styled(Box)(() => ({
+  width: "100%",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: "0.4rem",
+  overflow: "hidden",
+  gap: "0.7rem",
+  height: "100%",
+}));
+
+const Text = styled(Typography)(({ theme }) => ({
+  fontSize: "0.8rem",
+  color: theme.palette.text.secondary,
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
+  textWrap: "nowrap",
+  textAlign: "start",
+}));
 
 const RootStyle = styled(Box)(() => ({
   height: "100%",

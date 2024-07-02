@@ -16,6 +16,7 @@ import { PropertyApi, PropertyClass, enumPropertyType } from "./DataObject";
 import showLoading from "src/util/ShowLoading";
 import { Typography } from "@mui/material";
 import { Chip } from "@mui/material";
+import { TimeFormatter } from "src/common/TimeFormater";
 
 type Props = {};
 
@@ -43,7 +44,9 @@ export default function HotelList({}: Props) {
     PropertyApi.getAllProperty(
       id,
       (res) => {
-        setPropertyList(res);
+        if (res.length > 0) {
+          setPropertyList(res);
+        }
         showLoading(theme, false);
       },
       (err) => {
@@ -110,6 +113,10 @@ export default function HotelList({}: Props) {
           </Button>
         </GridHeader>
         <MUIDataGrid
+          density="compact"
+          // loading={rows.length === 0}
+
+          rowHeight={50}
           columnVisibilityModel={{
             _id: false,
           }}
@@ -188,11 +195,25 @@ export default function HotelList({}: Props) {
               field: "createdAt",
               headerName: "Created On",
               width: 200,
+              renderCell: (param: any) => (
+                <TextWrapper>
+                  <Text>
+                    {TimeFormatter.formatTimeDifference(param.row.createdAt)}
+                  </Text>
+                </TextWrapper>
+              ),
             },
             {
               field: "updatedAt",
               headerName: "Last Updated",
               width: 200,
+              renderCell: (param: any) => (
+                <TextWrapper>
+                  <Text>
+                    {TimeFormatter.formatTimeDifference(param.row.updatedAt)}
+                  </Text>
+                </TextWrapper>
+              ),
             },
 
             {

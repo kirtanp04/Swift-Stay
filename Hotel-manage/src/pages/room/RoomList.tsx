@@ -1,6 +1,5 @@
-import { Button, Typography } from "@mui/material";
-import { Box, styled } from "@mui/material";
-import { useState } from "react";
+import { Box, Button, Typography, styled, useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
 import {
   DeleteIcon,
   EditIcon,
@@ -10,20 +9,48 @@ import {
 import GridHeader from "src/components/GridHeader";
 import Page from "src/components/Page";
 import { MUIDataGrid } from "src/components/mui/MUIDataGrid";
-import AddRoomDialog from "./AddRoomDialog";
-import { RoomClass } from "./DataObject";
 import useAuth from "src/hooks/useAuth";
+import AddRoomDialog from "./AddRoomDialog";
+import { RoomApi, RoomClass, enumRoomType } from "./DataObject";
+import showLoading from "src/util/ShowLoading";
+import showMessage from "src/util/ShowMessage";
+import { Chip } from "@mui/material";
+import { TimeFormatter } from "src/common/TimeFormater";
 
 type Props = {};
 
 export default function RoomList({}: Props) {
   const [stAddRoomDialog, setStAddRoomDialog] = useState<boolean>(false);
   const [selectedRoom, setSelectedRoom] = useState<RoomClass>(new RoomClass());
+  const [RoomList, setRoomList] = useState<RoomClass[]>([]);
   const {
     user: {
       userInfo: { id },
     },
   } = useAuth();
+  const theme = useTheme();
+
+  useEffect(() => {
+    getAllRooms();
+  }, []);
+
+  const getAllRooms = () => {
+    showLoading(theme, true);
+    RoomApi.getAllRooms(
+      id,
+      (res) => {
+        showLoading(theme, false);
+        if (res.length > 0) {
+          setRoomList(res);
+        }
+      },
+      (err) => {
+        showMessage(err, theme, () => {});
+        showLoading(theme, false);
+      }
+    );
+  };
+
   const openAddRoomDialog = () => {
     let _newRoom = new RoomClass();
     _newRoom.adminID = id;
@@ -61,13 +88,15 @@ export default function RoomList({}: Props) {
           </Button>
         </GridHeader>
         <MUIDataGrid
+          density="compact"
+          rowHeight={50}
           columnVisibilityModel={{
             _id: false,
           }}
           getRowId={(row) => row._id}
           rowSelection={false}
           hideFooter
-          rows={[]}
+          rows={RoomList}
           columns={[
             {
               field: "_id",
@@ -78,17 +107,11 @@ export default function RoomList({}: Props) {
               field: "property",
               headerName: "Property",
               width: 150, // display property name
-              //   renderCell: (param: any) => (
-              //     <TextWrapper>
-              //       <Chip
-              //         label={param.row.propertyType}
-              //         color={getChipColor(param.row.propertyType) as any}
-              //         variant="filled"
-              //         size="small"
-              //         sx={{ width: 120 }}
-              //       />
-              //     </TextWrapper>
-              //   ),
+              renderCell: (param: any) => (
+                <TextWrapper>
+                  <Text>{param.row.property.name}</Text>
+                </TextWrapper>
+              ),
             },
             {
               field: "roomNumber",
@@ -96,7 +119,7 @@ export default function RoomList({}: Props) {
               width: 100,
               renderCell: (param: any) => (
                 <TextWrapper>
-                  <Text>{param.row.rooms.length}</Text>
+                  <Text>{param.row.roomNumber}</Text>
                 </TextWrapper>
               ),
             },
@@ -104,6 +127,17 @@ export default function RoomList({}: Props) {
               field: "type",
               headerName: "Room Type",
               width: 200,
+              renderCell: (param: any) => (
+                <TextWrapper>
+                  <Chip
+                    label={param.row.type}
+                    color={getChipColor(param.row.type) as any}
+                    variant="filled"
+                    size="small"
+                    sx={{ width: 120 }}
+                  />
+                </TextWrapper>
+              ),
             },
 
             {
@@ -125,11 +159,25 @@ export default function RoomList({}: Props) {
               field: "createdAt",
               headerName: "Created On",
               width: 200,
+              renderCell: (param: any) => (
+                <TextWrapper>
+                  <Text>
+                    {TimeFormatter.formatTimeDifference(param.row.createdAt)}
+                  </Text>
+                </TextWrapper>
+              ),
             },
             {
               field: "updatedAt",
               headerName: "Last Updated",
               width: 200,
+              renderCell: (param: any) => (
+                <TextWrapper>
+                  <Text>
+                    {TimeFormatter.formatTimeDifference(param.row.updatedAt)}
+                  </Text>
+                </TextWrapper>
+              ),
             },
             {
               field: "",
@@ -185,3 +233,31 @@ const Text = styled(Typography)(({ theme }) => ({
   textOverflow: "ellipsis",
   textWrap: "nowrap",
 }));
+
+const getChipColor = (_RoomType: enumRoomType): string => {
+  let color: string = "";
+
+  if (_RoomType === enumRoomType.Double_Room) {
+    color = "primary";
+  }
+  if (_RoomType === enumRoomType.Executive_Room) {
+    color = "secondary";
+  }
+  if (_RoomType === enumRoomType.Juniour_Suites) {
+    color = "error";
+  }
+  if (_RoomType === enumRoomType.King_Room) {
+    color = "info";
+  }
+  if (_RoomType === enumRoomType.Queen_Room) {
+    color = "success";
+  }
+  if (_RoomType === enumRoomType.Single_Room) {
+    color = "warning";
+  }
+  if (_RoomType === enumRoomType.Triple_Room) {
+    color = "secondary";
+  }
+
+  return color;
+};

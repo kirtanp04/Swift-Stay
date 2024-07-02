@@ -25,10 +25,10 @@ import FormTextArea from "src/components/Form/FormTextArea";
 import FormTextFiels from "src/components/Form/FormTextField";
 import { RESIconButton } from "src/components/RESIconButton";
 import Scrollbar from "src/components/Scrollbar";
+import UploadImage from "src/components/UploadImage";
 import showMessage from "src/util/ShowMessage";
 import * as yup from "yup";
 import { PropertyApi, PropertyClass, enumPropertyType } from "./DataObject";
-import UploadPropertyImage from "./UploadPropertyImage";
 
 type Props = {
   onClose: () => void;
@@ -330,10 +330,11 @@ export default function AddPropertyDialog({ onClose, objProperty }: Props) {
       </FormProvider>
 
       {showUploadImageDialog && (
-        <UploadPropertyImage
+        <UploadImage
           onClose={closeUploadImageDialog}
           onSaveImages={SaveImageList}
           imageList={_objProperty.images}
+          Tilte="Property Image"
         />
       )}
     </Dialog>

@@ -1,15 +1,15 @@
-import { NextFunction, Request, Response } from "express";
-import { CacheKey, Param } from "../Constant";
-import { TParam } from "../types/Type";
-import { HttpStatusCodes, GetUserErrorObj, UserResponse, Cache, GetUserSuccessObj } from "../common";
-import { Room, RoomClass } from "../models/RoomModel";
-import { checkAdminVerification } from "../middleware/AdiminVerification";
-import { Property } from "../models/PropertyModel";
+import { NextFunction, Request, Response } from 'express';
+import { CacheKey, Param } from '../Constant';
+import { TParam } from '../types/Type';
+import { HttpStatusCodes, GetUserErrorObj, UserResponse, Cache, GetUserSuccessObj } from '../common';
+import { Room, RoomClass } from '../models/RoomModel';
+import { checkAdminVerification } from '../middleware/AdiminVerification';
+import { Property } from '../models/PropertyModel';
 
-
-const _AddRoom = Param.function.manager.Room.AddRoom
-const _UpdateRoom = Param.function.manager.Room.UpdateRoom
-const _DeleteRoom = Param.function.manager.Room.DeleteRoom
+const _AddRoom = Param.function.manager.Room.AddRoom;
+const _UpdateRoom = Param.function.manager.Room.UpdateRoom;
+const _DeleteRoom = Param.function.manager.Room.DeleteRoom;
+const _GetAllRoom = Param.function.manager.Room.GetAllRoom;
 
 export class RoomFunction {
     private static objUserResponse: UserResponse = new UserResponse();
@@ -24,17 +24,16 @@ export class RoomFunction {
         if (objParam.function === _AddRoom) {
             const _res = await _Function.addRoom();
             this.objUserResponse = _res;
+        } else if (objParam.function === _GetAllRoom) {
+            const _res = await _Function.getAllRooms();
+            this.objUserResponse = _res;
         } else {
             this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
         }
 
-
         return this.objUserResponse;
-
-    }
-
+    };
 }
-
 
 class Functions {
     private objUserResponse: UserResponse = new UserResponse();
@@ -49,13 +48,24 @@ class Functions {
 
     public addRoom = async (): Promise<UserResponse> => {
         try {
+            const {
+                adminID,
+                amenities,
+                createdAt,
+                description,
+                isAvailable,
+                maxOccupancy,
+                price,
+                property,
+                roomNumber,
+                type,
+                updatedAt,
+                images,
+            } = this.objParam.data as RoomClass;
 
-            const { adminID, amenities, createdAt, description, isAvailable, maxOccupancy, price, property, roomNumber, type, updatedAt, images } = this.objParam.data as RoomClass
-
-            const isUser = await checkAdminVerification(adminID)
+            const isUser = await checkAdminVerification(adminID);
 
             if (isUser.error === '') {
-
                 const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(isUser.data.email));
                 const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(isUser.data.email));
                 const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
@@ -72,20 +82,22 @@ class Functions {
                     roomNumber: roomNumber,
                     type: type,
                     updatedAt: updatedAt,
-                    images: images
-                })
+                    images: images,
+                });
 
-                await newRoom.save()
+                await newRoom.save();
 
                 if (newRoom) {
-
-                    const isRoom = await Property.findOne({ rooms: newRoom._id })
+                    const isRoom = await Property.findOne({ rooms: newRoom._id });
                     if (isRoom === null || isRoom === undefined) {
-                        const isPropertyUpdated = await Property.findByIdAndUpdate({ _id: property._id }, {
-                            $push: {
-                                rooms: newRoom._id
+                        const isPropertyUpdated = await Property.findByIdAndUpdate(
+                            { _id: property._id },
+                            {
+                                $push: {
+                                    rooms: newRoom._id,
+                                },
                             }
-                        })
+                        );
 
                         if (isPropertyUpdated) {
                             this.objUserResponse = GetUserSuccessObj(
@@ -101,43 +113,57 @@ class Functions {
                             if (UserRoomCache.data !== '') {
                                 Cache.ClearCache(CacheKey.user.property);
                             }
-
                         } else {
                             this.objUserResponse = GetUserErrorObj(
                                 `Server error : Unable to update your property after creating room.`,
                                 HttpStatusCodes.BAD_REQUEST
                             );
                         }
-
                     } else {
                         this.objUserResponse = GetUserErrorObj(
-                            `Server error : Create new room. This room is alreaded being created.`,
+                            `Server error : Create new room. This room is already being created.`,
                             HttpStatusCodes.BAD_REQUEST
                         );
                     }
-
-
-
                 } else {
-                    this.objUserResponse = GetUserErrorObj(
-                        `Server error not able to save Room `,
-                        HttpStatusCodes.BAD_REQUEST
-                    );
+                    this.objUserResponse = GetUserErrorObj(`Server error not able to save Room `, HttpStatusCodes.BAD_REQUEST);
                 }
                 //delete room cach fro property adding
-
             } else {
                 this.objUserResponse = GetUserErrorObj(isUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
             }
-
-
-
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
         } finally {
-            return this.objUserResponse
+            return this.objUserResponse;
         }
-    }
+    };
 
+    public getAllRooms = async (): Promise<UserResponse> => {
+        try {
+            const adminID = this.objParam.data;
 
+            const isUser = await checkAdminVerification(adminID);
+
+            if (isUser.error === '') {
+                const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(isUser.data.email));
+
+                if (ManagerRoomCache.error === '') {
+                    this.objUserResponse = GetUserSuccessObj(ManagerRoomCache.data, HttpStatusCodes.OK);
+                } else {
+                    const allRooms = await Room.find({ adminID: adminID }).populate('property').exec();
+                    if (allRooms.length > 0) {
+                        Cache.SetCache(CacheKey.manager.room(isUser.data.email), allRooms);
+                        this.objUserResponse = GetUserSuccessObj(allRooms, HttpStatusCodes.OK);
+                    }
+                }
+            } else {
+                this.objUserResponse = GetUserErrorObj(isUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
 }

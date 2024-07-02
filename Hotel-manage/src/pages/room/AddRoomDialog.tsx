@@ -1,6 +1,6 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
+  Button,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,12 +11,13 @@ import {
   useTheme,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import {
   CloseCircleIcon,
   CloseIcon,
   LoadingAnimation,
   PlusIcon,
+  UpdateIcon,
 } from "src/assets/iconify";
 import { FormCheckbox } from "src/components/Form/FormCheckBox";
 import FormProvider from "src/components/Form/FormProvider";
@@ -25,10 +26,12 @@ import FormTextArea from "src/components/Form/FormTextArea";
 import FormTextFiels from "src/components/Form/FormTextField";
 import { RESIconButton } from "src/components/RESIconButton";
 import Scrollbar from "src/components/Scrollbar";
-import * as yup from "yup";
-import { RoomApi, RoomClass, enumRoomType } from "./DataObject";
-import { PropertyApi, PropertyClass } from "../Property/DataObject";
 import showMessage from "src/util/ShowMessage";
+import * as yup from "yup";
+import { PropertyApi, PropertyClass } from "../Property/DataObject";
+import { RoomApi, RoomClass, enumRoomType } from "./DataObject";
+import UploadImage from "src/components/UploadImage";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type Props = {
   onClose: () => void;
@@ -36,26 +39,23 @@ type Props = {
 };
 
 const AddRoomSchema = yup.object().shape({
-  name: yup.string().required("Hotel name is required"),
-  address: yup.string().required("Address is required"),
-  city: yup.string().required("City is required"),
-  state: yup.string().required("State is required"),
-  country: yup.string().required("Country is required"),
-  zipCode: yup.string().min(4).required("ZipCode is required"),
-  phone: yup.string().required("Phone is required"),
-  website: yup.string().required("Website is required"),
+  property: yup.object().shape({
+    _id: yup.string().required("Property is required"),
+  }),
+  roomNumber: yup.number().required("Room Number is required"),
+  price: yup.number().required("Price is required"),
+  maxOccupancy: yup.number().min(1),
   amenities: yup.array().of(yup.string().required("Amenity is required")),
-  email: yup
-    .string()
-    .email("Email must be a valid email")
-    .required("Public Email is required"),
 });
 
 export default function AddRoomDialog({ objRoom, onClose }: Props) {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [showUploadRoomImgDialog, setShowUploadRoomImgDialog] =
+    useState<boolean>(false);
   const [showPropertyLoading, setShowPropertyLoading] =
     useState<boolean>(false);
   const [propertyList, setPropertyList] = useState<PropertyClass[]>([]);
+  const [RoomDetails, setRoomDetails] = useState<RoomClass>(objRoom);
+  const [loading, setLoading] = useState<boolean>(false);
   const theme = useTheme();
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
 
   const _Method = useForm<RoomClass>({
     defaultValues: objRoom,
-    // resolver: yupResolver(AddRoomSchema) as any,
+    resolver: yupResolver(AddRoomSchema) as any,
   });
   const { handleSubmit, control } = _Method;
 
@@ -72,6 +72,17 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
     control,
     name: "amenities" as any,
   });
+
+  const openUploadroomimageDialog = () => {
+    setShowUploadRoomImgDialog(true);
+  };
+  const closeUploadroomimageDialog = () => {
+    setShowUploadRoomImgDialog(false);
+  };
+
+  const SaveRoomImageList = (ImageList: any[]) => {
+    setRoomDetails({ ...RoomDetails, images: ImageList });
+  };
 
   const getAllProperty = () => {
     setShowPropertyLoading(true);
@@ -89,20 +100,28 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
   };
 
   const onAddRoom = (_objRoom: RoomClass) => {
-    if (objRoom._id === "") {
-      //new
-
-      RoomApi.addNewRoom(
-        _objRoom,
-        (res) => {
-          showMessage(res, theme, () => {});
-        },
-        (err) => {
-          showMessage(err, theme, () => {});
-        }
-      );
+    if (RoomDetails.images.length !== 0) {
+      RoomDetails.images.forEach((img) => _objRoom.images.push(img));
+      setLoading(true);
+      if (objRoom._id === "") {
+        RoomApi.addNewRoom(
+          _objRoom,
+          (res) => {
+            showMessage(res, theme, () => {});
+            setLoading(false);
+            onClose();
+          },
+          (err) => {
+            showMessage(err, theme, () => {});
+            setLoading(false);
+          }
+        );
+      } else {
+        //update
+        setLoading(false);
+      }
     } else {
-      //update
+      showMessage("Select atleast One Room Image", theme, () => {});
     }
   };
 
@@ -121,7 +140,7 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
         >
           <Scrollbar sx={{ height: "100%" }}>
             <FieldWrapper>
-              {loading ? (
+              {showPropertyLoading ? (
                 <PropertyLoadingText>Getting Property...</PropertyLoadingText>
               ) : propertyList.length === 0 ? (
                 "Create A Property first."
@@ -253,6 +272,14 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
         </DialogContent>
         <Divider orientation="horizontal" flexItem sx={{ mt: 2 }} />
         <DialogActions>
+          <Button
+            onClick={openUploadroomimageDialog}
+            startIcon={<UpdateIcon />}
+            variant="outlined"
+            sx={{ marginRight: "auto" }}
+          >
+            Upload Image
+          </Button>
           <RESIconButton
             iconposition="start"
             starticon={loading ? <LoadingAnimation /> : <PlusIcon />}
@@ -272,6 +299,15 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
           </RESIconButton>
         </DialogActions>
       </FormProvider>
+
+      {showUploadRoomImgDialog && (
+        <UploadImage
+          onClose={closeUploadroomimageDialog}
+          onSaveImages={SaveRoomImageList}
+          imageList={RoomDetails.images}
+          Tilte="Room Images"
+        />
+      )}
     </Dialog>
   );
 }
