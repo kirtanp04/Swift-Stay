@@ -1,3 +1,4 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
   Button,
@@ -26,16 +27,18 @@ import FormTextArea from "src/components/Form/FormTextArea";
 import FormTextFiels from "src/components/Form/FormTextField";
 import { RESIconButton } from "src/components/RESIconButton";
 import Scrollbar from "src/components/Scrollbar";
+import UploadImage from "src/components/UploadImage";
 import showMessage from "src/util/ShowMessage";
 import * as yup from "yup";
+import AddPropertyDialog from "../Property/AddPropertyDialog";
 import { PropertyApi, PropertyClass } from "../Property/DataObject";
 import { RoomApi, RoomClass, enumRoomType } from "./DataObject";
-import UploadImage from "src/components/UploadImage";
-import { yupResolver } from "@hookform/resolvers/yup";
+import useAuth from "src/hooks/useAuth";
 
 type Props = {
   onClose: () => void;
   objRoom: RoomClass;
+  getAllRooms: () => void;
 };
 
 const AddRoomSchema = yup.object().shape({
@@ -48,7 +51,11 @@ const AddRoomSchema = yup.object().shape({
   amenities: yup.array().of(yup.string().required("Amenity is required")),
 });
 
-export default function AddRoomDialog({ objRoom, onClose }: Props) {
+export default function AddRoomDialog({
+  objRoom,
+  onClose,
+  getAllRooms,
+}: Props) {
   const [showUploadRoomImgDialog, setShowUploadRoomImgDialog] =
     useState<boolean>(false);
   const [showPropertyLoading, setShowPropertyLoading] =
@@ -57,6 +64,15 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
   const [RoomDetails, setRoomDetails] = useState<RoomClass>(objRoom);
   const [loading, setLoading] = useState<boolean>(false);
   const theme = useTheme();
+  const [showAddPropertyDialog, setShowAddProperty] = useState<boolean>(false);
+  const [objProperty, setObjProperty] = useState<PropertyClass>(
+    new PropertyClass()
+  );
+  const {
+    user: {
+      userInfo: { id },
+    },
+  } = useAuth();
 
   useEffect(() => {
     getAllProperty();
@@ -73,9 +89,17 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
     name: "amenities" as any,
   });
 
+  const openAddPropertyDialog = () => {
+    let _newObjProperty = new PropertyClass();
+    _newObjProperty.adminID = id;
+    setObjProperty(_newObjProperty);
+    setShowAddProperty(true);
+  };
+
   const openUploadroomimageDialog = () => {
     setShowUploadRoomImgDialog(true);
   };
+
   const closeUploadroomimageDialog = () => {
     setShowUploadRoomImgDialog(false);
   };
@@ -103,13 +127,16 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
     if (RoomDetails.images.length !== 0) {
       RoomDetails.images.forEach((img) => _objRoom.images.push(img));
       setLoading(true);
+
       if (objRoom._id === "") {
+        //new
         RoomApi.addNewRoom(
           _objRoom,
           (res) => {
             showMessage(res, theme, () => {});
             setLoading(false);
             onClose();
+            getAllRooms();
           },
           (err) => {
             showMessage(err, theme, () => {});
@@ -118,7 +145,19 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
         );
       } else {
         //update
-        setLoading(false);
+        RoomApi.updatedRoom(
+          _objRoom,
+          (res) => {
+            showMessage(res, theme, () => {});
+            setLoading(false);
+            onClose();
+            getAllRooms();
+          },
+          (err) => {
+            showMessage(err, theme, () => {});
+            setLoading(false);
+          }
+        );
       }
     } else {
       showMessage("Select atleast One Room Image", theme, () => {});
@@ -143,7 +182,13 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
               {showPropertyLoading ? (
                 <PropertyLoadingText>Getting Property...</PropertyLoadingText>
               ) : propertyList.length === 0 ? (
-                "Create A Property first."
+                <Button
+                  startIcon={<PlusIcon />}
+                  variant="outlined"
+                  onClick={openAddPropertyDialog}
+                >
+                  Create Property First
+                </Button>
               ) : (
                 <FormSelectField
                   variant="outlined"
@@ -306,6 +351,13 @@ export default function AddRoomDialog({ objRoom, onClose }: Props) {
           onSaveImages={SaveRoomImageList}
           imageList={RoomDetails.images}
           Tilte="Room Images"
+        />
+      )}
+
+      {showAddPropertyDialog && (
+        <AddPropertyDialog
+          objProperty={objProperty}
+          onClose={() => setShowAddProperty(false)}
         />
       )}
     </Dialog>

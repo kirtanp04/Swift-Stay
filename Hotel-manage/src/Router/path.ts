@@ -13,6 +13,7 @@ export const Path = {
     dashboard: rootPath + '/dashboard',
     property: {
         root: rootPath + '/properties',
+        singleProperty: (propertyID: any) => rootPath + `/properties/${propertyID}`
     },
     room: {
         root: rootPath + '/rooms'

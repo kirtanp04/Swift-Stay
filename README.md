@@ -50,6 +50,7 @@
 - **Scaling / optimization**
   - Lazy Load
   - Lazy image load
+  - Image Compression
 
 </div>
 

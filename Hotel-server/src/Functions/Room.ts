@@ -27,6 +27,12 @@ export class RoomFunction {
         } else if (objParam.function === _GetAllRoom) {
             const _res = await _Function.getAllRooms();
             this.objUserResponse = _res;
+        } else if (objParam.function === _UpdateRoom) {
+            const _res = await _Function.updateRoom();
+            this.objUserResponse = _res;
+        } else if (objParam.function === _DeleteRoom) {
+            const _res = await _Function.deleteRoom();
+            this.objUserResponse = _res;
         } else {
             this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
         }
@@ -69,65 +75,93 @@ class Functions {
                 const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(isUser.data.email));
                 const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(isUser.data.email));
                 const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
+                const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
 
-                const newRoom = await Room.create({
-                    adminID: adminID,
-                    amenities: amenities,
-                    createdAt: createdAt,
-                    description: description,
-                    isAvailable: isAvailable,
-                    maxOccupancy: maxOccupancy,
-                    price: price,
-                    property: property._id,
-                    roomNumber: roomNumber,
-                    type: type,
-                    updatedAt: updatedAt,
-                    images: images,
-                });
+                const isAvailableRoom = await Room.findOne({
+                    $and: [
+                        {
+                            type: type
+                        },
+                        {
+                            roomNumber: roomNumber
+                        },
+                        {
+                            property: property._id
+                        }
+                    ]
+                })
 
-                await newRoom.save();
+                if (isAvailableRoom) {
+                    this.objUserResponse = GetUserErrorObj(`Server error: Same room type/ Same room number/ and same property already present change any of one. `, HttpStatusCodes.NOT_ACCEPTABLE);
 
-                if (newRoom) {
-                    const isRoom = await Property.findOne({ rooms: newRoom._id });
-                    if (isRoom === null || isRoom === undefined) {
-                        const isPropertyUpdated = await Property.findByIdAndUpdate(
-                            { _id: property._id },
-                            {
-                                $push: {
-                                    rooms: newRoom._id,
-                                },
-                            }
-                        );
+                } else {
 
-                        if (isPropertyUpdated) {
-                            this.objUserResponse = GetUserSuccessObj(
-                                `Success: New Room have been created for property ` + isPropertyUpdated.name,
-                                HttpStatusCodes.CREATED
+                    const newRoom = await Room.create({
+                        adminID: adminID,
+                        amenities: amenities,
+                        createdAt: createdAt,
+                        description: description,
+                        isAvailable: isAvailable,
+                        maxOccupancy: maxOccupancy,
+                        price: price,
+                        property: property._id,
+                        roomNumber: roomNumber,
+                        type: type,
+                        updatedAt: updatedAt,
+                        images: images,
+                    });
+
+                    await newRoom.save();
+
+                    if (newRoom) {
+                        const isRoom = await Property.findOne({ rooms: newRoom._id });
+                        if (isRoom === null || isRoom === undefined) {
+                            const isPropertyUpdated = await Property.findByIdAndUpdate(
+                                { _id: property._id },
+                                {
+                                    $push: {
+                                        rooms: newRoom._id,
+                                    },
+                                }
                             );
-                            if (ManagerRoomCache.data !== '') {
-                                Cache.ClearCache(CacheKey.manager.room(isUser.data.email));
-                            }
-                            if (ManagerPropertyCache.data !== '') {
-                                Cache.ClearCache(CacheKey.manager.property(isUser.data.email));
-                            }
-                            if (UserRoomCache.data !== '') {
-                                Cache.ClearCache(CacheKey.user.property);
+
+                            if (isPropertyUpdated) {
+                                if (ManagerRoomCache.data !== '') {
+                                    Cache.ClearCache(CacheKey.manager.room(isUser.data.email));
+                                }
+                                if (ManagerPropertyCache.data !== '') {
+                                    Cache.ClearCache(CacheKey.manager.property(isUser.data.email));
+                                }
+                                if (UserRoomCache.data !== '') {
+                                    Cache.ClearCache(CacheKey.user.room);
+                                }
+                                if (UserPropertyCache.data !== '') {
+                                    Cache.ClearCache(CacheKey.user.property);
+                                }
+                                this.objUserResponse = GetUserSuccessObj(
+                                    `Success: New Room have been created for property ` + isPropertyUpdated.name,
+                                    HttpStatusCodes.CREATED
+                                );
+
+                            } else {
+                                this.objUserResponse = GetUserErrorObj(
+                                    `Server error : Unable to update your property after creating room.`,
+                                    HttpStatusCodes.BAD_REQUEST
+                                );
                             }
                         } else {
                             this.objUserResponse = GetUserErrorObj(
-                                `Server error : Unable to update your property after creating room.`,
+                                `Server error : Create new room. This room is already being created.`,
                                 HttpStatusCodes.BAD_REQUEST
                             );
                         }
                     } else {
-                        this.objUserResponse = GetUserErrorObj(
-                            `Server error : Create new room. This room is already being created.`,
-                            HttpStatusCodes.BAD_REQUEST
-                        );
+                        this.objUserResponse = GetUserErrorObj(`Server error not able to save Room `, HttpStatusCodes.BAD_REQUEST);
                     }
-                } else {
-                    this.objUserResponse = GetUserErrorObj(`Server error not able to save Room `, HttpStatusCodes.BAD_REQUEST);
+
                 }
+
+
                 //delete room cach fro property adding
             } else {
                 this.objUserResponse = GetUserErrorObj(isUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
@@ -152,7 +186,7 @@ class Functions {
                     this.objUserResponse = GetUserSuccessObj(ManagerRoomCache.data, HttpStatusCodes.OK);
                 } else {
                     const allRooms = await Room.find({ adminID: adminID }).populate('property').exec();
-                    if (allRooms.length > 0) {
+                    if (allRooms) {
                         Cache.SetCache(CacheKey.manager.room(isUser.data.email), allRooms);
                         this.objUserResponse = GetUserSuccessObj(allRooms, HttpStatusCodes.OK);
                     }
@@ -166,4 +200,121 @@ class Functions {
             return this.objUserResponse;
         }
     };
+
+    public updateRoom = async (): Promise<UserResponse> => {
+        try {
+            const { _id, adminID, amenities, description, images, isAvailable, maxOccupancy, price, roomNumber, type, updatedAt } = this.objParam.data as RoomClass
+            const isUser = await checkAdminVerification(adminID);
+            if (isUser.error === '') {
+                const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(isUser.data.email));
+                const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(isUser.data.email));
+                const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
+                const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
+
+                const isUpdated = await Room.findByIdAndUpdate({ _id: _id }, {
+                    $set: {
+                        amenities: amenities,
+                        description: description,
+                        images: images,
+                        isAvailable: isAvailable,
+                        maxOccupancy: maxOccupancy,
+                        price: price,
+                        roomNumber: roomNumber,
+                        type: type,
+                        updatedAt: updatedAt
+                    }
+                })
+
+                if (isUpdated) {
+
+                    if (ManagerRoomCache.data !== '') {
+                        Cache.ClearCache(CacheKey.manager.room(isUser.data.email));
+                    }
+                    if (ManagerPropertyCache.data !== '') {
+                        Cache.ClearCache(CacheKey.manager.property(isUser.data.email));
+                    }
+                    if (UserRoomCache.data !== '') {
+                        Cache.ClearCache(CacheKey.user.room);
+                    }
+                    if (UserPropertyCache.data !== '') {
+                        Cache.ClearCache(CacheKey.user.property);
+                    }
+                    this.objUserResponse = GetUserSuccessObj(
+                        `Success: Your Room has been Updated `,
+                        HttpStatusCodes.CREATED
+                    );
+
+                } else {
+                    this.objUserResponse = GetUserErrorObj(`Server error not able to update Room `, HttpStatusCodes.BAD_REQUEST);
+                }
+            } else {
+                this.objUserResponse = GetUserErrorObj(isUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
+            }
+
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
+        } finally {
+            return this.objUserResponse
+        }
+    }
+
+    public deleteRoom = async (): Promise<UserResponse> => {
+        try {
+            const { adminID, RoomID } = this.objParam.data
+            const isUser = await checkAdminVerification(adminID);
+            if (isUser.error === '') {
+                const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(isUser.data.email));
+                const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(isUser.data.email));
+                const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
+                const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
+
+                const isDeleted = await Room.findByIdAndDelete({ _id: RoomID })
+
+                if (isDeleted) {
+                    const isPropertyUpdated = await Property.findByIdAndUpdate({ _id: isDeleted.property._id }, {
+                        $pull: {
+                            rooms: isDeleted._id
+                        }
+                    })
+
+                    if (isPropertyUpdated) {
+                        if (ManagerRoomCache.data !== '') {
+                            Cache.ClearCache(CacheKey.manager.room(isUser.data.email));
+                        }
+                        if (ManagerPropertyCache.data !== '') {
+                            Cache.ClearCache(CacheKey.manager.property(isUser.data.email));
+                        }
+                        if (UserRoomCache.data !== '') {
+                            Cache.ClearCache(CacheKey.user.room);
+                        }
+                        if (UserPropertyCache.data !== '') {
+                            Cache.ClearCache(CacheKey.user.property);
+                        }
+                        this.objUserResponse = GetUserSuccessObj(
+                            `Success: Your Room has been deleted `,
+                            HttpStatusCodes.CREATED
+                        );
+
+
+                    } else {
+                        this.objUserResponse = GetUserErrorObj('Server error: Not able to remove Room from property after deleting. ', HttpStatusCodes.BAD_REQUEST);
+                    }
+
+                } else {
+                    this.objUserResponse = GetUserErrorObj('Server error: Not able to delete Room. ', HttpStatusCodes.BAD_REQUEST);
+                }
+
+
+
+
+            } else {
+                this.objUserResponse = GetUserErrorObj(isUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
+            }
+
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
+        } finally {
+            return this.objUserResponse
+        }
+    }
 }

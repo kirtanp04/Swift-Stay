@@ -13,6 +13,7 @@ import {
 import { Fragment, useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { CloseCircleIcon, CloseIcon, SaveIcon } from "src/assets/iconify";
+import { ImageCompressor } from "src/common/ImageCompressor";
 import Scrollbar from "src/components/Scrollbar";
 import showMessage from "src/util/ShowMessage";
 
@@ -23,15 +24,6 @@ type Props = {
   Tilte: string;
 };
 
-async function fileToBase64(File: any) {
-  return new Promise((resolve, reject) => {
-    let reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = (e: any) => resolve(e.target.result);
-    reader.readAsDataURL(File);
-  });
-}
-
 export default function UploadImage({
   onClose,
   onSaveImages,
@@ -39,6 +31,7 @@ export default function UploadImage({
   Tilte,
 }: Props) {
   const [saveImage, setSaveImage] = useState<string[]>(imageList);
+  const [imageProgress, setImageProgress] = useState<number>(0);
   const theme = useTheme();
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -67,12 +60,21 @@ export default function UploadImage({
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      acceptedFiles.forEach(
-        async (file: File) =>
-          await fileToBase64(file).then((base64: any) =>
-            setSaveImage([base64, ...saveImage])
-          )
-      );
+      acceptedFiles.forEach(async (file: File) => {
+        let compressor = new ImageCompressor();
+        await compressor.Compress(
+          file,
+          (base64: string) => {
+            setSaveImage([base64, ...saveImage]);
+          },
+          (err) => {
+            showMessage(err, theme, () => {});
+          },
+          (prrogress) => {
+            setImageProgress(prrogress);
+          }
+        );
+      });
     },
     [saveImage]
   );
@@ -106,7 +108,9 @@ export default function UploadImage({
             <DropZone {...getRootProps({ className: "dropzone" })}>
               <input {...getInputProps()} />
               <Text>
-                Drag 'n' drop some Images here, or click to select Image.
+                {imageProgress !== 0 && imageProgress !== 100
+                  ? `${imageProgress} %`
+                  : " Drag 'n' drop some Images here, or click to select Image."}
               </Text>
             </DropZone>
 

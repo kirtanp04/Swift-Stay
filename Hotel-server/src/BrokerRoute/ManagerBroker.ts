@@ -26,7 +26,6 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
 
         if (paramObj.Broker === _ManagerAuthBroker) {
           const _res = await Functions.UserFunction.findFunction(paramObj, req, res, next);
-
         }
 
         if (paramObj.Broker === _ManagerPropertyBroker) {

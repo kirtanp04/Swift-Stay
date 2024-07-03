@@ -33,6 +33,7 @@ import { PropertyApi, PropertyClass, enumPropertyType } from "./DataObject";
 type Props = {
   onClose: () => void;
   objProperty: PropertyClass;
+  getAllProperty?: () => void;
 };
 
 const AddHotelSchema = yup.object().shape({
@@ -51,7 +52,11 @@ const AddHotelSchema = yup.object().shape({
     .required("Public Email is required"),
 });
 
-export default function AddPropertyDialog({ onClose, objProperty }: Props) {
+export default function AddPropertyDialog({
+  onClose,
+  objProperty,
+  getAllProperty,
+}: Props) {
   const [showUploadImageDialog, setShowUploadImageDialog] =
     useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -96,6 +101,9 @@ export default function AddPropertyDialog({ onClose, objProperty }: Props) {
           (res) => {
             setLoading(false);
             showMessage(res, theme, () => onClose());
+            if (getAllProperty !== undefined) {
+              getAllProperty();
+            }
           },
           (err) => {
             setLoading(false);
@@ -111,6 +119,9 @@ export default function AddPropertyDialog({ onClose, objProperty }: Props) {
           (res) => {
             setLoading(false);
             showMessage(res, theme, () => onClose());
+            if (getAllProperty !== undefined) {
+              getAllProperty();
+            }
           },
           (err) => {
             setLoading(false);

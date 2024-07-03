@@ -1,22 +1,22 @@
-import { Box, Button, styled, useTheme } from "@mui/material";
+import { Box, Button, Chip, Typography, styled, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   DeleteIcon,
   EditIcon,
   PlusIcon,
+  PreviewIcon,
   RefreshIcon,
 } from "src/assets/iconify";
+import { TimeFormatter } from "src/common/TimeFormater";
 import GridHeader from "src/components/GridHeader";
 import Page from "src/components/Page";
 import { MUIDataGrid } from "src/components/mui/MUIDataGrid";
 import useAuth from "src/hooks/useAuth";
+import showLoading from "src/util/ShowLoading";
 import showMessage from "src/util/ShowMessage";
 import AddPropertyDialog from "./AddPropertyDialog";
 import { PropertyApi, PropertyClass, enumPropertyType } from "./DataObject";
-import showLoading from "src/util/ShowLoading";
-import { Typography } from "@mui/material";
-import { Chip } from "@mui/material";
-import { TimeFormatter } from "src/common/TimeFormater";
 
 type Props = {};
 
@@ -32,6 +32,7 @@ export default function HotelList({}: Props) {
     },
   } = useAuth();
   const theme = useTheme();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (propertyList.length === 0) {
@@ -52,10 +53,6 @@ export default function HotelList({}: Props) {
       (err) => {
         showMessage(err, theme, () => {});
         showLoading(theme, false);
-      },
-      (progress) => {
-        console.log(progress);
-        // showPercentageLoading(progress, theme);
       }
     );
   };
@@ -66,6 +63,10 @@ export default function HotelList({}: Props) {
       id,
       PropertyID,
       (res) => {
+        const _updated = propertyList.filter(
+          (objProperty) => objProperty._id !== PropertyID
+        );
+        setPropertyList(_updated);
         showMessage(res, theme, () => {});
         showLoading(theme, false);
       },
@@ -89,6 +90,10 @@ export default function HotelList({}: Props) {
   };
   const closeAddHotelDialogBox = () => {
     setOpenAddHotelDialog(false);
+  };
+
+  const onPreview = (PropertyID: string) => {
+    navigate(PropertyID);
   };
   return (
     <Page title="Property">
@@ -114,8 +119,6 @@ export default function HotelList({}: Props) {
         </GridHeader>
         <MUIDataGrid
           density="compact"
-          // loading={rows.length === 0}
-
           rowHeight={50}
           columnVisibilityModel={{
             _id: false,
@@ -227,6 +230,11 @@ export default function HotelList({}: Props) {
                     width={20}
                     onClick={() => onEditProperty(param.row)}
                   />
+                  <PreviewIcon
+                    height={20}
+                    width={20}
+                    onClick={() => onPreview(param.row._id)}
+                  />
                   <DeleteIcon
                     height={20}
                     width={20}
@@ -243,13 +251,14 @@ export default function HotelList({}: Props) {
         <AddPropertyDialog
           onClose={closeAddHotelDialogBox}
           objProperty={objPropert}
+          getAllProperty={getAllProperty}
         />
       )}
     </Page>
   );
 }
 
-const getChipColor = (_PropertyType: enumPropertyType): string => {
+export const getChipColor = (_PropertyType: enumPropertyType): string => {
   let color: string = "";
 
   if (_PropertyType === enumPropertyType.Apartment) {

@@ -135,6 +135,25 @@ class Functions {
 
     public getSingleProperty = async (): Promise<UserResponse> => {
         try {
+            const { adminID, propertyID } = this.objParam.data
+            const checkUser = await checkAdminVerification(adminID);
+            if (checkUser.error === '') {
+
+                const isProperty = await PropertyModel.findOne({
+                    $and: [
+                        { _id: propertyID },
+                        { adminID: adminID }
+                    ]
+                }).populate('rooms').exec()
+
+                if (isProperty) {
+                    this.objUserResponse = GetUserSuccessObj(isProperty, HttpStatusCodes.OK);
+                } else {
+                    this.objUserResponse = GetUserErrorObj(`Server error: Property id is not matching with admin, or wronge propertyID / admin  is provided`, HttpStatusCodes.NOT_ACCEPTABLE);
+                }
+            } else {
+                this.objUserResponse = GetUserErrorObj(checkUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
+            }
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
         } finally {
@@ -157,7 +176,7 @@ class Functions {
                 } else {
                     // const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id })
                     const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id }).populate('rooms').exec()
-                    if (allProperties.length > 0) {
+                    if (allProperties) {
                         Cache.SetCache(CacheKey.manager.property(checkUser.data.email), allProperties)
                         this.objUserResponse = GetUserSuccessObj(allProperties, HttpStatusCodes.OK);
 
@@ -201,6 +220,9 @@ class Functions {
             if (checkUser.error === '') {
                 const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
                 const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
+                const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(checkUser.data.email));
+                const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
+
                 const isUpdated = await PropertyModel.findOneAndUpdate({ _id: _id }, {
                     $set: {
                         address: address,
@@ -221,16 +243,23 @@ class Functions {
                 }, { new: true })
 
                 if (isUpdated) {
-                    this.objUserResponse = GetUserSuccessObj(
-                        `Success: Your ` + propertyType + ` has been Updated.`,
-                        HttpStatusCodes.CREATED
-                    );
                     if (ManagerPropertyCache.data !== '') {
                         Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                     }
                     if (UserPropertyCache.data !== '') {
                         Cache.ClearCache(CacheKey.user.property);
                     }
+                    if (ManagerRoomCache.data !== '') {
+                        Cache.ClearCache(CacheKey.manager.room(checkUser.data.email));
+                    }
+                    if (UserRoomCache.data !== '') {
+                        Cache.ClearCache(CacheKey.user.room);
+                    }
+                    this.objUserResponse = GetUserSuccessObj(
+                        `Success: Your ` + propertyType + ` has been Updated.`,
+                        HttpStatusCodes.CREATED
+                    );
+
                 } else {
                     this.objUserResponse = GetUserErrorObj(
                         `Server error not able to Update ` + propertyType + `. Create Manager account first. Might wrong credentials.`,
@@ -258,6 +287,7 @@ class Functions {
                 const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
                 const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
                 const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(checkUser.data.email));
+                const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
 
                 const isDeleted = await PropertyModel.findByIdAndDelete({ _id: PropertyID })
 
@@ -265,10 +295,6 @@ class Functions {
                     const isRoomDelete = await Room.deleteMany({ _id: { $in: isDeleted?.rooms } })
 
                     if (isRoomDelete) {
-                        this.objUserResponse = GetUserSuccessObj(
-                            `Success: Your ` + isDeleted!.propertyType + isDeleted!.name + ` has been Deleted.`,
-                            HttpStatusCodes.OK
-                        );
                         if (ManagerPropertyCache.data !== '') {
                             Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                         }
@@ -278,9 +304,14 @@ class Functions {
                         if (ManagerRoomCache.data !== '') {
                             Cache.ClearCache(CacheKey.manager.room(checkUser.data.email));
                         }
-                        if (ManagerRoomCache.data !== '') {
+                        if (UserRoomCache.data !== '') {
                             Cache.ClearCache(CacheKey.user.room);
                         }
+                        this.objUserResponse = GetUserSuccessObj(
+                            `Success: Your ` + isDeleted!.propertyType + isDeleted!.name + ` has been Deleted.`,
+                            HttpStatusCodes.OK
+                        );
+
                     } else {
                         this.objUserResponse = GetUserErrorObj(
                             `Server error not able to Delete Rooms of ` + isDeleted!.propertyType + isDeleted!.name + `. Create Manager account first. Might wrong credentials.`,
@@ -289,16 +320,17 @@ class Functions {
                     }
                 } else {
                     if (isDeleted) {
-                        this.objUserResponse = GetUserSuccessObj(
-                            `Success: Your ` + isDeleted.propertyType + isDeleted.name + ` has been Deleted.`,
-                            HttpStatusCodes.OK
-                        );
                         if (ManagerPropertyCache.data !== '') {
                             Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                         }
                         if (UserPropertyCache.data !== '') {
                             Cache.ClearCache(CacheKey.user.property);
                         }
+                        this.objUserResponse = GetUserSuccessObj(
+                            `Success: Your ` + isDeleted.propertyType + isDeleted.name + ` has been Deleted.`,
+                            HttpStatusCodes.OK
+                        );
+
                     } else {
                         this.objUserResponse = GetUserErrorObj(
                             `Server error not able to Delete ` + isDeleted!.propertyType + isDeleted!.name + `. Create Manager account first. Might wrong credentials.`,

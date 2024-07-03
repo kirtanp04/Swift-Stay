@@ -134,4 +134,35 @@ export class PropertyApi {
         }
 
     }
+
+
+    static getSingleProperty = async (
+        adminID: string,
+        propertyID: string,
+        onsuccess: (res: any) => void,
+        onFail: (err: any) => void,
+    ) => {
+        try {
+
+            const _Param = getGETParamData(
+                Param.broker.manager.Property,
+                Param.function.manager.Property.GetSingleProperty,
+                { adminID: adminID, propertyID: propertyID }
+            );
+
+            await Api.protectedGet(_Param, (res) => {
+                if (res.error === "") {
+                    onsuccess(res.data);
+                } else {
+                    StoreError('Getting Single Property', res.error)
+                    onFail(res.error);
+                }
+            });
+
+        } catch (error: any) {
+            StoreError('Adding Property', error.message)
+            onFail(error.message);
+        }
+
+    };
 }

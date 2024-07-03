@@ -1,4 +1,4 @@
-import { Box, Button, Typography, styled, useTheme } from "@mui/material";
+import { Box, Button, Chip, Typography, styled, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
   DeleteIcon,
@@ -6,16 +6,15 @@ import {
   PlusIcon,
   RefreshIcon,
 } from "src/assets/iconify";
+import { TimeFormatter } from "src/common/TimeFormater";
 import GridHeader from "src/components/GridHeader";
 import Page from "src/components/Page";
 import { MUIDataGrid } from "src/components/mui/MUIDataGrid";
 import useAuth from "src/hooks/useAuth";
-import AddRoomDialog from "./AddRoomDialog";
-import { RoomApi, RoomClass, enumRoomType } from "./DataObject";
 import showLoading from "src/util/ShowLoading";
 import showMessage from "src/util/ShowMessage";
-import { Chip } from "@mui/material";
-import { TimeFormatter } from "src/common/TimeFormater";
+import AddRoomDialog from "./AddRoomDialog";
+import { RoomApi, RoomClass, enumRoomType } from "./DataObject";
 
 type Props = {};
 
@@ -47,6 +46,26 @@ export default function RoomList({}: Props) {
       (err) => {
         showMessage(err, theme, () => {});
         showLoading(theme, false);
+      }
+    );
+  };
+
+  const DeleteRoom = (RoomID: string) => {
+    showLoading(theme, true);
+    RoomApi.deleteRoom(
+      id,
+      RoomID,
+      (res) => {
+        showLoading(theme, false);
+        showMessage(res, theme, () => {});
+        const updatedRoomList = RoomList.filter(
+          (objRoom) => objRoom._id !== RoomID
+        );
+        setRoomList(updatedRoomList);
+      },
+      (err) => {
+        showLoading(theme, false);
+        showMessage(err, theme, () => {});
       }
     );
   };
@@ -83,6 +102,7 @@ export default function RoomList({}: Props) {
               minWidth: "auto",
               marginLeft: "1rem",
             }}
+            onClick={getAllRooms}
           >
             <RefreshIcon height={20} width={20} />
           </Button>
@@ -190,7 +210,11 @@ export default function RoomList({}: Props) {
                     width={20}
                     onClick={() => onUpdateRoom(param.row)}
                   />
-                  <DeleteIcon height={20} width={20} />
+                  <DeleteIcon
+                    height={20}
+                    width={20}
+                    onClick={() => DeleteRoom(param.row._id)}
+                  />
                 </TextWrapper>
               ),
             },
@@ -199,7 +223,11 @@ export default function RoomList({}: Props) {
       </RootStyle>
 
       {stAddRoomDialog && (
-        <AddRoomDialog onClose={closeAddRoomDialog} objRoom={selectedRoom} />
+        <AddRoomDialog
+          onClose={closeAddRoomDialog}
+          objRoom={selectedRoom}
+          getAllRooms={getAllRooms}
+        />
       )}
     </Page>
   );
