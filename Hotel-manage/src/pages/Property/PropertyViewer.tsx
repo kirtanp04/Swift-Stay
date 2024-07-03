@@ -12,6 +12,7 @@ import LazyImage from "src/components/LazyImage";
 import { Chip } from "@mui/material";
 import { getChipColor } from "./PropertyList";
 import { TimeFormatter } from "src/common/TimeFormater";
+import RoomCard from "./RoomCard";
 
 type Props = {};
 
@@ -212,6 +213,17 @@ export default function PropertyViewer({}: Props) {
 
               {/* ---------------------------- // -------------------------------------- */}
             </TopContentWrapper>
+
+            <BottomWrapper>
+              <BottomHeader>
+                <RoomHeader>Rooms</RoomHeader>
+              </BottomHeader>
+              <RoomCardWrapper>
+                {Property.rooms.map((objRoom) => (
+                  <RoomCard key={objRoom._id} objRoom={objRoom} />
+                ))}
+              </RoomCardWrapper>
+            </BottomWrapper>
           </ContentWrapper>
         </EScrollbar>
       </RootStyle>
@@ -274,6 +286,14 @@ const TopContentWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
+const BottomWrapper = styled(Box)(() => ({
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  alignItems: "center",
+  flexDirection: "column",
+}));
+
 const ImageSkeleton = styled(LoadingSkeleton)(({ theme }) => ({
   height: 400,
   width: 550,
@@ -281,14 +301,18 @@ const ImageSkeleton = styled(LoadingSkeleton)(({ theme }) => ({
   flexDirection: "column",
   alignItems: "center",
   gap: "15px",
-  [theme.breakpoints.down("lg")]: {
+  [theme.breakpoints.down("xl")]: {
     width: 400,
+    height: 350,
+  },
+  [theme.breakpoints.down("lg")]: {
+    width: 380,
   },
   [theme.breakpoints.down("md")]: {
-    width: 360,
+    width: 340,
   },
   [theme.breakpoints.down("sm")]: {
-    width: 290,
+    width: 260,
   },
 }));
 
@@ -298,13 +322,16 @@ const Image = styled(LazyImage)(() => ({
   width: "100%",
 }));
 
-const TopRightContentWrapper = styled(Box)(() => ({
+const TopRightContentWrapper = styled(Box)(({ theme }) => ({
   height: "100%",
   width: "100%",
   display: "grid",
   padding: "0.7rem 0rem",
   gridTemplateColumns: "repeat(3,1fr)",
   gap: "10px",
+  [theme.breakpoints.down("xl")]: {
+    gridTemplateColumns: "repeat(2,1fr)",
+  },
 }));
 
 const TextWrapper = styled(Box)(() => ({
@@ -326,6 +353,9 @@ const TextSkeleton = styled(LoadingSkeleton)(() => ({
 const Label = styled(Typography)(({ theme }) => ({
   fontSize: "1rem",
   color: theme.palette.text.secondary,
+  [theme.breakpoints.down("xl")]: {
+    fontSize: "0.85rem",
+  },
 }));
 
 const Text = styled(Typography)(({ theme }) => ({
@@ -334,6 +364,9 @@ const Text = styled(Typography)(({ theme }) => ({
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
+  [theme.breakpoints.down("xl")]: {
+    fontSize: "0.85rem",
+  },
 }));
 
 const AmenitiesWrapper = styled(Box)(() => ({
@@ -353,4 +386,29 @@ const AmenitiesCard = styled(Box)(({ theme }) => ({
   minWidth: 100,
   borderRadius: "10px",
   border: `1px solid ${theme.palette.divider}`,
+}));
+
+const BottomHeader = styled(Box)(({ theme }) => ({
+  width: "100%",
+  display: "flex",
+  borderBottom: `1px dashed ${theme.palette.divider}`,
+  paddingBottom: "0.5rem",
+}));
+
+const RoomHeader = styled(Typography)(({ theme }) => ({
+  fontSize: "2rem",
+  color: theme.palette.text.primary,
+  [theme.breakpoints.down("xl")]: {
+    fontSize: "1.5rem",
+  },
+}));
+
+const RoomCardWrapper = styled(Box)(() => ({
+  display: "flex",
+  width: "100%",
+  alignItems: "center",
+  marginTop: "0.7rem",
+  flexWrap: "wrap",
+  flexShrink: "initial",
+  justifyContent: "space-around",
 }));
