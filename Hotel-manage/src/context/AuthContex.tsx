@@ -2,6 +2,7 @@ import { useTheme } from "@mui/material";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { Storage } from "src/common/Storage";
 import { Auth, _Login } from "src/pages/Authentication/AuthMgr";
+import showLoading from "src/util/ShowLoading";
 import showMessage from "src/util/ShowMessage";
 import { StoreError } from "src/util/StoreError";
 
@@ -90,20 +91,22 @@ function AuthContexProvider({ children }: Props) {
   };
 
   const LoginManager = async (objLogindetail: _Login): Promise<void> => {
+    showLoading(theme, true);
     await Auth.Login(
       objLogindetail,
       (res) => {
+        showLoading(theme, false);
         let _user = new TUser();
         _user.email = res.email;
         _user.name = res.name;
         _user.profileImg = res.profile;
         _user.role = res.role;
         _user.id = res.id;
-        console.log(res);
         setUser({ ...user, isAuthenticated: true, userInfo: _user });
         Storage.setToSessionStorage("Auth", _user);
       },
       (err) => {
+        showLoading(theme, false);
         StoreError("login", err);
         showMessage(err, theme, () => {});
       }

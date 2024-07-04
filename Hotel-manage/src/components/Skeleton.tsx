@@ -21,6 +21,7 @@ const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
           width={"100%"}
           height={"100%"}
           animation="wave"
+          sx={{ minHeight: 60 }}
         />
       ) : (
         children

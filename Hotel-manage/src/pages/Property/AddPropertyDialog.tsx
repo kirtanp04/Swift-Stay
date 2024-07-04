@@ -33,7 +33,7 @@ import { PropertyApi, PropertyClass, enumPropertyType } from "./DataObject";
 type Props = {
   onClose: () => void;
   objProperty: PropertyClass;
-  getAllProperty?: () => void;
+  afterSave?: (objPropertyData?: PropertyClass) => void;
 };
 
 const AddHotelSchema = yup.object().shape({
@@ -55,7 +55,7 @@ const AddHotelSchema = yup.object().shape({
 export default function AddPropertyDialog({
   onClose,
   objProperty,
-  getAllProperty,
+  afterSave,
 }: Props) {
   const [showUploadImageDialog, setShowUploadImageDialog] =
     useState<boolean>(false);
@@ -90,19 +90,19 @@ export default function AddPropertyDialog({
     setObjProperty({ ..._objProperty, images: ImageList });
   };
 
-  const onAddHotel = (objHotelData: PropertyClass) => {
-    if (_objProperty.images.length >= 1 || objHotelData.images.length >= 1) {
-      objHotelData.images = [];
-      _objProperty.images.forEach((img) => objHotelData.images.push(img));
-      if (objHotelData._id === "") {
+  const onAddHotel = (objPropertyData: PropertyClass) => {
+    if (_objProperty.images.length >= 1 || objPropertyData.images.length >= 1) {
+      objPropertyData.images = [];
+      _objProperty.images.forEach((img) => objPropertyData.images.push(img));
+      if (objPropertyData._id === "") {
         setLoading(true);
         PropertyApi.addNewProperty(
-          objHotelData,
+          objPropertyData,
           (res) => {
             setLoading(false);
             showMessage(res, theme, () => onClose());
-            if (getAllProperty !== undefined) {
-              getAllProperty();
+            if (afterSave !== undefined) {
+              afterSave(objPropertyData);
             }
           },
           (err) => {
@@ -115,12 +115,12 @@ export default function AddPropertyDialog({
 
         setLoading(true);
         PropertyApi.updateProperty(
-          objHotelData,
+          objPropertyData,
           (res) => {
             setLoading(false);
             showMessage(res, theme, () => onClose());
-            if (getAllProperty !== undefined) {
-              getAllProperty();
+            if (afterSave !== undefined) {
+              afterSave(objPropertyData);
             }
           },
           (err) => {

@@ -50,6 +50,10 @@ export default function RoomList({}: Props) {
     );
   };
 
+  const afterSaveRoom = () => {
+    getAllRooms();
+  };
+
   const DeleteRoom = (RoomID: string) => {
     showLoading(theme, true);
     RoomApi.deleteRoom(
@@ -226,7 +230,7 @@ export default function RoomList({}: Props) {
         <AddRoomDialog
           onClose={closeAddRoomDialog}
           objRoom={selectedRoom}
-          getAllRooms={getAllRooms}
+          afterSave={afterSaveRoom}
         />
       )}
     </Page>
@@ -262,7 +266,7 @@ const Text = styled(Typography)(({ theme }) => ({
   textWrap: "nowrap",
 }));
 
-const getChipColor = (_RoomType: enumRoomType): string => {
+export const getChipColor = (_RoomType: enumRoomType): string => {
   let color: string = "";
 
   if (_RoomType === enumRoomType.Double_Room) {

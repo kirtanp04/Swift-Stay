@@ -7,7 +7,6 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  Typography,
   styled,
   useTheme,
 } from "@mui/material";
@@ -27,18 +26,19 @@ import FormTextArea from "src/components/Form/FormTextArea";
 import FormTextFiels from "src/components/Form/FormTextField";
 import { RESIconButton } from "src/components/RESIconButton";
 import Scrollbar from "src/components/Scrollbar";
+import LoadingSkeleton from "src/components/Skeleton";
 import UploadImage from "src/components/UploadImage";
+import useAuth from "src/hooks/useAuth";
 import showMessage from "src/util/ShowMessage";
 import * as yup from "yup";
 import AddPropertyDialog from "../Property/AddPropertyDialog";
 import { PropertyApi, PropertyClass } from "../Property/DataObject";
 import { RoomApi, RoomClass, enumRoomType } from "./DataObject";
-import useAuth from "src/hooks/useAuth";
 
 type Props = {
   onClose: () => void;
   objRoom: RoomClass;
-  getAllRooms: () => void;
+  afterSave?: (objRoom?: RoomClass) => void;
 };
 
 const AddRoomSchema = yup.object().shape({
@@ -51,11 +51,7 @@ const AddRoomSchema = yup.object().shape({
   amenities: yup.array().of(yup.string().required("Amenity is required")),
 });
 
-export default function AddRoomDialog({
-  objRoom,
-  onClose,
-  getAllRooms,
-}: Props) {
+export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
   const [showUploadRoomImgDialog, setShowUploadRoomImgDialog] =
     useState<boolean>(false);
   const [showPropertyLoading, setShowPropertyLoading] =
@@ -109,18 +105,26 @@ export default function AddRoomDialog({
   };
 
   const getAllProperty = () => {
-    setShowPropertyLoading(true);
-    PropertyApi.getAllProperty(
-      objRoom.adminID,
-      (res) => {
-        setPropertyList(res);
-        setShowPropertyLoading(false);
-      },
-      (err) => {
-        showMessage(err, theme, () => {});
-        setShowPropertyLoading(false);
-      }
-    );
+    if (objRoom._id === "") {
+      setShowPropertyLoading(true);
+      PropertyApi.getAllProperty(
+        objRoom.adminID,
+        (res) => {
+          setPropertyList(res);
+          setShowPropertyLoading(false);
+        },
+        (err) => {
+          showMessage(err, theme, () => {});
+          setShowPropertyLoading(false);
+        }
+      );
+    }
+  };
+
+  const AfterPropertySave = (objProperty: PropertyClass | undefined) => {
+    getAllProperty();
+    if (objProperty) {
+    }
   };
 
   const onAddRoom = (_objRoom: RoomClass) => {
@@ -136,7 +140,9 @@ export default function AddRoomDialog({
             showMessage(res, theme, () => {});
             setLoading(false);
             onClose();
-            getAllRooms();
+            if (afterSave !== undefined) {
+              afterSave(_objRoom);
+            }
           },
           (err) => {
             showMessage(err, theme, () => {});
@@ -151,7 +157,9 @@ export default function AddRoomDialog({
             showMessage(res, theme, () => {});
             setLoading(false);
             onClose();
-            getAllRooms();
+            if (afterSave !== undefined) {
+              afterSave(_objRoom);
+            }
           },
           (err) => {
             showMessage(err, theme, () => {});
@@ -179,29 +187,43 @@ export default function AddRoomDialog({
         >
           <Scrollbar sx={{ height: "100%" }}>
             <FieldWrapper>
-              {showPropertyLoading ? (
-                <PropertyLoadingText>Getting Property...</PropertyLoadingText>
-              ) : propertyList.length === 0 ? (
-                <Button
-                  startIcon={<PlusIcon />}
-                  variant="outlined"
-                  onClick={openAddPropertyDialog}
+              {objRoom._id === "" ? (
+                <LoadingSkeleton
+                  isLoading={showPropertyLoading}
+                  sx={{ width: "100%" }}
                 >
-                  Create Property First
-                </Button>
+                  {propertyList.length === 0 ? (
+                    <Button
+                      startIcon={<PlusIcon />}
+                      variant="outlined"
+                      onClick={openAddPropertyDialog}
+                    >
+                      Create Property First
+                    </Button>
+                  ) : (
+                    <FormSelectField
+                      variant="outlined"
+                      label="Property"
+                      name="property._id"
+                      sx={{ width: "100%" }}
+                    >
+                      <option value={""}></option>
+                      {propertyList.map((objProperty) => (
+                        <option value={objProperty._id} key={objProperty._id}>
+                          {objProperty.name}
+                        </option>
+                      ))}
+                    </FormSelectField>
+                  )}
+                </LoadingSkeleton>
               ) : (
-                <FormSelectField
+                <FormTextFiels
                   variant="outlined"
                   label="Property"
-                  name="property._id"
-                >
-                  <option value={""}></option>
-                  {propertyList.map((objProperty) => (
-                    <option value={objProperty._id} key={objProperty._id}>
-                      {objProperty.name}
-                    </option>
-                  ))}
-                </FormSelectField>
+                  name="property.name"
+                  sx={{ width: "100%" }}
+                  disabled
+                />
               )}
             </FieldWrapper>
 
@@ -358,6 +380,7 @@ export default function AddRoomDialog({
         <AddPropertyDialog
           objProperty={objProperty}
           onClose={() => setShowAddProperty(false)}
+          afterSave={AfterPropertySave}
         />
       )}
     </Dialog>
@@ -384,10 +407,4 @@ const InputWrapper = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down("sm")]: {
     flexDirection: "column",
   },
-}));
-
-const PropertyLoadingText = styled(Typography)(({ theme }) => ({
-  fontSize: "0.85rem",
-  textAlign: "center",
-  color: theme.palette.primary.main,
 }));

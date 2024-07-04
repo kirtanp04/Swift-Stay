@@ -144,7 +144,12 @@ class Functions {
                         { _id: propertyID },
                         { adminID: adminID }
                     ]
-                }).populate('rooms').exec()
+                }).populate({
+                    path: 'rooms',
+                    populate: {
+                        path: 'property'
+                    }
+                }).exec()
 
                 if (isProperty) {
                     this.objUserResponse = GetUserSuccessObj(isProperty, HttpStatusCodes.OK);
@@ -175,7 +180,12 @@ class Functions {
 
                 } else {
                     // const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id })
-                    const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id }).populate('rooms').exec()
+                    const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id }).populate({
+                        path: 'rooms',
+                        populate: {
+                            path: 'property'
+                        }
+                    }).exec()
                     if (allProperties) {
                         Cache.SetCache(CacheKey.manager.property(checkUser.data.email), allProperties)
                         this.objUserResponse = GetUserSuccessObj(allProperties, HttpStatusCodes.OK);

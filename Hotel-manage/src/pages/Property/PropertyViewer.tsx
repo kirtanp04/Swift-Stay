@@ -210,9 +210,9 @@ export default function PropertyViewer({}: Props) {
                   </TextWrapper>
                 </TopRightContentWrapper>
               </Scrollbar>
-
-              {/* ---------------------------- // -------------------------------------- */}
             </TopContentWrapper>
+
+            {/* ----------------------------BottomWrapper Room Data -------------------------------------- */}
 
             <BottomWrapper>
               <BottomHeader>
@@ -292,6 +292,7 @@ const BottomWrapper = styled(Box)(() => ({
   display: "flex",
   alignItems: "center",
   flexDirection: "column",
+  marginTop: "1rem",
 }));
 
 const ImageSkeleton = styled(LoadingSkeleton)(({ theme }) => ({
@@ -409,6 +410,6 @@ const RoomCardWrapper = styled(Box)(() => ({
   alignItems: "center",
   marginTop: "0.7rem",
   flexWrap: "wrap",
-  flexShrink: "initial",
-  justifyContent: "space-around",
+  // flexShrink: "initial",
+  gap: "10px",
 }));

@@ -77,6 +77,12 @@ export default function HotelList({}: Props) {
     );
   };
 
+  const AfterSaveProperty = (objProperty: PropertyClass | undefined) => {
+    getAllProperty();
+    if (objProperty) {
+    }
+  };
+
   const onEditProperty = (objProperty: PropertyClass) => {
     setObjPropert(objProperty);
     setOpenAddHotelDialog(true);
@@ -251,7 +257,7 @@ export default function HotelList({}: Props) {
         <AddPropertyDialog
           onClose={closeAddHotelDialogBox}
           objProperty={objPropert}
-          getAllProperty={getAllProperty}
+          afterSave={AfterSaveProperty}
         />
       )}
     </Page>
