@@ -59,11 +59,12 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
   const [propertyList, setPropertyList] = useState<PropertyClass[]>([]);
   const [RoomDetails, setRoomDetails] = useState<RoomClass>(objRoom);
   const [loading, setLoading] = useState<boolean>(false);
-  const theme = useTheme();
   const [showAddPropertyDialog, setShowAddProperty] = useState<boolean>(false);
   const [objProperty, setObjProperty] = useState<PropertyClass>(
     new PropertyClass()
   );
+
+  const theme = useTheme();
   const {
     user: {
       userInfo: { id },

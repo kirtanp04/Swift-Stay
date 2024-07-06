@@ -76,7 +76,7 @@ class Functions {
                 state,
                 website,
                 zipCode,
-                updatedAt
+                updatedAt,
             } = this.objParam!.data as PropertyClass;
 
             const checkUser = await checkAdminVerification(adminID);
@@ -101,7 +101,7 @@ class Functions {
                     state: state,
                     website: website,
                     zipCode: zipCode,
-                    updatedAt: updatedAt
+                    updatedAt: updatedAt,
                 });
 
                 const isSave = await _Property.save();
@@ -135,26 +135,27 @@ class Functions {
 
     public getSingleProperty = async (): Promise<UserResponse> => {
         try {
-            const { adminID, propertyID } = this.objParam.data
+            const { adminID, propertyID } = this.objParam.data;
             const checkUser = await checkAdminVerification(adminID);
             if (checkUser.error === '') {
-
                 const isProperty = await PropertyModel.findOne({
-                    $and: [
-                        { _id: propertyID },
-                        { adminID: adminID }
-                    ]
-                }).populate({
-                    path: 'rooms',
-                    populate: {
-                        path: 'property'
-                    }
-                }).exec()
+                    $and: [{ _id: propertyID }, { adminID: adminID }],
+                })
+                    .populate({
+                        path: 'rooms',
+                        populate: {
+                            path: 'property',
+                        },
+                    })
+                    .exec();
 
                 if (isProperty) {
                     this.objUserResponse = GetUserSuccessObj(isProperty, HttpStatusCodes.OK);
                 } else {
-                    this.objUserResponse = GetUserErrorObj(`Server error: Property id is not matching with admin, or wronge propertyID / admin  is provided`, HttpStatusCodes.NOT_ACCEPTABLE);
+                    this.objUserResponse = GetUserErrorObj(
+                        `Server error: Property id is not matching with admin, or wronge propertyID / admin  is provided`,
+                        HttpStatusCodes.NOT_ACCEPTABLE
+                    );
                 }
             } else {
                 this.objUserResponse = GetUserErrorObj(checkUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
@@ -177,19 +178,19 @@ class Functions {
 
                 if (ManagerPropertyCache.error === '') {
                     this.objUserResponse = GetUserSuccessObj(ManagerPropertyCache.data, HttpStatusCodes.OK);
-
                 } else {
                     // const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id })
-                    const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id }).populate({
-                        path: 'rooms',
-                        populate: {
-                            path: 'property'
-                        }
-                    }).exec()
+                    const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id })
+                        .populate({
+                            path: 'rooms',
+                            populate: {
+                                path: 'property',
+                            },
+                        })
+                        .exec();
                     if (allProperties) {
-                        Cache.SetCache(CacheKey.manager.property(checkUser.data.email), allProperties)
+                        Cache.SetCache(CacheKey.manager.property(checkUser.data.email), allProperties);
                         this.objUserResponse = GetUserSuccessObj(allProperties, HttpStatusCodes.OK);
-
                     }
                 }
             } else {
@@ -222,7 +223,7 @@ class Functions {
                 state,
                 website,
                 zipCode,
-                updatedAt
+                updatedAt,
             } = this.objParam!.data as PropertyClass;
 
             const checkUser = await checkAdminVerification(adminID);
@@ -233,24 +234,30 @@ class Functions {
                 const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(checkUser.data.email));
                 const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
 
-                const isUpdated = await PropertyModel.findOneAndUpdate({ _id: _id }, {
-                    $set: {
-                        address: address,
-                        amenities: amenities,
-                        city: city,
-                        country: country,
-                        description: description,
-                        email: email,
-                        images: images,
-                        name: name,
-                        phone: phone,
-                        propertyType: propertyType,
-                        state: state,
-                        website: website,
-                        zipCode: zipCode,
-                        updatedAt: updatedAt
-                    }
-                }, { new: true })
+                const isUpdated = await PropertyModel.findOneAndUpdate(
+                    {
+                        $and: [{ _id: _id }, { adminID: adminID }],
+                    },
+                    {
+                        $set: {
+                            address: address,
+                            amenities: amenities,
+                            city: city,
+                            country: country,
+                            description: description,
+                            email: email,
+                            images: images,
+                            name: name,
+                            phone: phone,
+                            propertyType: propertyType,
+                            state: state,
+                            website: website,
+                            zipCode: zipCode,
+                            updatedAt: updatedAt,
+                        },
+                    },
+                    { new: true }
+                );
 
                 if (isUpdated) {
                     if (ManagerPropertyCache.data !== '') {
@@ -269,28 +276,25 @@ class Functions {
                         `Success: Your ` + propertyType + ` has been Updated.`,
                         HttpStatusCodes.CREATED
                     );
-
                 } else {
                     this.objUserResponse = GetUserErrorObj(
                         `Server error not able to Update ` + propertyType + `. Create Manager account first. Might wrong credentials.`,
                         HttpStatusCodes.BAD_REQUEST
                     );
                 }
-
             } else {
                 this.objUserResponse = GetUserErrorObj(checkUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
             }
-
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
         } finally {
-            return this.objUserResponse
+            return this.objUserResponse;
         }
-    }
+    };
 
     public deleteProperty = async (): Promise<UserResponse> => {
         try {
-            const { adminID, PropertyID } = this.objParam.data
+            const { adminID, PropertyID } = this.objParam.data;
             const checkUser = await checkAdminVerification(adminID);
 
             if (checkUser.error === '') {
@@ -299,10 +303,19 @@ class Functions {
                 const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(checkUser.data.email));
                 const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
 
-                const isDeleted = await PropertyModel.findByIdAndDelete({ _id: PropertyID })
+                const isDeleted = await PropertyModel.findOneAndDelete({
+                    $and: [
+                        {
+                            _id: PropertyID,
+                        },
+                        {
+                            adminID: adminID,
+                        },
+                    ],
+                });
 
                 if (isDeleted?.rooms.length! > 0) {
-                    const isRoomDelete = await Room.deleteMany({ _id: { $in: isDeleted?.rooms } })
+                    const isRoomDelete = await Room.deleteMany({ _id: { $in: isDeleted?.rooms } });
 
                     if (isRoomDelete) {
                         if (ManagerPropertyCache.data !== '') {
@@ -321,10 +334,12 @@ class Functions {
                             `Success: Your ` + isDeleted!.propertyType + isDeleted!.name + ` has been Deleted.`,
                             HttpStatusCodes.OK
                         );
-
                     } else {
                         this.objUserResponse = GetUserErrorObj(
-                            `Server error not able to Delete Rooms of ` + isDeleted!.propertyType + isDeleted!.name + `. Create Manager account first. Might wrong credentials.`,
+                            `Server error not able to Delete Rooms of ` +
+                            isDeleted!.propertyType +
+                            isDeleted!.name +
+                            `. Create Manager account first. Might wrong credentials.`,
                             HttpStatusCodes.BAD_REQUEST
                         );
                     }
@@ -340,29 +355,25 @@ class Functions {
                             `Success: Your ` + isDeleted.propertyType + isDeleted.name + ` has been Deleted.`,
                             HttpStatusCodes.OK
                         );
-
                     } else {
                         this.objUserResponse = GetUserErrorObj(
-                            `Server error not able to Delete ` + isDeleted!.propertyType + isDeleted!.name + `. Create Manager account first. Might wrong credentials.`,
+                            `Server error not able to Delete ` +
+                            isDeleted!.propertyType +
+                            isDeleted!.name +
+                            `. Create Manager account first. Might wrong credentials.`,
                             HttpStatusCodes.BAD_REQUEST
                         );
                     }
                 }
-
-
-
-
             } else {
                 this.objUserResponse = GetUserErrorObj(checkUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
             }
-
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
         } finally {
-            return this.objUserResponse
+            return this.objUserResponse;
         }
-    }
+    };
 }
-
 
 //const ids= ['hgihgiy','ojgorg','hrgrhguh'] her i want to delete all the room whose _id is indide this using mongoose operators not bu any js loop

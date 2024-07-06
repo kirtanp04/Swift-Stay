@@ -211,7 +211,7 @@ class Functions {
                 const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
                 const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
 
-                const isUpdated = await Room.findByIdAndUpdate({ _id: _id }, {
+                const isUpdated = await Room.findOneAndUpdate({ $and: [{ _id: _id }, { adminID: adminID }] }, {
                     $set: {
                         amenities: amenities,
                         description: description,
@@ -268,10 +268,10 @@ class Functions {
                 const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
                 const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
 
-                const isDeleted = await Room.findByIdAndDelete({ _id: RoomID })
+                const isDeleted = await Room.findOneAndDelete({ $and: [{ _id: RoomID }, { adminID: adminID }] })
 
                 if (isDeleted) {
-                    const isPropertyUpdated = await Property.findByIdAndUpdate({ _id: isDeleted.property._id }, {
+                    const isPropertyUpdated = await Property.findOneAndDelete({ _id: isDeleted.property._id }, {
                         $pull: {
                             rooms: isDeleted._id
                         }

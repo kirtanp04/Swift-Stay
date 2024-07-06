@@ -134,7 +134,11 @@ export default function UploadImage({
                         />
                       </EditBtnWrapper> */}
                     <CancleBtnWrapper onClick={() => removeImage(img)}>
-                      <CloseCircleIcon height={"100%"} width={"100%"} />
+                      <CloseCircleIcon
+                        height={"100%"}
+                        width={"100%"}
+                        IconColor={theme.palette.error.main}
+                      />
                     </CancleBtnWrapper>
                   </ImageWrapper>
                 </Fragment>

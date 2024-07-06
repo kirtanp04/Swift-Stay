@@ -1,6 +1,6 @@
-import { Box, Typography, styled, useTheme } from "@mui/material";
+import { Box, Button, Typography, styled, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Page from "src/components/Page";
 import useAuth from "src/hooks/useAuth";
 import showLoading from "src/util/ShowLoading";
@@ -13,12 +13,19 @@ import { Chip } from "@mui/material";
 import { getChipColor } from "./PropertyList";
 import { TimeFormatter } from "src/common/TimeFormater";
 import RoomCard from "./RoomCard";
+import { RESIconButton } from "src/components/RESIconButton";
+import { DeleteIcon, PlusIcon, UpdateIcon } from "src/assets/iconify";
+import AddPropertyDialog from "./AddPropertyDialog";
+import { Path } from "src/Router/path";
 
 type Props = {};
 
 export default function PropertyViewer({}: Props) {
   const [Property, setProperty] = useState<PropertyClass>(new PropertyClass());
+  const [showUpdatePropertyDialog, setShowUpdatePropertyDialog] =
+    useState<boolean>(false);
   const theme = useTheme();
+  const navigate = useNavigate();
   const {
     user: {
       userInfo: { id },
@@ -45,25 +52,85 @@ export default function PropertyViewer({}: Props) {
     }
   }, [Param]);
 
+  const openUpdatePropertyDialog = () => {
+    setShowUpdatePropertyDialog(true);
+  };
+
+  const closeUpdatePropertyDialog = () => {
+    setShowUpdatePropertyDialog(false);
+  };
+
+  const DeleteProperty = () => {
+    showLoading(theme, true);
+    PropertyApi.deleteProperty(
+      id,
+      Property._id,
+      (res) => {
+        showLoading(theme, false);
+        navigate(Path.property.root);
+        if (res) {
+        }
+      },
+      (err) => {
+        showLoading(theme, false);
+        showMessage(err, theme, () => {});
+      }
+    );
+  };
+
+  const afterDeleteRoom = (RoomID: string) => {
+    const _updatedRoom = Property.rooms.filter(
+      (objRoom) => objRoom._id !== RoomID
+    );
+    setProperty({ ...Property, rooms: _updatedRoom });
+  };
+
+  const afterUpdateProperty = (objProperty: PropertyClass | undefined) => {
+    setProperty(objProperty!);
+  };
+
   return (
     <Page title={Property.name}>
       <RootStyle>
         <HeaderWrapper>
-          <HeaderHotelName className="headerPropertyName">
-            {Property.name}
-          </HeaderHotelName>
-          <HeaderHotelCity>{Property.city}</HeaderHotelCity>
+          <LoadingSkeleton
+            isLoading={Property.images.length > 0 ? false : true}
+            sx={{ width: "100%", height: "100%" }}
+            variant="text"
+          >
+            <HeaderHotelName>{Property.name}</HeaderHotelName>
+          </LoadingSkeleton>
+          <HeaderHotelAction>
+            <RESIconButton
+              iconposition="start"
+              starticon={<UpdateIcon />}
+              variant="outlined"
+              onClick={openUpdatePropertyDialog}
+            >
+              Update
+            </RESIconButton>
+            <RESIconButton
+              iconposition="start"
+              starticon={<DeleteIcon />}
+              variant="contained"
+              onClick={DeleteProperty}
+            >
+              Delete
+            </RESIconButton>
+          </HeaderHotelAction>
         </HeaderWrapper>
         <EScrollbar>
           <ContentWrapper>
             {/* ---------------------------- top Text Content-------------------------------------- */}
             <TopContentWrapper>
-              <ImageSkeleton
-                isLoading={Property.images.length > 0 ? false : true}
-                variant="rectangular"
-              >
-                <Image src={Property.images[0]} alt="Hotel pic" />
-              </ImageSkeleton>
+              <ImageWrapper>
+                <ImageSkeleton
+                  isLoading={Property.images.length > 0 ? false : true}
+                  variant="rectangular"
+                >
+                  <Image src={Property.images[0]} alt="Hotel pic" />
+                </ImageSkeleton>
+              </ImageWrapper>
 
               <Scrollbar sx={{ height: "100%", width: "100%" }}>
                 <TopRightContentWrapper>
@@ -215,18 +282,51 @@ export default function PropertyViewer({}: Props) {
             {/* ----------------------------BottomWrapper Room Data -------------------------------------- */}
 
             <BottomWrapper>
-              <BottomHeader>
-                <RoomHeader>Rooms</RoomHeader>
-              </BottomHeader>
-              <RoomCardWrapper>
-                {Property.rooms.map((objRoom) => (
-                  <RoomCard key={objRoom._id} objRoom={objRoom} />
-                ))}
-              </RoomCardWrapper>
+              <LoadingSkeleton
+                isLoading={Property._id === "" ? true : false}
+                sx={{ width: "100%" }}
+              >
+                <BottomHeader>
+                  <RoomHeader>Rooms</RoomHeader>
+                </BottomHeader>
+              </LoadingSkeleton>
+
+              {Property.rooms.length > 0 ? (
+                <RoomCardWrapper>
+                  {Property.rooms.map((objRoom) => (
+                    <RoomCard
+                      afterDeleteRoom={afterDeleteRoom}
+                      key={objRoom._id}
+                      objRoom={objRoom}
+                    />
+                  ))}
+                </RoomCardWrapper>
+              ) : (
+                <LoadingSkeleton
+                  isLoading={Property._id === "" ? true : false}
+                  sx={{ height: "100%", width: "100%" }}
+                >
+                  <NowRooWrapper>
+                    <Typography fontSize={"0.9rem"}>No rooms </Typography>
+                    <Button startIcon={<PlusIcon />} variant="outlined">
+                      {" "}
+                      Create new Room
+                    </Button>
+                  </NowRooWrapper>
+                </LoadingSkeleton>
+              )}
             </BottomWrapper>
           </ContentWrapper>
         </EScrollbar>
       </RootStyle>
+
+      {showUpdatePropertyDialog && (
+        <AddPropertyDialog
+          objProperty={Property}
+          onClose={closeUpdatePropertyDialog}
+          afterSave={afterUpdateProperty}
+        />
+      )}
     </Page>
   );
 }
@@ -257,14 +357,15 @@ const HeaderHotelName = styled(Typography)(({ theme }) => ({
   fontFamily: "Heading",
 }));
 
-const HeaderHotelCity = styled(Typography)(({ theme }) => ({
-  fontSize: "1rem",
-  color: theme.palette.text.secondary,
-  fontStyle: "italic",
+const HeaderHotelAction = styled(Typography)(() => ({
+  display: "flex",
+  alignItems: "center",
+  gap: "15px",
 }));
 
 const EScrollbar = styled(Scrollbar)(() => ({
   height: "100%",
+  width: "100%",
 }));
 
 const ContentWrapper = styled(Box)(({ theme }) => ({
@@ -295,7 +396,7 @@ const BottomWrapper = styled(Box)(() => ({
   marginTop: "1rem",
 }));
 
-const ImageSkeleton = styled(LoadingSkeleton)(({ theme }) => ({
+const ImageWrapper = styled(Box)(({ theme }) => ({
   height: 400,
   width: 550,
   display: "flex",
@@ -303,22 +404,29 @@ const ImageSkeleton = styled(LoadingSkeleton)(({ theme }) => ({
   alignItems: "center",
   gap: "15px",
   [theme.breakpoints.down("xl")]: {
-    width: 400,
+    width: 350,
     height: 350,
   },
   [theme.breakpoints.down("lg")]: {
-    width: 380,
+    width: "100%",
+    height: 300,
   },
   [theme.breakpoints.down("md")]: {
-    width: 340,
+    height: 250,
   },
-  [theme.breakpoints.down("sm")]: {
-    width: 260,
-  },
+  // [theme.breakpoints.down("sm")]: {
+  //   width: 260,
+  //   height: 350,
+  // },
+}));
+
+const ImageSkeleton = styled(LoadingSkeleton)(() => ({
+  height: "100%",
+  width: "100%",
 }));
 
 const Image = styled(LazyImage)(() => ({
-  flex: 1,
+  height: "100%",
   objectFit: "fill",
   width: "100%",
 }));
@@ -332,6 +440,9 @@ const TopRightContentWrapper = styled(Box)(({ theme }) => ({
   gap: "10px",
   [theme.breakpoints.down("xl")]: {
     gridTemplateColumns: "repeat(2,1fr)",
+  },
+  [theme.breakpoints.down("lg")]: {
+    gridTemplateColumns: "repeat(1,1fr)",
   },
 }));
 
@@ -412,4 +523,14 @@ const RoomCardWrapper = styled(Box)(() => ({
   flexWrap: "wrap",
   // flexShrink: "initial",
   gap: "10px",
+}));
+
+const NowRooWrapper = styled(Box)(() => ({
+  width: "100%",
+  height: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "3rem",
+  gap: "20px",
 }));

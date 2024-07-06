@@ -1,4 +1,3 @@
-import { alpha, useTheme } from "@mui/material";
 import { SVGProps } from "react";
 
 interface Props extends SVGProps<SVGSVGElement> {
@@ -239,7 +238,6 @@ export function EditIcon({ IconColor, ...other }: Props) {
 }
 
 export function DeleteIcon({ IconColor, ...other }: Props) {
-  const theme = useTheme();
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -249,7 +247,7 @@ export function DeleteIcon({ IconColor, ...other }: Props) {
       {...other}
     >
       <path
-        fill={IconColor ? IconColor : alpha(theme.palette.error.main, 0.5)}
+        fill={IconColor ? IconColor : "currentColor"}
         d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4zm2 2h6V4H9zM6.074 8l.857 12H17.07l.857-12zM10 10a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1"
       />
     </svg>
@@ -257,7 +255,6 @@ export function DeleteIcon({ IconColor, ...other }: Props) {
 }
 
 export function CloseCircleIcon({ IconColor, ...other }: Props) {
-  const theme = useTheme();
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -267,7 +264,7 @@ export function CloseCircleIcon({ IconColor, ...other }: Props) {
       {...other}
     >
       <path
-        fill={IconColor ? IconColor : alpha(theme.palette.error.main, 0.5)}
+        fill={IconColor ? IconColor : "currentColor"}
         d="M16 2C8.2 2 2 8.2 2 16s6.2 14 14 14s14-6.2 14-14S23.8 2 16 2m5.4 21L16 17.6L10.6 23L9 21.4l5.4-5.4L9 10.6L10.6 9l5.4 5.4L21.4 9l1.6 1.6l-5.4 5.4l5.4 5.4z"
       ></path>
     </svg>
@@ -433,6 +430,57 @@ export function PreviewIcon({ IconColor, ...other }: Props) {
         fill={IconColor ? IconColor : "currentColor"}
         d="M5 21q-.825 0-1.412-.587T3 19V5q0-.825.588-1.412T5 3h14q.825 0 1.413.588T21 5v14q0 .825-.587 1.413T19 21zm0-2h14V7H5zm7-2q-2.05 0-3.662-1.112T6 13q.725-1.775 2.338-2.887T12 9q2.05 0 3.663 1.113T18 13q-.725 1.775-2.337 2.888T12 17m0-2.5q-.625 0-1.062-.437T10.5 13q0-.625.438-1.062T12 11.5q.625 0 1.063.438T13.5 13q0 .625-.437 1.063T12 14.5m0 1q1.05 0 1.775-.725T14.5 13q0-1.05-.725-1.775T12 10.5q-1.05 0-1.775.725T9.5 13q0 1.05.725 1.775T12 15.5"
       />
+    </svg>
+  );
+}
+
+export function VerticleMenuIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 32 32"
+      {...other}
+    >
+      <circle
+        cx={16}
+        cy={8}
+        r={2}
+        fill={IconColor ? IconColor : "currentColor"}
+      ></circle>
+      <circle
+        cx={16}
+        cy={16}
+        r={2}
+        fill={IconColor ? IconColor : "currentColor"}
+      ></circle>
+      <circle
+        cx={16}
+        cy={24}
+        r={2}
+        fill={IconColor ? IconColor : "currentColor"}
+      ></circle>
+    </svg>
+  );
+}
+
+export function HorizontalMenuIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill="none"
+        stroke={IconColor ? IconColor : "currentColor"}
+        strokeLinejoin="round"
+        strokeWidth={3.75}
+        d="M12.01 12v.01H12V12zm7 0v.01H19V12zm-14 0v.01H5V12z"
+      ></path>
     </svg>
   );
 }
