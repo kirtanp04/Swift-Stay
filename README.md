@@ -1,4 +1,4 @@
-# Concept that are followed in this Project
+# Concepts that are followed in this Project
 
 <div style="display: flex; justify-content: space-between;">
 

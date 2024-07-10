@@ -2,12 +2,14 @@ import bcrypt from 'bcrypt';
 import * as CryptoTS from 'crypto-ts';
 import { Convert } from './Convert';
 import { ProjectResponse, errorPath } from './Response';
+import { SecrtKey } from '../env';
 // import { logEntry } from 'src/logging/logger';
 
 export class Crypt {
-    private static key = CryptoTS.enc.Utf8.parse('knjbvuigbuvhuy84578953686578ty78');
 
-    private static Iv = CryptoTS.enc.Utf8.parse('knjbvuigbuvhuy84578953686578ty78');
+    private static key = CryptoTS.enc.Utf8.parse(SecrtKey.ENCRYPTION_KEY!);
+
+    private static Iv = CryptoTS.enc.Utf8.parse(SecrtKey.ENCRYPTION_KEY!);
 
     static Decryption(value: string): ProjectResponse {
         let _res = new ProjectResponse();

@@ -17,6 +17,8 @@ import { RESIconButton } from "src/components/RESIconButton";
 import { DeleteIcon, PlusIcon, UpdateIcon } from "src/assets/iconify";
 import AddPropertyDialog from "./AddPropertyDialog";
 import { Path } from "src/Router/path";
+import { RoomClass } from "../room/DataObject";
+import AddRoomDialog from "../room/AddRoomDialog";
 
 type Props = {};
 
@@ -24,6 +26,8 @@ export default function PropertyViewer({}: Props) {
   const [Property, setProperty] = useState<PropertyClass>(new PropertyClass());
   const [showUpdatePropertyDialog, setShowUpdatePropertyDialog] =
     useState<boolean>(false);
+  const [showAddRoomDialog, setShowAddRoomDialog] = useState<boolean>(false);
+  const [objRoom, setObjRoom] = useState<RoomClass>(new RoomClass());
   const theme = useTheme();
   const navigate = useNavigate();
   const {
@@ -60,6 +64,18 @@ export default function PropertyViewer({}: Props) {
     setShowUpdatePropertyDialog(false);
   };
 
+  const openAddRoomDialog = () => {
+    let _objNewRoom = new RoomClass();
+    _objNewRoom.property = Property;
+    _objNewRoom.adminID = id;
+    setObjRoom(_objNewRoom);
+    setShowAddRoomDialog(true);
+  };
+
+  const closeAddRoomDialog = () => {
+    setShowAddRoomDialog(false);
+  };
+
   const DeleteProperty = () => {
     showLoading(theme, true);
     PropertyApi.deleteProperty(
@@ -89,35 +105,47 @@ export default function PropertyViewer({}: Props) {
     setProperty(objProperty!);
   };
 
+  const afterCreatingRoom = (objRoom: RoomClass | undefined) => {
+    let _objNewProperty = Property;
+    _objNewProperty.rooms.push(objRoom!);
+    setProperty(_objNewProperty);
+  };
+
   return (
     <Page title={Property.name}>
       <RootStyle>
         <HeaderWrapper>
           <LoadingSkeleton
             isLoading={Property.images.length > 0 ? false : true}
-            sx={{ width: "100%", height: "100%" }}
+            sx={{
+              width: "100%",
+              height: "100%",
+              justifyContent: "space-between",
+              display: "flex",
+            }}
             variant="text"
           >
             <HeaderHotelName>{Property.name}</HeaderHotelName>
+
+            <HeaderHotelAction>
+              <RESIconButton
+                iconposition="start"
+                starticon={<UpdateIcon />}
+                variant="outlined"
+                onClick={openUpdatePropertyDialog}
+              >
+                Update
+              </RESIconButton>
+              <RESIconButton
+                iconposition="start"
+                starticon={<DeleteIcon />}
+                variant="contained"
+                onClick={DeleteProperty}
+              >
+                Delete
+              </RESIconButton>
+            </HeaderHotelAction>
           </LoadingSkeleton>
-          <HeaderHotelAction>
-            <RESIconButton
-              iconposition="start"
-              starticon={<UpdateIcon />}
-              variant="outlined"
-              onClick={openUpdatePropertyDialog}
-            >
-              Update
-            </RESIconButton>
-            <RESIconButton
-              iconposition="start"
-              starticon={<DeleteIcon />}
-              variant="contained"
-              onClick={DeleteProperty}
-            >
-              Delete
-            </RESIconButton>
-          </HeaderHotelAction>
         </HeaderWrapper>
         <EScrollbar>
           <ContentWrapper>
@@ -308,8 +336,11 @@ export default function PropertyViewer({}: Props) {
                 >
                   <NowRooWrapper>
                     <Typography fontSize={"0.9rem"}>No rooms </Typography>
-                    <Button startIcon={<PlusIcon />} variant="outlined">
-                      {" "}
+                    <Button
+                      startIcon={<PlusIcon />}
+                      variant="outlined"
+                      onClick={openAddRoomDialog}
+                    >
                       Create new Room
                     </Button>
                   </NowRooWrapper>
@@ -325,6 +356,14 @@ export default function PropertyViewer({}: Props) {
           objProperty={Property}
           onClose={closeUpdatePropertyDialog}
           afterSave={afterUpdateProperty}
+        />
+      )}
+
+      {showAddRoomDialog && (
+        <AddRoomDialog
+          objRoom={objRoom}
+          onClose={closeAddRoomDialog}
+          afterSave={afterCreatingRoom}
         />
       )}
     </Page>
@@ -347,7 +386,7 @@ const HeaderWrapper = styled(Box)(({ theme }) => ({
   height: 60,
   borderBottom: `1px dashed ${theme.palette.divider}`,
   padding: "0.7rem",
-  justifyContent: "space-between",
+
   paddingRight: "1rem",
 }));
 

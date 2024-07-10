@@ -270,12 +270,15 @@ class Functions {
 
                 const isDeleted = await Room.findOneAndDelete({ $and: [{ _id: RoomID }, { adminID: adminID }] })
 
+
+
                 if (isDeleted) {
-                    const isPropertyUpdated = await Property.findOneAndDelete({ _id: isDeleted.property._id }, {
+                    const isPropertyUpdated = await Property.findOneAndUpdate({ _id: isDeleted.property }, {
                         $pull: {
                             rooms: isDeleted._id
                         }
                     })
+
 
                     if (isPropertyUpdated) {
                         if (ManagerRoomCache.data !== '') {

@@ -1,6 +1,7 @@
 import Cluster, { Worker } from 'cluster';
 import cpu from 'os';
 import { _Express } from './server';
+require('dotenv').config()
 
 const _CpuLength: number = cpu.availableParallelism();
 const cluster: typeof Cluster = Cluster;

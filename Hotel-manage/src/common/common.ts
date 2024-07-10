@@ -24,3 +24,16 @@ export function getAvatarColor(fullName: string): string {
         return "#81A263";
     }
 }
+
+
+export function isUndefinedOrNull(value: any, defaultValue: any) {
+    try {
+        if (value === undefined || value === null) {
+            return defaultValue;
+        } else {
+            return value;
+        }
+    } catch (error) {
+        return defaultValue;
+    }
+}

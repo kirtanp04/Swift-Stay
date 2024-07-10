@@ -2,6 +2,7 @@ import { Api, getGETParamData, getPostParamData } from "src/common/ApiCall";
 import { PropertyClass } from "../Property/DataObject";
 import { Param } from "src/Constant";
 import { StoreError } from "src/util/StoreError";
+import { isUndefinedOrNull } from "src/common/common";
 
 export enum enumRoomType {
     Single_Room = 'Single Room',
@@ -27,6 +28,19 @@ export class RoomClass {
     isAvailable: boolean = true
     createdAt: Date = new Date()
     updatedAt: Date = new Date()
+
+    static getCopy(ObjRoom: any): RoomClass {
+        let _newObjRoom: any = new RoomClass();
+        try {
+            for (const key in _newObjRoom) {
+                _newObjRoom[key] = isUndefinedOrNull(ObjRoom[key], _newObjRoom[key]);
+            }
+        } catch (error) {
+            _newObjRoom = new RoomClass();
+        } finally {
+            return _newObjRoom;
+        }
+    }
 }
 
 export class RoomApi {

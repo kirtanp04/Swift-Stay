@@ -1,6 +1,7 @@
 import { useTheme } from "@mui/material";
 import { ReactNode, createContext, useEffect, useState } from "react";
 import { Storage } from "src/common/Storage";
+import { TimeFormatter } from "src/common/TimeFormater";
 import { Auth, _Login } from "src/pages/Authentication/AuthMgr";
 import showLoading from "src/util/ShowLoading";
 import showMessage from "src/util/ShowMessage";
@@ -16,6 +17,7 @@ export class TUser {
   name: string = "";
   role: string = "";
   id: string = "";
+  loginPeriod: Date = new Date();
 }
 
 export class TAuth {
@@ -51,6 +53,24 @@ function AuthContexProvider({ children }: Props) {
         userInfo: new TUser(),
       });
       return;
+    }
+
+    if (Authdata.data !== "") {
+      let _userInfo: TUser = Authdata.data;
+      const _loginPeriod = TimeFormatter.formatTimeDifference(
+        _userInfo.loginPeriod
+      );
+
+      if (_loginPeriod === "1 day ago") {
+        showMessage("Your Session get's expire. Login again", theme, () => {
+          setUser({
+            isProcessing: false,
+            isAuthenticated: false,
+            userInfo: new TUser(),
+          });
+        });
+        return;
+      }
     }
   };
 
@@ -102,6 +122,7 @@ function AuthContexProvider({ children }: Props) {
         _user.profileImg = res.profile;
         _user.role = res.role;
         _user.id = res.id;
+        _user.loginPeriod = new Date();
         setUser({ ...user, isAuthenticated: true, userInfo: _user });
         Storage.setToSessionStorage("Auth", _user);
       },

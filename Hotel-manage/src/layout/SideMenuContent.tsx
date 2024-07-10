@@ -100,7 +100,7 @@ export default function SideMenuContent({}: Props) {
           IconColor={theme.palette.text.primary}
         />
       ),
-      path: "/",
+      path: Path.chat.root,
     },
     {
       name: "Error logs",

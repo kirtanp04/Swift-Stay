@@ -1,8 +1,9 @@
 import { Box, styled } from "@mui/material";
 import { Helmet } from "react-helmet";
 import { descriptionContent } from "../Constant";
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import setFavicon from "./Favicon";
 
 type Props = {
   title: string;
@@ -13,6 +14,9 @@ type Props = {
 export default function Page({ title, description, children }: Props) {
   const _description: string = description || descriptionContent;
   const { pathname } = useLocation();
+  useEffect(() => {
+    setFavicon();
+  }, []);
   return (
     // <main>
     <RootStyle>

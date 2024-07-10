@@ -11,7 +11,7 @@ export enum enumPropertyType {
 
 export class PropertyClass {
     _id: string = '';
-    adminID: any = new UserClass();
+    adminID: string = '';
     name: string = '';
     propertyType: enumPropertyType = enumPropertyType.Hotel;
     address: string = '';
@@ -31,7 +31,7 @@ export class PropertyClass {
 }
 
 const PropertySchema = new Schema<PropertyClass>({
-    adminID: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    adminID: { type: String, required: [true, 'Admin ID is required.'] },
     name: { type: String, required: [true, 'Property name is required.'] },
     propertyType: { type: String, enum: Object.values(enumPropertyType), default: enumPropertyType.Hotel },
     address: { type: String, required: [true, 'Property address is required.'] },

@@ -4,6 +4,7 @@ import { TParam } from '../types/Type';
 import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
 import { Login, User, UserClass, enumUserRole } from '../models/UserModel';
 import { Param } from '../Constant';
+import { Email } from '../service/Email';
 
 
 
@@ -180,6 +181,9 @@ class Functions {
                             const setCookie = Storage.setCookie('Auth', getToken.data, this.res!);
 
                             if (setCookie.error === '') {
+
+                                // let _Email = new Email()
+
                                 this.objUserResponse = GetUserSuccessObj(
                                     { email: isUser.email, name: isUser.name, profile: isUser.profileImg, role: isUser.role, id: isUser._id },
                                     HttpStatusCodes.ACCEPTED

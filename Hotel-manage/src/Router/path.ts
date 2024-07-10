@@ -24,5 +24,8 @@ export const Path = {
     review: {
         root: rootPath + '/reviews'
     },
+    chat: {
+        root: rootPath + '/chats'
+    },
     errorLogs: rootPath + '/errorlogs'
 }

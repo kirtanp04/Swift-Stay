@@ -64,6 +64,8 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
     new PropertyClass()
   );
 
+  debugger;
+
   const theme = useTheme();
   const {
     user: {
@@ -72,7 +74,11 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
   } = useAuth();
 
   useEffect(() => {
-    getAllProperty();
+    if (objRoom._id === "") {
+      if (objRoom.property._id === "") {
+        getAllProperty();
+      }
+    }
   }, []);
 
   const _Method = useForm<RoomClass>({
@@ -106,20 +112,18 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
   };
 
   const getAllProperty = () => {
-    if (objRoom._id === "") {
-      setShowPropertyLoading(true);
-      PropertyApi.getAllProperty(
-        objRoom.adminID,
-        (res) => {
-          setPropertyList(res);
-          setShowPropertyLoading(false);
-        },
-        (err) => {
-          showMessage(err, theme, () => {});
-          setShowPropertyLoading(false);
-        }
-      );
-    }
+    setShowPropertyLoading(true);
+    PropertyApi.getAllProperty(
+      objRoom.adminID,
+      (res) => {
+        setPropertyList(res);
+        setShowPropertyLoading(false);
+      },
+      (err) => {
+        showMessage(err, theme, () => {});
+        setShowPropertyLoading(false);
+      }
+    );
   };
 
   const AfterPropertySave = (objProperty: PropertyClass | undefined) => {
@@ -188,7 +192,7 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
         >
           <Scrollbar sx={{ height: "100%" }}>
             <FieldWrapper>
-              {objRoom._id === "" ? (
+              {objRoom._id === "" && objRoom.property._id === "" ? (
                 <LoadingSkeleton
                   isLoading={showPropertyLoading}
                   sx={{ width: "100%" }}

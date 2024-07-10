@@ -55,6 +55,7 @@ export default function RoomCard({ objRoom, afterDeleteRoom }: Props) {
   };
 
   const DeleteRoom = () => {
+    debugger;
     showLoading(theme, true);
     RoomApi.deleteRoom(
       id,

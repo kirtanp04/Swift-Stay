@@ -3,11 +3,12 @@ import { SecrtKey } from '../env';
 import { Crypt } from './Crypt';
 import { ProjectResponse, errorPath } from './Response';
 
-
 // const privateKey = fs.readFileSync(path.join(__dirname, 'private_key.pem'), 'utf8');
 // const publicKey = fs.readFileSync(path.join(__dirname, 'public_key.pem'), 'utf8');
-const JWT_KEY = 'jbut*%$%^JHFR^$^$^&FC64';
+
 export class Jwt {
+    private static JWT_KEY = SecrtKey.JWT_KEY!;
+
     static SignJwt = (data: any, expireIn?: string | number): ProjectResponse => {
         let _res = new ProjectResponse();
 
@@ -19,17 +20,17 @@ export class Jwt {
                     {
                         data: objEncrypt.data,
                     },
-                    JWT_KEY!,
+                    this.JWT_KEY,
                     {
                         expiresIn: expireIn || '1h',
-                        //  algorithm: 'RS256' 
+                        //  algorithm: 'RS256'
                     }
                 );
 
                 if (getToken) {
-                    _res.data = getToken
+                    _res.data = getToken;
                 } else {
-                    _res.error = 'Server Error not able to generate token'
+                    _res.error = 'Server Error not able to generate token';
                 }
             } else {
                 _res.error = errorPath('common/JWT', 'SignJwt', 33) + objEncrypt.error;
@@ -41,18 +42,16 @@ export class Jwt {
         }
     };
 
-
-
     static VerifyJwt = (token: string): ProjectResponse => {
         let _res = new ProjectResponse();
 
         try {
-            const decodedToken: any = jwt.verify(token, JWT_KEY!);
+            const decodedToken: any = jwt.verify(token, this.JWT_KEY);
             if (decodedToken) {
-                const objDecrypt = Crypt.Decryption(decodedToken.data)
+                const objDecrypt = Crypt.Decryption(decodedToken.data);
 
                 if (objDecrypt.error === '') {
-                    _res.data = objDecrypt.data
+                    _res.data = objDecrypt.data;
                 } else {
                     _res.error = errorPath('common/JWT', 'VerifyJwt', 54) + objDecrypt.error;
                 }
