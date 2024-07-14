@@ -12,6 +12,7 @@ const ManagerBrokerRouter: Router = express.Router();
 const _ManagerAuthBroker: string = Param.broker.manager.Auth;
 const _ManagerPropertyBroker: string = Param.broker.manager.Property;
 const _ManagerRoomBroker: string = Param.broker.manager.Room;
+const _ManagerChatBroker: string = Param.broker.manager.chat;
 
 ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -36,6 +37,12 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
           const _res = await Functions.RoomFunction.findFunction(paramObj, req, res, next)
           return SendResponseToUser(_res, next);
         }
+        if (paramObj.Broker === _ManagerChatBroker) {
+          const _res = await Functions.ChatFunction.findFunction(paramObj, req, res, next)
+          return SendResponseToUser(_res, next);
+        }
+
+
       } else {
         return SendResponseToUser(GetUserErrorObj(`Server Error: ${objDecrypt.error}`, 404), next);
       }

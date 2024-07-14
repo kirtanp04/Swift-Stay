@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useMemo } from "react";
+import { ReactNode, useMemo } from "react";
 // @mui
 import { CssBaseline } from "@mui/material";
 import {
@@ -26,9 +26,6 @@ export default function ThemeProvider({ children }: Props) {
   const { mode } = useThemeSetting();
 
   const isLight = mode === "light";
-  useEffect(() => {
-    console.log(mode);
-  }, [mode]);
 
   const themeOptions: ThemeOptions = useMemo(
     () => ({

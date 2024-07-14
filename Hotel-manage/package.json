@@ -33,6 +33,7 @@
     "react-lazyload": "^3.2.1",
     "react-router-dom": "^6.23.1",
     "simplebar-react": "^3.2.6",
+    "socket.io-client": "^4.7.5",
     "yup": "^1.4.0"
   },
   "devDependencies": {

@@ -4,27 +4,25 @@ export const baseUrlName: string = '/'
 export const descriptionContent = 'Book the best hotels, resort, appartments and manymore all over India.'
 
 
+export const BackendBaseUrl = 'http://localhost:8080'
 
+export const BackendBaseApi = 'http://localhost:8080'
 
 
 export const Param = {
-
     broker: {
-
         manager: {
             Auth: 'ManagerAuthBroker',
             Property: 'ManagerPropertyBroker',
-            Room: 'ManagerRoomBroker'
+            Room: 'ManagerRoomBroker',
+            chat: 'ManagerChatBroker'
         },
 
         guest: {
-
             Auth: 'GuestAuthBroker',
             Property: 'GuestPropertyBroker',
-            Room: 'GuestRoomBroker'
-
-        }
-
+            Room: 'GuestRoomBroker',
+        },
     },
 
     function: {
@@ -43,11 +41,14 @@ export const Param = {
                 UpdateRoom: 'ManagerUpdateRoom',
                 DeleteRoom: 'ManagerDeleteRoom',
                 GetAllRoom: 'ManagerGetAllRoom'
+            },
+            chat: {
+                Init: 'ManagetChatInit'
             }
         },
         guest: {
             register: 'CreateGuestAccount',
-            login: 'GuestLogin'
-        }
-    }
-}
+            login: 'GuestLogin',
+        },
+    },
+};

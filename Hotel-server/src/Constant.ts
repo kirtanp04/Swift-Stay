@@ -4,6 +4,7 @@ export const Param = {
             Auth: 'ManagerAuthBroker',
             Property: 'ManagerPropertyBroker',
             Room: 'ManagerRoomBroker',
+            chat: 'ManagerChatBroker'
         },
 
         guest: {
@@ -29,6 +30,9 @@ export const Param = {
                 UpdateRoom: 'ManagerUpdateRoom',
                 DeleteRoom: 'ManagerDeleteRoom',
                 GetAllRoom: 'ManagerGetAllRoom'
+            },
+            chat: {
+                Init: 'ManagetChatInit'
             }
         },
         guest: {

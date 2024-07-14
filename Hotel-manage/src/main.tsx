@@ -9,13 +9,13 @@ import ThemeProvider from "./theme/index.tsx";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     {/* <GoogleOAuthProvider clientId="831825545652-fo49fofro8bk0e9q9mmue8k7o9v858bn.apps.googleusercontent.com"> */}
-    <ThemeProvider>
-      <ThemeSettingCTXProvider>
+    <ThemeSettingCTXProvider>
+      <ThemeProvider>
         <BrowserRouter>
           <App />
         </BrowserRouter>
-      </ThemeSettingCTXProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </ThemeSettingCTXProvider>
     {/* </GoogleOAuthProvider> */}
   </React.StrictMode>
 );

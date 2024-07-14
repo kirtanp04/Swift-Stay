@@ -522,3 +522,25 @@ export function FaviconIcon() {
     </svg>
   );
 }
+
+export function SendMessageIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 48 48"
+      {...other}
+    >
+      <g
+        fill="none"
+        stroke={IconColor ? IconColor : "currentColor"}
+        strokeLinejoin="round"
+        strokeWidth={4}
+      >
+        <path d="M42 6L4 20.138l20 3.87L29.005 44z"></path>
+        <path strokeLinecap="round" d="m24.008 24.008l5.657-5.656"></path>
+      </g>
+    </svg>
+  );
+}

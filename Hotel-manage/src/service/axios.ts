@@ -1,7 +1,8 @@
 import axios from "axios";
+import { BackendBaseApi } from "src/Constant";
 
 const axiosCall = axios.create({
-    baseURL: "http://localhost:8080/swiftstay/manager/api/",
+    baseURL: BackendBaseApi,
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json;charset=UTF-8',

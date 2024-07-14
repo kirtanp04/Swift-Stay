@@ -19,7 +19,6 @@ export class MongoDB {
                 _userRes.Message = errorPath('Database/DB.ts', 'ConnectDB', 17) + error;
                 _userRes.isError = true;
             } finally {
-                console.log(_userRes)
                 if (_userRes.isError) {
 
                     SendResponseToUser(_userRes, next);

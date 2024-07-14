@@ -182,7 +182,45 @@ class Functions {
 
                             if (setCookie.error === '') {
 
-                                // let _Email = new Email()
+                                let _Email = new Email({ next: this.next! })
+
+                                _Email.from = 'kirtanpatel6189@gmail.com'
+                                _Email.to = email
+                                _Email.subject = 'login Activity'
+                                _Email.html = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img src="https://example.com/path/to/company-logo.png" alt="Company Logo" style="max-width: 150px;">
+      </div>
+      <h1 style="color: #4CAF50;">Welcome to Our Service!</h1>
+      <p style="font-size: 16px; color: #555;">Hello,</p>
+      <p style="font-size: 16px; color: #555;">
+        We're excited to have you on board. Here's a summary of what you can expect from our service:
+      </p>
+      <ul style="list-style-type: none; padding: 0;">
+        <li style="background-color: #f9f9f9; margin: 10px 0; padding: 10px; border-radius: 5px;">
+          <strong>Feature 1:</strong> Description of feature 1.
+        </li>
+        <li style="background-color: #f9f9f9; margin: 10px 0; padding: 10px; border-radius: 5px;">
+          <strong>Feature 2:</strong> Description of feature 2.
+        </li>
+        <li style="background-color: #f9f9f9; margin: 10px 0; padding: 10px; border-radius: 5px;">
+          <strong>Feature 3:</strong> Description of feature 3.
+        </li>
+      </ul>
+      <p style="font-size: 16px; color: #555;">
+        If you have any questions, feel free to <a href="mailto:support@example.com" style="color: #4CAF50;">contact us</a>.
+      </p>
+      <div style="text-align: center; margin: 20px 0;">
+        <a href="https://frontend.example.com" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+          Visit Our Website
+        </a>
+      </div>
+      <p style="font-size: 16px; color: #555;">Best regards,<br/>The Team</p>
+    </div>
+  `
+
+                                _Email.sendEmail()
 
                                 this.objUserResponse = GetUserSuccessObj(
                                     { email: isUser.email, name: isUser.name, profile: isUser.profileImg, role: isUser.role, id: isUser._id },

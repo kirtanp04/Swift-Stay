@@ -1,21 +1,22 @@
-import { Avatar, useTheme } from "@mui/material";
+import { Avatar, AvatarProps, useTheme } from "@mui/material";
 import { getAvatarColor, getFirstLetter } from "src/common/common";
 
-type Props = {
+interface Props extends AvatarProps {
   src?: string;
   name: string;
-};
+}
 
-export default function MUIAvatar({ name, src }: Props) {
+export default function MUIAvatar({ name, src, ...other }: Props) {
   const theme = useTheme();
   if (src !== undefined) {
-    return <Avatar alt={name} src={src} />;
+    return <Avatar alt={name} src={src} {...other} />;
   }
 
   return (
     <Avatar
       alt={name}
       sx={{ bgcolor: getAvatarColor(name), color: theme.palette.text.primary }}
+      {...other}
     >
       {getFirstLetter(name)}
     </Avatar>

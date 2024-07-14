@@ -18,7 +18,6 @@ function ThemeSettingCTXProvider({ children }: TProps) {
   const [mode, setMode] = useState<string>(InitialValue);
 
   const ChangeMode = (modeName: "dark" | "light") => {
-    debugger;
     setMode(modeName);
   };
 

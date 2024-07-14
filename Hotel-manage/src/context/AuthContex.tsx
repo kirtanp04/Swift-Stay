@@ -61,16 +61,16 @@ function AuthContexProvider({ children }: Props) {
         _userInfo.loginPeriod
       );
 
-      if (_loginPeriod === "1 day ago") {
-        showMessage("Your Session get's expire. Login again", theme, () => {
-          setUser({
-            isProcessing: false,
-            isAuthenticated: false,
-            userInfo: new TUser(),
-          });
-        });
-        return;
-      }
+      // if (_loginPeriod === "1 day ago") {
+      //   showMessage("Your Session get's expire. Login again", theme, () => {
+      //     setUser({
+      //       isProcessing: false,
+      //       isAuthenticated: false,
+      //       userInfo: new TUser(),
+      //     });
+      //   });
+      //   return;
+      // }
     }
   };
 
@@ -115,6 +115,7 @@ function AuthContexProvider({ children }: Props) {
     await Auth.Login(
       objLogindetail,
       (res) => {
+        debugger;
         showLoading(theme, false);
         let _user = new TUser();
         _user.email = res.email;
