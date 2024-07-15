@@ -11,164 +11,8 @@ import showMessage from "src/util/ShowMessage";
 import { SocketService } from "src/service/Socket";
 
 export default function ChatViewer() {
-  const [ChatMessages, setChatMessages] = useState<ChatObj[]>([
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtanpatel0412@gmail.com",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtan@123456",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtanpatel0412@gmail.com",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtanpatel0412@gmail.com",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtan@123456",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtan@123456",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtanpatel0412@gmail.com",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtan@123456",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtan@123456",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtan@123456",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtanpatel0412@gmail.com",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtan@123456",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtan@123456",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-    {
-      message: "Hellow from kirtan",
-      date: TimeFormatter.formatTimeDifference(new Date()),
-      key: "6745",
-      senderDetail: {
-        email: "kirtanpatel0412@gmail.com",
-        name: "Kirtan",
-        id: "2375v7vgrv",
-        profileImg: "",
-      },
-    },
-  ]);
-
-  const [SelectedSubscriber, setSelectedSubriber] = useState<TSubscriber>({
+  const [ChatMessages, setChatMessages] = useState<ChatObj[]>([]);
+  const [SelectedSubscriber, setSelectedSubscriber] = useState<TSubscriber>({
     email: "",
     name: "",
     profileImg: "",
@@ -194,12 +38,24 @@ export default function ChatViewer() {
     });
   }, []);
 
+  const SendMessage = () => {
+    Socket.sendChatMessageInRoom("SendMessage", {
+      date: "kirtan",
+      key: id,
+      message: "kirtan",
+      senderDetail: {
+        email: email,
+        id: id,
+        name: name,
+        profileImg: "",
+      },
+    });
+  };
+
   const InitilizeChatService = () => {
     ChatApi.InitChatService(
       id,
-      (res) => {
-        console.log(res);
-      },
+      (res) => {},
       (err) => {
         showMessage(err, theme, () => {});
       }
@@ -207,7 +63,7 @@ export default function ChatViewer() {
   };
 
   const OnSelectSubscriber = (subscriber: TSubscriber) => {
-    setSelectedSubriber(subscriber);
+    setSelectedSubscriber(subscriber);
   };
 
   return (
@@ -219,20 +75,24 @@ export default function ChatViewer() {
           </SubscriberListHeaderWrapper>
           <SubscriberList>
             <Scrollbar>
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3].map((val) => (
+              {/* Dummy data for subscribers */}
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((val) => (
                 <SubscriberDetailWrapper
+                  key={val}
                   onClick={() =>
                     OnSelectSubscriber({
-                      email: "kirtanpatel6189@gmail.com",
-                      name: "Kirtan",
+                      email: "subscriber" + val + "@example.com",
+                      name: "Subscriber " + val,
                       profileImg: "",
                     })
                   }
                 >
-                  <MUIAvatar name={"Kirtan"} />
+                  <MUIAvatar name={"Subscriber " + val} />
                   <UserContentWrapper>
-                    <UserNameText>Kirtan</UserNameText>
-                    <UserEmailText>kirtanpatel6189@gmail.com</UserEmailText>
+                    <UserNameText>{"Subscriber " + val}</UserNameText>
+                    <UserEmailText>
+                      {"subscriber" + val + "@example.com"}
+                    </UserEmailText>
                   </UserContentWrapper>
                 </SubscriberDetailWrapper>
               ))}
@@ -283,7 +143,7 @@ export default function ChatViewer() {
           </MessageListWrapper>
           <MessageInputWrapper>
             <MessageInputField placeholder="Enter Your Message.." />
-            <SendButtonWrapper>
+            <SendButtonWrapper onClick={SendMessage}>
               <SendMessageIcon
                 height={25}
                 width={25}

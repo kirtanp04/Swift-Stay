@@ -10,8 +10,21 @@ import { UserResponse } from './common/Response';
 import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
 import { MainApiLimit } from './middleware/RateLimitApi';
 import { SecrtKey } from './env';
+import http from 'http';
+import { Server } from 'socket.io';
 
-const _app = express();
+
+export const _app = express();
+
+const server = http.createServer(_app);
+export const io = new Server(server, {
+  cors: {
+    credentials: true,
+    methods: 'GET,POST',
+    optionsSuccessStatus: 201,
+    origin: SecrtKey.FRONTEND_URL,
+  }
+});
 
 export class _Express {
   Port: number = 8080;
@@ -54,6 +67,10 @@ export class _Express {
     _app.use(express.json({ limit: '50mb' }));
 
     _app.use(cookieParser());
+
+
+
+
   }
 
   route() {
@@ -74,9 +91,10 @@ export class _Express {
 
   listen() {
     try {
-      _app.listen(this.Port, () => {
+      server.listen(this.Port, () => {
         console.log('Server started on Port' + this.Port);
       });
+
     } catch (error) {
       console.log('Error while Starting Server -> ' + error);
     }

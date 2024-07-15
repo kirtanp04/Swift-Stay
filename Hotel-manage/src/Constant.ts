@@ -6,7 +6,7 @@ export const descriptionContent = 'Book the best hotels, resort, appartments and
 
 export const BackendBaseUrl = 'http://localhost:8080'
 
-export const BackendBaseApi = 'http://localhost:8080'
+export const BackendBaseApi = 'http://localhost:8080' // main api for manager 
 
 
 export const Param = {

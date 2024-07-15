@@ -48,8 +48,10 @@ class Functions {
 
             if (isValidUser.error === '') {
 
-                const Socket = new WebSocket()
-                Socket.Start(8102)
+                const Port: number = 1212
+
+                const Socket = new WebSocket(Port)
+                // Socket.Start()
 
 
             } else {

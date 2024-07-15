@@ -1,9 +1,10 @@
-import { createServer } from 'http';
+import http from 'http';
 import { Server, Socket } from 'socket.io';
-import { DefaultEventsMap } from 'socket.io/dist/typed-events';
-import { Crypt } from '../common';
+import { Server as HttpServer } from 'http';
+import { Crypt } from '../common/Crypt';
 import { enumUserRole } from '../models/UserModel';
-import { SecrtKey } from '../env';
+import { _app, io } from '../server';
+
 
 export class SocketUserAuth {
     name: string = '';
@@ -13,86 +14,70 @@ export class SocketUserAuth {
 }
 
 export interface CustomSocket extends Socket {
-    UserInfo?: SocketUserAuth;
+    userDetail?: SocketUserAuth;
 }
 
-export class WebSocket {
-    private HtttpServer = createServer();
-    private IO: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any> | null = null;
-    private JoinroomsocketName: string = 'Join_Room';
 
-    constructor() {
-        const IO = this.CreateSocketServer();
-        this.IO = IO;
+export class WebSocket {
+    private server: HttpServer;
+    private io: Server;
+
+    constructor(port: number) {
+        this.server = http.createServer(_app);
+        this.io = io
         // this.MiddleWare();
         this.HandleConnections();
     }
 
-    private CreateSocketServer = (): Server => {
-        const IO = new Server(this.HtttpServer);
-        return IO;
-    }
+    private MiddleWare = () => {
+        this.io.use((socket: CustomSocket, next) => {
+            const userInfo = socket.handshake.auth.userInfo;
+            const userData = Crypt.Decryption(userInfo);
+            if (userData.error === '') {
+                socket.userDetail = userData.data;
+                next();
+            } else {
+                next(new Error('Authentication error'));
+            }
+        });
 
-    private MiddleWare = (): void => {
-        try {
-            this.IO?.use((socket: CustomSocket, next) => {
-                const token: string = socket.handshake.auth.UserInfo;
-                const decryptedObj = Crypt.Decryption(token);
-                if (decryptedObj.error === '') {
-                    socket.UserInfo = decryptedObj.data;
-                    next();
+        this.server.on('error', (error: Error) => {
+            console.log(error.message)
+        });
+    };
+
+    private HandleConnections = () => {
+        this.io.on('connection', (socket: CustomSocket) => {
+            console.log('User connected:');
+
+            socket.on('Join_Room', (roomKey: string) => {
+                console.log('key', roomKey)
+                socket.join(roomKey);
+                this.io.to(roomKey).emit('roomJoined');
+            });
+
+            socket.on('SendMessage', (encryptedMessage: string) => {
+                const decryptedMessage = Crypt.Decryption(encryptedMessage);
+                console.log('Message', decryptedMessage.data)
+                if (decryptedMessage.error === '') {
+                    this.io.to(decryptedMessage.data).emit('message', decryptedMessage.data);
                 } else {
-                    next(new Error('You are not Authenticated For Using Chat Service. Login to perform this task.'));
+                    console.log('Failed to decrypt message');
                 }
             });
-        } catch (error: any) {
-            console.log({ soccket_Middleware_error: error.message });
-        }
-    }
 
-    private IsRoomAlreadyThere = (roomKey: string): boolean => {
-        const Rooms = this.IO?.sockets.adapter.rooms;
-        return Rooms ? Rooms.has(roomKey) : false;
-    }
-
-    private HandleConnections = (): void => {
-        try {
-            this.IO?.on('connection', (socket: CustomSocket) => {
-                console.log(`User Connected -> UserName: ${socket.UserInfo?.name} / Email:${socket.UserInfo?.email} / Role:${socket.UserInfo?.role}`);
-
-                socket.on(this.JoinroomsocketName, (roomKey: string) => {
-                    if (this.IsRoomAlreadyThere(roomKey)) {
-                        console.log(`User ${socket.UserInfo?.name} is joining existing room: ${roomKey}`);
-                        socket.join(roomKey);
-                        socket.emit('roomJoined', `Joined existing room: ${roomKey}`);
-                    } else {
-                        console.log(`User ${socket.UserInfo?.name} is creating and joining new room: ${roomKey}`);
-                        socket.join(roomKey);
-                        socket.emit('roomCreated', `Created and joined new room: ${roomKey}`);
-                    }
-                });
-
-                socket.on('message', (objChat: ChatObj) => {
-                    console.log(`Message from ${socket.UserInfo?.name}: ${objChat}`);
-                    this.IO?.to(objChat.key).emit('message', objChat);
-                });
-
-                socket.on('disconnect', () => {
-                    console.log(`User disconnected: ${socket.UserInfo?.name}`);
-                });
-
+            socket.on('disconnect', () => {
+                console.log('User disconnected:');
             });
-        } catch (error: any) {
-            console.log({ soccket_Handel_error: error.message });
-        }
-    }
 
-    public Start = (port: number): void => {
-        this.HtttpServer.listen(port, () => {
-            console.log(`Server is listening on port ${port}`);
+
         });
-    }
+    };
 }
+
+// Initialize the WebSocket server on port 3000
+// new WebSocket(3000);
+
 
 export class ChatObj {
     message: string = '';
