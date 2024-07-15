@@ -1,8 +1,8 @@
 import { io, Socket } from 'socket.io-client';
 import { Crypt } from 'src/common/Crypt';
-import { BackendBaseApi } from 'src/Constant';
 import { enumUserRole } from 'src/pages/Authentication/AuthMgr';
 import { ChatObj } from 'src/pages/Chat/DataObject';
+import { SocketIoBaseUrl } from '../Constant';
 
 export class SocketUserAuth {
     name: string = '';
@@ -12,7 +12,7 @@ export class SocketUserAuth {
 }
 
 export class SocketService {
-    private BackendURL: string = BackendBaseApi;
+    private BackendURL: string = SocketIoBaseUrl;
     private _Socket: Socket | null = null;
     private RoomKey: string = '';
     private JoinRoomSocketName: string = 'Join_Room';
@@ -21,22 +21,30 @@ export class SocketService {
         this._Socket = this.ConnectToSocket(objUser);
     }
 
-    private ConnectToSocket = (objUser: SocketUserAuth): Socket => {
-        const encryptedObj = Crypt.Encryption(objUser);
-        let _Socket: any;
-        if (encryptedObj.error === '') {
-            try {
-                _Socket = io(this.BackendURL, {
-                    auth: {
-                        userInfo: encryptedObj.data,
-                    },
-                });
-            } catch (error) {
-                console.log(error)
+    private ConnectToSocket = (objUser: SocketUserAuth) => {
+
+        try {
+            const encryptedObj = Crypt.Encryption(objUser);
+            let _Socket: any;
+            if (encryptedObj.error === '') {
+                try {
+                    _Socket = io(this.BackendURL, {
+                        auth: {
+                            userInfo: encryptedObj.data,
+                        },
+                    });
+                    return _Socket;
+                } catch (error) {
+                    console.log(error)
+                }
+
             }
 
+        } catch (error) {
+            console.log(error)
         }
-        return _Socket;
+
+
     };
 
     public joinRoom = (roomKey: string, onfail?: (err: any) => void) => {

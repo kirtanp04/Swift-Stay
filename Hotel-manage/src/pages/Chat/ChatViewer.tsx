@@ -32,10 +32,10 @@ export default function ChatViewer() {
   });
 
   useEffect(() => {
-    InitilizeChatService();
-    Socket.joinRoom(id, (err) => {
-      alert(err);
-    });
+    // InitilizeChatService();
+    // Socket.joinRoom(id, (err) => {
+    //   alert(err);
+    // });
   }, []);
 
   const SendMessage = () => {

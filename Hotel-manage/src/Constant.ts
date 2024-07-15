@@ -4,7 +4,7 @@ export const baseUrlName: string = '/'
 export const descriptionContent = 'Book the best hotels, resort, appartments and manymore all over India.'
 
 
-export const BackendBaseUrl = 'http://localhost:8080'
+export const SocketIoBaseUrl = 'http://localhost:5050'
 
 export const BackendBaseApi = 'http://localhost:8080' // main api for manager 
 

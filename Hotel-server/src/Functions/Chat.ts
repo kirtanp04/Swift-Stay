@@ -3,7 +3,7 @@ import { GetUserErrorObj, HttpStatusCodes, UserResponse } from "../common";
 import { Param } from "../Constant";
 import { TParam } from "../types/Type";
 import { checkAdminVerification } from "../middleware/AdiminVerification";
-import { WebSocket } from "../service/Socket";
+
 
 const _ManagerChatInit: string = Param.function.manager.chat.Init;
 
@@ -48,9 +48,9 @@ class Functions {
 
             if (isValidUser.error === '') {
 
-                const Port: number = 1212
 
-                const Socket = new WebSocket(Port)
+
+
                 // Socket.Start()
 
 
