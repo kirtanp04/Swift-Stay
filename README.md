@@ -10,6 +10,10 @@
 - Mongoose
 - Typescript
 
+- **Real_Time_Chat**
+
+- Socket.io
+
 - **Protection**
 
   - cors
@@ -38,6 +42,10 @@
 - axios
 - react-hook-form
 - react-dropzone
+
+- **Real_Time_Chat**
+
+- Socket.io
 
 - **Validation**
 

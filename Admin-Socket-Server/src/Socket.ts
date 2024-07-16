@@ -1,9 +1,6 @@
 import http from 'http';
 import { Server, Socket } from 'socket.io';
-import { Server as HttpServer } from 'http';
 import { Crypt } from './common/index';
-
-
 
 export class SocketUserAuth {
     name: string = '';
@@ -15,64 +12,52 @@ export interface CustomSocket extends Socket {
     userDetail?: SocketUserAuth;
 }
 
-
 export class WebSocket {
-
     private io: Server;
-
+    private ActiveRoom: string = ''
     constructor(SocketServer: Server) {
-
-        this.io = SocketServer
-        // this.MiddleWare();
+        this.io = SocketServer;
         this.HandleConnections();
     }
 
-    private MiddleWare = () => {
-        this.io.use((socket: CustomSocket, next) => {
-            const userInfo = socket.handshake.auth.userInfo;
-            const userData = Crypt.Decryption(userInfo);
-            if (userData.error === '') {
-                socket.userDetail = userData.data;
-                next();
-            } else {
-                next(new Error('Authentication error'));
-            }
-        });
-
-    };
-
     private HandleConnections = () => {
         this.io.on('connection', (socket: CustomSocket) => {
-            console.log('User connected:');
+            console.log('User connected:', socket.id);
 
             socket.on('Join_Room', (roomKey: string) => {
-                console.log('key', roomKey)
-                socket.join(roomKey);
-                this.io.to(roomKey).emit('roomJoined');
+                // decrypting key 
+                const objDecryptKey: ChatObj = Crypt.Decryption(roomKey).data
+                console.log('Joining room:', roomKey);
+                socket.join(objDecryptKey.key);
+
+                if (this.ActiveRoom === objDecryptKey.key) {
+
+                    const chatMess = new ChatObj();
+                    chatMess.date = `${objDecryptKey.senderDetail.name} is live now`;
+                    const encryptMess = Crypt.Encryption(chatMess).data;
+                    console.log('Emitting roomJoined event to room:', roomKey);
+                    socket.to(objDecryptKey.key).emit('roomJoined', encryptMess);
+                }
+
+                this.ActiveRoom = objDecryptKey.key
             });
 
             socket.on('SendMessage', (encryptedMessage: string) => {
                 const decryptedMessage = Crypt.Decryption(encryptedMessage);
-                console.log('Message', decryptedMessage.data)
                 if (decryptedMessage.error === '') {
-                    this.io.to(decryptedMessage.data).emit('message', decryptedMessage.data);
+                    console.log('Sending message to room:', decryptedMessage.data);
+                    socket.to(decryptedMessage.data.roomKey).emit('message', decryptedMessage.data);
                 } else {
                     console.log('Failed to decrypt message');
                 }
             });
 
             socket.on('disconnect', () => {
-                console.log('User disconnected:');
+                console.log('User disconnected:', socket.id);
             });
-
-
         });
     };
 }
-
-// Initialize the WebSocket server on port 3000
-// new WebSocket(3000);
-
 
 export class ChatObj {
     message: string = '';

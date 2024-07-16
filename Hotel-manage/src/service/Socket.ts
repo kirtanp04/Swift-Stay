@@ -1,32 +1,32 @@
-import { io, Socket } from 'socket.io-client';
-import { Crypt } from 'src/common/Crypt';
-import { enumUserRole } from 'src/pages/Authentication/AuthMgr';
-import { ChatObj } from 'src/pages/Chat/DataObject';
-import { SocketIoBaseUrl } from '../Constant';
+import { io, Socket } from "socket.io-client";
+import { Crypt } from "src/common/Crypt";
+import { enumUserRole } from "src/pages/Authentication/AuthMgr";
+import { ChatObj } from "src/pages/Chat/DataObject";
+import { SocketIoBaseUrl } from "../Constant";
 
 export class SocketUserAuth {
-    name: string = '';
-    email: string = '';
+    name: string = "";
+    email: string = "";
     role: enumUserRole = enumUserRole.guest;
-    _id: string = '';
+    _id: string = "";
 }
 
 export class SocketService {
     private BackendURL: string = SocketIoBaseUrl;
     private _Socket: Socket | null = null;
-    private RoomKey: string = '';
-    private JoinRoomSocketName: string = 'Join_Room';
+    private RoomKey: string = "";
+    private JoinRoomSocketName: string = "Join_Room";
 
     constructor(objUser: SocketUserAuth) {
         this._Socket = this.ConnectToSocket(objUser);
+        this.setupEventListeners();
     }
 
     private ConnectToSocket = (objUser: SocketUserAuth) => {
-
         try {
             const encryptedObj = Crypt.Encryption(objUser);
             let _Socket: any;
-            if (encryptedObj.error === '') {
+            if (encryptedObj.error === "") {
                 try {
                     _Socket = io(this.BackendURL, {
                         auth: {
@@ -35,25 +35,33 @@ export class SocketService {
                     });
                     return _Socket;
                 } catch (error) {
-                    console.log(error)
+                    console.log(error);
                 }
-
             }
-
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
-
-
     };
 
-    public joinRoom = (roomKey: string, onfail?: (err: any) => void) => {
-        try {
-            if (this.RoomKey === '') {
-                this.RoomKey = roomKey;
-                this._Socket?.emit(this.JoinRoomSocketName, roomKey);
+    private setupEventListeners = () => {
+        this._Socket?.on('roomJoined', (data: any) => {
+            console.log('roomJoined event received:', data);
+            const decryptChat = Crypt.Decryption(data);
+            if (decryptChat.error === "") {
+                console.log('Decrypted chat message:', decryptChat.data);
             } else {
-                this._Socket?.emit(this.JoinRoomSocketName, roomKey);
+                console.error('Failed to decrypt chat message');
+            }
+        });
+    };
+
+    public joinRoom = (roomKey: ChatObj, onfail?: (err: any) => void) => {
+        try {
+            if (this.RoomKey === "") {
+                this.RoomKey = roomKey.key;
+                this._Socket?.emit(this.JoinRoomSocketName, Crypt.Encryption(roomKey).data);
+            } else {
+                this._Socket?.emit(this.JoinRoomSocketName, Crypt.Encryption(roomKey).data);
             }
         } catch (error: any) {
             if (onfail !== undefined) {
@@ -62,22 +70,49 @@ export class SocketService {
         }
     };
 
-    public sendChatMessageInRoom = (socketKeyName: string, objChat: ChatObj, onfail?: (err: any) => void) => {
+    public sendChatMessageInRoom = (
+        socketKeyName: string,
+        objChat: ChatObj,
+        onfail?: (err: any) => void
+    ) => {
         try {
-            if (this.RoomKey === '') {
+            if (this.RoomKey === "") {
                 if (onfail !== undefined) {
-                    onfail('First You Need to Join Room');
+                    onfail("First You Need to Join Room");
                 }
             } else {
                 const encryptedChat = Crypt.Encryption(objChat);
-                if (encryptedChat.error === '') {
+                if (encryptedChat.error === "") {
                     this._Socket?.emit(socketKeyName, encryptedChat.data);
                 } else {
                     if (onfail !== undefined) {
-                        onfail('Not able to Encrypt Your Chat');
+                        onfail("Not able to Encrypt Your Chat");
                     }
                 }
             }
+        } catch (error: any) {
+            if (onfail !== undefined) {
+                onfail(error.message);
+            }
+        }
+    };
+
+    public GetChatMessage = (
+        socketKeyName: string,
+        onSuccess: (objChat: ChatObj) => void,
+        onfail?: (err: any) => void
+    ) => {
+        try {
+            this._Socket?.on(socketKeyName, (data: any) => {
+                const decryptChat = Crypt.Decryption(data);
+                if (decryptChat.error === "") {
+                    onSuccess(decryptChat.data);
+                } else {
+                    if (onfail !== undefined) {
+                        onfail("Not able to decrypt Your Chat");
+                    }
+                }
+            });
         } catch (error: any) {
             if (onfail !== undefined) {
                 onfail(error.message);

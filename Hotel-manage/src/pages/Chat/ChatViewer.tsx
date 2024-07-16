@@ -4,14 +4,13 @@ import { SendMessageIcon } from "src/assets/iconify";
 import MUIAvatar from "src/components/mui/MUIAvatar";
 import Page from "src/components/Page";
 import Scrollbar from "src/components/Scrollbar";
-import { ChatApi, ChatObj, TSubscriber } from "./DataObject";
-import { TimeFormatter } from "src/common/TimeFormater";
 import useAuth from "src/hooks/useAuth";
-import showMessage from "src/util/ShowMessage";
 import { SocketService } from "src/service/Socket";
+import { ChatObj, TSubscriber } from "./DataObject";
+import showMessage from "src/util/ShowMessage";
 
 export default function ChatViewer() {
-  const [ChatMessages, setChatMessages] = useState<ChatObj[]>([]);
+  const [ChatMessages] = useState<ChatObj[]>([]);
   const [SelectedSubscriber, setSelectedSubscriber] = useState<TSubscriber>({
     email: "",
     name: "",
@@ -32,11 +31,32 @@ export default function ChatViewer() {
   });
 
   useEffect(() => {
-    // InitilizeChatService();
-    // Socket.joinRoom(id, (err) => {
-    //   alert(err);
-    // });
+    if (SelectedSubscriber.email !== "" && email !== "") {
+      const _ChatObj = new ChatObj();
+      _ChatObj.date = "";
+      _ChatObj.key = email + SelectedSubscriber.email; // first admin email then subscriber email
+      _ChatObj.message = "";
+      _ChatObj.senderDetail.name = name;
+      _ChatObj.senderDetail.email = email;
+      Socket.joinRoom(_ChatObj);
+    } else {
+      showMessage(
+        "Not able to join Room. Email of Subscriber / Admin is getting null",
+        theme,
+        () => {}
+      );
+    }
+  }, [SelectedSubscriber]);
+
+  useEffect(() => {
+    ReceiveAllChatMessage();
   }, []);
+
+  const ReceiveAllChatMessage = () => {
+    Socket.GetChatMessage("roomJoined", (data) => {
+      console.log(data);
+    });
+  };
 
   const SendMessage = () => {
     Socket.sendChatMessageInRoom("SendMessage", {
@@ -52,15 +72,15 @@ export default function ChatViewer() {
     });
   };
 
-  const InitilizeChatService = () => {
-    ChatApi.InitChatService(
-      id,
-      (res) => {},
-      (err) => {
-        showMessage(err, theme, () => {});
-      }
-    );
-  };
+  // const InitilizeChatService = () => {
+  //   ChatApi.InitChatService(
+  //     id,
+  //     (res) => {},
+  //     (err) => {
+  //       showMessage(err, theme, () => {});
+  //     }
+  //   );
+  // };
 
   const OnSelectSubscriber = (subscriber: TSubscriber) => {
     setSelectedSubscriber(subscriber);

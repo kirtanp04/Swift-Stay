@@ -1,30 +1,17 @@
-import express, { NextFunction, Request, Response } from 'express';
-import cors from 'cors';
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import GuestBrokerRouter from './BrokerRoute/GuestBroker';
 import ManagerBrokerRouter from './BrokerRoute/ManagerBroker';
 import { UserResponse } from './common/Response';
-import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
-import { MainApiLimit } from './middleware/RateLimitApi';
 import { SecrtKey } from './env';
-import http from 'http';
-import { Server } from 'socket.io';
-
+import { MainApiLimit } from './middleware/RateLimitApi';
+import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
 
 export const _app = express();
-
-const server = http.createServer(_app);
-export const io = new Server(server, {
-  cors: {
-    credentials: true,
-    methods: 'GET,POST',
-    optionsSuccessStatus: 201,
-    origin: SecrtKey.FRONTEND_URL,
-  }
-});
 
 export class _Express {
   Port: number = 8080;
@@ -67,10 +54,6 @@ export class _Express {
     _app.use(express.json({ limit: '50mb' }));
 
     _app.use(cookieParser());
-
-
-
-
   }
 
   route() {
@@ -91,10 +74,9 @@ export class _Express {
 
   listen() {
     try {
-      server.listen(this.Port, () => {
+      _app.listen(this.Port, () => {
         console.log('Server started on Port' + this.Port);
       });
-
     } catch (error) {
       console.log('Error while Starting Server -> ' + error);
     }
