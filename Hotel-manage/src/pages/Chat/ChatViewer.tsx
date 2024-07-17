@@ -1,52 +1,54 @@
 import { alpha, Box, styled, Typography, useTheme } from "@mui/material";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SendMessageIcon } from "src/assets/iconify";
+import { TimeFormatter } from "src/common/TimeFormater";
 import MUIAvatar from "src/components/mui/MUIAvatar";
 import Page from "src/components/Page";
 import Scrollbar from "src/components/Scrollbar";
+import { SocketKeyName } from "src/Constant";
 import useAuth from "src/hooks/useAuth";
 import { SocketService } from "src/service/Socket";
-import { ChatObj, TSubscriber } from "./DataObject";
 import showMessage from "src/util/ShowMessage";
-import { SocketKeyName } from "src/Constant";
+import { ChatObj, TSubscriber } from "./DataObject";
 
 export default function ChatViewer() {
-  const [ChatMessages, setChatMessages] = useState<ChatObj[]>([]);
-  const [Socket, setSocket] = useState<SocketService | null>(null);
+  const [Message, setMessage] = useState("");
+  const [chatMessages, setChatMessages] = useState<ChatObj[]>([]);
+  const [socketError, setSocketError] = useState<ChatObj | null>(null);
   const [SelectedSubscriber, setSelectedSubscriber] = useState<TSubscriber>(
     new TSubscriber()
   );
-  const [Message, setMessage] = useState<string>("");
-  const theme = useTheme();
   const {
     user: {
-      userInfo: { email, id, name, role },
+      userInfo: { email, name, id, role },
     },
   } = useAuth();
-  const _Socket = new SocketService({
-    _id: id,
-    email: email,
-    name: name,
-    role: role as any,
-  });
+  const theme = useTheme();
 
-  useEffect(() => {
-    ReceiveAllChatMessage();
-  }, []);
+  const _Socket = new SocketService(
+    {
+      _id: id,
+      email: email,
+      name: name,
+      role: role as any,
+    },
+    GetChatMessage,
+    GetChatError
+  );
 
   useEffect(() => {
     if (SelectedSubscriber.email !== "" && email !== "") {
       const _ChatObj = new ChatObj();
       _ChatObj.key = email + SelectedSubscriber.email; // first admin email then subscriber email -- change email to id
-      _Socket!.joinRoom(_ChatObj);
-    } else {
-      // showMessage(
-      //   "Not able to join Room. Email of Subscriber / Admin is getting null",
-      //   theme,
-      //   () => {}
-      // );
+      _Socket.joinRoom(_ChatObj);
     }
   }, [SelectedSubscriber]);
+
+  useEffect(() => {
+    if (socketError !== null) {
+      showMessage(socketError.message, theme, () => {});
+    }
+  }, [socketError]);
 
   const GetChatObj = (message: string, key?: string): ChatObj => {
     const _ChatObj = new ChatObj();
@@ -63,24 +65,23 @@ export default function ChatViewer() {
     return _ChatObj;
   };
 
-  const ReceiveAllChatMessage = () => {
-    _Socket!.GetChatMessage(SocketKeyName.ReceiveMessage, (data) => {
-      if (data) {
-        console.log(data.message);
-        setChatMessages([...ChatMessages, data]);
-      }
-    });
-    _Socket?.GetChatMessage(SocketKeyName.ReceiveError, (data) => {
-      if (data) {
-        alert(data);
-      }
-    });
-  };
+  function GetChatMessage(msg: ChatObj) {
+    let newChatObj = new ChatObj();
+    newChatObj = { ...msg, date: TimeFormatter.formatTimeDifference(msg.date) };
+    setChatMessages((prevMessages) => [...prevMessages, newChatObj]);
+  }
+
+  function GetChatError(err: ChatObj) {
+    setSocketError(err);
+  }
 
   const SendMessage = () => {
-    _Socket!.sendChatMessageInRoom(
+    _Socket.sendChatMessageInRoom(
       SocketKeyName.SendMessage,
-      GetChatObj(Message)
+      GetChatObj(Message),
+      (err) => {
+        console.log(err);
+      }
     );
   };
 
@@ -97,7 +98,6 @@ export default function ChatViewer() {
           </SubscriberListHeaderWrapper>
           <SubscriberList>
             <Scrollbar>
-              {/* Dummy data for subscribers */}
               {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((val) => (
                 <SubscriberDetailWrapper
                   key={val}
@@ -123,7 +123,6 @@ export default function ChatViewer() {
           </SubscriberList>
         </SubscriberListWrapper>
 
-        {/* ---------------------------------------------- */}
         <MessageContentWrapper>
           <MessageListWrapper>
             <MessageContentHeader>
@@ -138,16 +137,20 @@ export default function ChatViewer() {
             </MessageContentHeader>
             <Scrollbar>
               <div style={{ padding: "0px 10px 10px 10px" }}>
-                {ChatMessages.map((objChat, index) => (
-                  <Fragment key={index}>
-                    <MessageTextWrapper
-                      sx={{
-                        marginLeft:
-                          objChat.senderDetail.email === email
-                            ? "auto"
-                            : "none",
-                      }}
-                    >
+                {chatMessages.map((objChat, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent:
+                        objChat.senderDetail.email === email
+                          ? "flex-end"
+                          : "flex-start",
+                    }}
+                  >
+                    <MessageTextWrapper>
                       <MUIAvatar
                         name={objChat.senderDetail.name}
                         src={
@@ -159,7 +162,7 @@ export default function ChatViewer() {
                       <MessageText>{objChat.message}</MessageText>
                       <MessageDate>{objChat.date as string}</MessageDate>
                     </MessageTextWrapper>
-                  </Fragment>
+                  </Box>
                 ))}
               </div>
             </Scrollbar>
@@ -246,22 +249,21 @@ const MessageTextWrapper = styled(Box)(({ theme }) => ({
   textWrap: "wrap",
   backgroundColor: theme.palette.grey[50012],
   gap: "10px",
-  width: "max-content",
+  width: "25%",
   position: "relative",
   marginTop: "10px",
 }));
 
 const MessageText = styled(Typography)(() => ({
-  fontSize: "1rem",
+  fontSize: "0.85rem",
   color: "white",
-  textAlign: "left",
+  width: "100%",
 }));
 
 const MessageListWrapper = styled(Box)(() => ({
   display: "flex",
   height: "90%",
   maxHeight: "90%",
-
   width: "100%",
   flexDirection: "column",
   justifyContent: "flex-end",
@@ -301,48 +303,40 @@ const SubscriberListHeader = styled(Typography)(({ theme }) => ({
 
 const SubscriberList = styled(Box)(() => ({
   height: "calc(100% - 20px)",
-  maxHeight: "calc(100% - 20px)",
-  // padding: "10px 0px",
+  overflowY: "auto",
+  maxHeight: "100%",
   width: "100%",
+  display: "flex",
+  flexDirection: "column",
 }));
 
 const SubscriberDetailWrapper = styled(Box)(({ theme }) => ({
-  width: "100%",
   display: "flex",
+  flexDirection: "row",
   alignItems: "center",
-  justifyContent: "center",
-  padding: 5,
-  borderBottom: `1px dashed ${theme.palette.divider}`,
-  overflow: "hidden",
-  maxWidth: "100%",
+  justifyContent: "flex-start",
+  padding: "10px",
   cursor: "pointer",
+  gap: "10px",
+  borderBottom: `1px dashed ${theme.palette.divider}`,
   "&:hover": {
-    backgroundColor: alpha(theme.palette.divider, 0.09),
+    backgroundColor: alpha(theme.palette.grey[500], 0.1),
   },
 }));
 
 const UserContentWrapper = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
-  marginLeft: "0.5rem",
-  maxWidth: "80%",
-  overflow: "hidden",
 }));
 
 const UserNameText = styled(Typography)(({ theme }) => ({
-  fontSize: "0.9rem",
-  textWrap: "nowrap",
   color: theme.palette.text.primary,
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-  overflow: "hidden",
+  fontSize: "1rem",
+  textAlign: "left",
 }));
 
 const UserEmailText = styled(Typography)(({ theme }) => ({
-  fontSize: "0.75rem",
-  textWrap: "nowrap",
-  textOverflow: "ellipsis",
   color: theme.palette.text.secondary,
-  whiteSpace: "nowrap",
-  overflow: "hidden",
+  fontSize: "0.85rem",
+  textAlign: "left",
 }));

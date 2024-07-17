@@ -1,3 +1,4 @@
+// SocketService.ts
 import { io, Socket } from "socket.io-client";
 import { Crypt } from "src/common/Crypt";
 import { enumUserRole } from "src/pages/Authentication/AuthMgr";
@@ -16,9 +17,10 @@ export class SocketService {
     private _Socket: Socket | null = null;
     private RoomKey: string = "";
 
-    constructor(objUser: SocketUserAuth) {
+    constructor(objUser: SocketUserAuth, onMessage: (msg: ChatObj) => void, onError: (err: any) => void) {
         this._Socket = this.ConnectToSocket(objUser);
         this.setupEventListeners();
+        this.setupMessageReception(onMessage, onError);
     }
 
     private ConnectToSocket = (objUser: SocketUserAuth) => {
@@ -75,18 +77,12 @@ export class SocketService {
         onfail?: (err: any) => void
     ) => {
         try {
-            if (this.RoomKey === "") {
-                if (onfail !== undefined) {
-                    onfail("First You Need to Join Room");
-                }
+            const encryptedChat = Crypt.Encryption(objChat);
+            if (encryptedChat.error === "") {
+                this._Socket?.emit(socketKeyName, encryptedChat.data);
             } else {
-                const encryptedChat = Crypt.Encryption(objChat);
-                if (encryptedChat.error === "") {
-                    this._Socket?.emit(socketKeyName, encryptedChat.data);
-                } else {
-                    if (onfail !== undefined) {
-                        onfail("Not able to Encrypt Your Chat");
-                    }
+                if (onfail !== undefined) {
+                    onfail("Not able to Encrypt Your Chat");
                 }
             }
         } catch (error: any) {
@@ -96,7 +92,7 @@ export class SocketService {
         }
     };
 
-    public GetChatMessage = (
+    private GetChatMessage = (
         socketKeyName: string,
         onSuccess: (objChat: ChatObj) => void,
         onfail?: (err: any) => void
@@ -117,5 +113,19 @@ export class SocketService {
                 onfail(error.message);
             }
         }
+    };
+
+    private setupMessageReception = (onMessage: (msg: ChatObj) => void, onError: (err: ChatObj) => void) => {
+        this.GetChatMessage(SocketKeyName.ReceiveMessage, (data) => {
+            onMessage(data);
+        }, (error) => {
+            onError(error);
+        });
+
+        this.GetChatMessage(SocketKeyName.ReceiveError, (data) => {
+            onError(data);
+        }, (error) => {
+            onError(error);
+        });
     };
 }

@@ -83,8 +83,6 @@ export class WebSocket {
     ) => {
         try {
             const encryptedChat = Crypt.Encryption(data).data;
-
-            console.log('Se4nding message' + ' Key -> ' + + data.key + ' Message ->  ' + data.message)
             this.Socket!.to(data.key).emit(SocketName, encryptedChat);
         } catch (error) { }
     };
@@ -97,7 +95,7 @@ export class WebSocket {
         try {
             this.Socket!.on(SocketName, (data: any) => {
                 const decryptChat = Crypt.Decryption(data);
-                console.log('received message' + ' Key -> ' + + data.key + ' Message ->  ' + data.message)
+                // console.log(decryptChat.data)
                 if (decryptChat.error === "") {
                     onSuccess(decryptChat.data);
                 } else {

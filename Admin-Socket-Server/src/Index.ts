@@ -5,7 +5,7 @@ import http from "http";
 import { Server } from "socket.io";
 import { ChatObj, SocketKeyName, WebSocket } from "./Socket";
 
-const port = process.env.PORT || 5050;
+const port = process.env.PORT || 5000;
 
 dotenv.config({
     path: "../.env",
