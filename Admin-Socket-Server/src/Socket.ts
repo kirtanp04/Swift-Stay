@@ -1,11 +1,21 @@
-import http from 'http';
-import { Server, Socket } from 'socket.io';
-import { Crypt } from './common/index';
+import { Server, Socket } from "socket.io";
+import { runChat } from ".";
+import { Crypt } from "./common/index";
+
+
+export const SocketKeyName = {
+    JoinRoom: 'Join_room',
+    SendMessage: 'Send_Message',
+    ReceiveMessage: 'Receive_Message',
+    ReceiveError: 'Receive_Error',
+    onJoinRoom: 'roomJoined'
+}
 
 export class SocketUserAuth {
-    name: string = '';
-    email: string = '';
-    _id: string = '';
+    name: string = "";
+    email: string = "";
+    _id: string = "";
+    role: string = ''
 }
 
 export interface CustomSocket extends Socket {
@@ -14,61 +24,116 @@ export interface CustomSocket extends Socket {
 
 export class WebSocket {
     private io: Server;
-    private ActiveRoom: string = ''
+    private ActiveRoom: string = "";
+    private Socket: CustomSocket | null = null;
     constructor(SocketServer: Server) {
         this.io = SocketServer;
+        this.UserAuthMiddleWare();
         this.HandleConnections();
     }
 
-    private HandleConnections = () => {
-        this.io.on('connection', (socket: CustomSocket) => {
-            console.log('User connected:', socket.id);
+    public userInfo: SocketUserAuth = new SocketUserAuth()
 
-            socket.on('Join_Room', (roomKey: string) => {
-                // decrypting key 
-                const objDecryptKey: ChatObj = Crypt.Decryption(roomKey).data
-                console.log('Joining room:', roomKey);
-                socket.join(objDecryptKey.key);
+    private UserAuthMiddleWare = () => {
+        try {
+            this.io.use((socket: CustomSocket, next) => {
+                const encryptedUserInfo = socket.handshake.auth.userInfo;
+                const decryptedUserInfo = Crypt.Decryption(encryptedUserInfo);
 
-                if (this.ActiveRoom === objDecryptKey.key) {
-
-                    const chatMess = new ChatObj();
-                    chatMess.date = `${objDecryptKey.senderDetail.name} is live now`;
-                    const encryptMess = Crypt.Encryption(chatMess).data;
-                    console.log('Emitting roomJoined event to room:', roomKey);
-                    socket.to(objDecryptKey.key).emit('roomJoined', encryptMess);
-                }
-
-                this.ActiveRoom = objDecryptKey.key
-            });
-
-            socket.on('SendMessage', (encryptedMessage: string) => {
-                const decryptedMessage = Crypt.Decryption(encryptedMessage);
-                if (decryptedMessage.error === '') {
-                    console.log('Sending message to room:', decryptedMessage.data);
-                    socket.to(decryptedMessage.data.roomKey).emit('message', decryptedMessage.data);
+                if (decryptedUserInfo.error === "" && decryptedUserInfo.data.role === 'admin') {
+                    socket.userDetail = decryptedUserInfo.data;
+                    this.userInfo = decryptedUserInfo.data
+                    next();
                 } else {
-                    console.log('Failed to decrypt message');
+                    next(new Error("Authentication error"));
                 }
             });
+        } catch (error) { }
+    };
 
-            socket.on('disconnect', () => {
-                console.log('User disconnected:', socket.id);
-            });
+    private HandleConnections = () => {
+        this.io.on("connection", (socket: CustomSocket) => {
+            console.log("User connected:", socket.id);
+            this.Socket = socket;
+            runChat()
         });
+    };
+
+    public OnJoinRoom = (ResPonseDate: ChatObj) => {
+
+        this.Socket!.on(SocketKeyName.JoinRoom, (roomKey: string) => {
+            const objDecryptKey: ChatObj = Crypt.Decryption(roomKey).data;
+            // console.log("Joining room:", roomKey);
+            this.Socket!.join(objDecryptKey.key);
+
+            if (this.ActiveRoom === objDecryptKey.key) {
+                const encryptMess = Crypt.Encryption(ResPonseDate).data;
+                // console.log("Emitting roomJoined event to room:", roomKey);
+                this.Socket!.to(objDecryptKey.key).emit(SocketKeyName.onJoinRoom, encryptMess);
+            }
+
+            this.ActiveRoom = objDecryptKey.key;
+        });
+
+    };
+
+    public SendChatMessageInRoom = (
+        SocketName: string,
+        data: ChatObj
+    ) => {
+        try {
+            const encryptedChat = Crypt.Encryption(data).data;
+
+            console.log('Se4nding message' + ' Key -> ' + + data.key + ' Message ->  ' + data.message)
+            this.Socket!.to(data.key).emit(SocketName, encryptedChat);
+        } catch (error) { }
+    };
+
+    public getChatMessage = (
+        SocketName: string,
+        onSuccess: (res: ChatObj) => void,
+        onfail: (err: any) => void
+    ) => {
+        try {
+            this.Socket!.on(SocketName, (data: any) => {
+                const decryptChat = Crypt.Decryption(data);
+                console.log('received message' + ' Key -> ' + + data.key + ' Message ->  ' + data.message)
+                if (decryptChat.error === "") {
+                    onSuccess(decryptChat.data);
+                } else {
+                    if (onfail !== undefined) {
+                        onfail("Not able to decrypt Your Chat");
+                    }
+                }
+            });
+        } catch (error: any) {
+            if (onfail !== undefined) {
+                onfail(error.message);
+            }
+        }
+    };
+
+    public OnDisconnect = () => {
+
+        try {
+            this.Socket!.on("disconnect", () => {
+                console.log("User disconnected:", this.Socket!.userDetail?.name);
+            });
+        } catch (error) { }
+
     };
 }
 
 export class ChatObj {
-    message: string = '';
+    message: string = "";
     date: Date | string = new Date();
-    key: string = '';
+    key: string = "";
     senderDetail: Sender = new Sender();
 }
 
 class Sender {
-    id: string = '';
-    email: string = '';
-    name: string = '';
-    profileImg: string = '';
+    id: string = "";
+    email: string = "";
+    name: string = "";
+    profileImg: string = "";
 }

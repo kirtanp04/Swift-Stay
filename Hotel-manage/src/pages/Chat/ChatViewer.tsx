@@ -8,22 +8,22 @@ import useAuth from "src/hooks/useAuth";
 import { SocketService } from "src/service/Socket";
 import { ChatObj, TSubscriber } from "./DataObject";
 import showMessage from "src/util/ShowMessage";
+import { SocketKeyName } from "src/Constant";
 
 export default function ChatViewer() {
-  const [ChatMessages] = useState<ChatObj[]>([]);
-  const [SelectedSubscriber, setSelectedSubscriber] = useState<TSubscriber>({
-    email: "",
-    name: "",
-    profileImg: "",
-  });
+  const [ChatMessages, setChatMessages] = useState<ChatObj[]>([]);
+  const [Socket, setSocket] = useState<SocketService | null>(null);
+  const [SelectedSubscriber, setSelectedSubscriber] = useState<TSubscriber>(
+    new TSubscriber()
+  );
+  const [Message, setMessage] = useState<string>("");
   const theme = useTheme();
   const {
     user: {
       userInfo: { email, id, name, role },
     },
   } = useAuth();
-
-  const Socket = new SocketService({
+  const _Socket = new SocketService({
     _id: id,
     email: email,
     name: name,
@@ -31,56 +31,58 @@ export default function ChatViewer() {
   });
 
   useEffect(() => {
-    if (SelectedSubscriber.email !== "" && email !== "") {
-      const _ChatObj = new ChatObj();
-      _ChatObj.date = "";
-      _ChatObj.key = email + SelectedSubscriber.email; // first admin email then subscriber email
-      _ChatObj.message = "";
-      _ChatObj.senderDetail.name = name;
-      _ChatObj.senderDetail.email = email;
-      Socket.joinRoom(_ChatObj);
-    } else {
-      showMessage(
-        "Not able to join Room. Email of Subscriber / Admin is getting null",
-        theme,
-        () => {}
-      );
-    }
-  }, [SelectedSubscriber]);
-
-  useEffect(() => {
     ReceiveAllChatMessage();
   }, []);
 
+  useEffect(() => {
+    if (SelectedSubscriber.email !== "" && email !== "") {
+      const _ChatObj = new ChatObj();
+      _ChatObj.key = email + SelectedSubscriber.email; // first admin email then subscriber email -- change email to id
+      _Socket!.joinRoom(_ChatObj);
+    } else {
+      // showMessage(
+      //   "Not able to join Room. Email of Subscriber / Admin is getting null",
+      //   theme,
+      //   () => {}
+      // );
+    }
+  }, [SelectedSubscriber]);
+
+  const GetChatObj = (message: string, key?: string): ChatObj => {
+    const _ChatObj = new ChatObj();
+    _ChatObj.date = new Date();
+    _ChatObj.key = key ? key : email + SelectedSubscriber.email;
+    _ChatObj.message = message;
+    _ChatObj.senderDetail = {
+      _id: id,
+      email: email,
+      name: name,
+      profileImg: "",
+    };
+
+    return _ChatObj;
+  };
+
   const ReceiveAllChatMessage = () => {
-    Socket.GetChatMessage("roomJoined", (data) => {
-      console.log(data);
+    _Socket!.GetChatMessage(SocketKeyName.ReceiveMessage, (data) => {
+      if (data) {
+        console.log(data.message);
+        setChatMessages([...ChatMessages, data]);
+      }
+    });
+    _Socket?.GetChatMessage(SocketKeyName.ReceiveError, (data) => {
+      if (data) {
+        alert(data);
+      }
     });
   };
 
   const SendMessage = () => {
-    Socket.sendChatMessageInRoom("SendMessage", {
-      date: "kirtan",
-      key: id,
-      message: "kirtan",
-      senderDetail: {
-        email: email,
-        id: id,
-        name: name,
-        profileImg: "",
-      },
-    });
+    _Socket!.sendChatMessageInRoom(
+      SocketKeyName.SendMessage,
+      GetChatObj(Message)
+    );
   };
-
-  // const InitilizeChatService = () => {
-  //   ChatApi.InitChatService(
-  //     id,
-  //     (res) => {},
-  //     (err) => {
-  //       showMessage(err, theme, () => {});
-  //     }
-  //   );
-  // };
 
   const OnSelectSubscriber = (subscriber: TSubscriber) => {
     setSelectedSubscriber(subscriber);
@@ -104,6 +106,7 @@ export default function ChatViewer() {
                       email: "subscriber" + val + "@example.com",
                       name: "Subscriber " + val,
                       profileImg: "",
+                      _id: "123456",
                     })
                   }
                 >
@@ -153,7 +156,7 @@ export default function ChatViewer() {
                             : undefined
                         }
                       />
-                      <Message>{objChat.message}</Message>
+                      <MessageText>{objChat.message}</MessageText>
                       <MessageDate>{objChat.date as string}</MessageDate>
                     </MessageTextWrapper>
                   </Fragment>
@@ -162,7 +165,10 @@ export default function ChatViewer() {
             </Scrollbar>
           </MessageListWrapper>
           <MessageInputWrapper>
-            <MessageInputField placeholder="Enter Your Message.." />
+            <MessageInputField
+              placeholder="Enter Your Message.."
+              onChange={(e) => setMessage(e.target.value)}
+            />
             <SendButtonWrapper onClick={SendMessage}>
               <SendMessageIcon
                 height={25}
@@ -245,7 +251,7 @@ const MessageTextWrapper = styled(Box)(({ theme }) => ({
   marginTop: "10px",
 }));
 
-const Message = styled(Typography)(() => ({
+const MessageText = styled(Typography)(() => ({
   fontSize: "1rem",
   color: "white",
   textAlign: "left",

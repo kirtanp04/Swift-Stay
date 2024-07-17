@@ -52,3 +52,14 @@ export const Param = {
         },
     },
 };
+
+
+
+
+export const SocketKeyName = {
+    JoinRoom: 'Join_room',
+    SendMessage: 'Send_Message',
+    ReceiveMessage: 'Receive_Message',
+    ReceiveError: 'Receive_Error',
+    onJoinRoom: 'roomJoined'
+}

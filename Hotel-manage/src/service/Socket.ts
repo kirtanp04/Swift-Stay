@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 import { Crypt } from "src/common/Crypt";
 import { enumUserRole } from "src/pages/Authentication/AuthMgr";
 import { ChatObj } from "src/pages/Chat/DataObject";
-import { SocketIoBaseUrl } from "../Constant";
+import { SocketIoBaseUrl, SocketKeyName } from "../Constant";
 
 export class SocketUserAuth {
     name: string = "";
@@ -15,7 +15,6 @@ export class SocketService {
     private BackendURL: string = SocketIoBaseUrl;
     private _Socket: Socket | null = null;
     private RoomKey: string = "";
-    private JoinRoomSocketName: string = "Join_Room";
 
     constructor(objUser: SocketUserAuth) {
         this._Socket = this.ConnectToSocket(objUser);
@@ -59,9 +58,9 @@ export class SocketService {
         try {
             if (this.RoomKey === "") {
                 this.RoomKey = roomKey.key;
-                this._Socket?.emit(this.JoinRoomSocketName, Crypt.Encryption(roomKey).data);
+                this._Socket?.emit(SocketKeyName.JoinRoom, Crypt.Encryption(roomKey).data);
             } else {
-                this._Socket?.emit(this.JoinRoomSocketName, Crypt.Encryption(roomKey).data);
+                this._Socket?.emit(SocketKeyName.JoinRoom, Crypt.Encryption(roomKey).data);
             }
         } catch (error: any) {
             if (onfail !== undefined) {

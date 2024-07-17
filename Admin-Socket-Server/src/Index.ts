@@ -1,45 +1,56 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import http from 'http';
-import { Server } from 'socket.io';
-import { WebSocket } from './Socket';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import http from "http";
+import { Server } from "socket.io";
+import { ChatObj, SocketKeyName, WebSocket } from "./Socket";
+
+const port = process.env.PORT || 5050;
 
 dotenv.config({
-    path: '../.env'
+    path: "../.env",
 });
 
 const app = express();
 
-app.use(cors({
-    credentials: true,
-    methods: 'GET,POST',
-    optionsSuccessStatus: 201,
-    origin: 'http://localhost:5173',
-}));
+app.use(
+    cors({
+        credentials: true,
+        methods: "GET,POST",
+        optionsSuccessStatus: 201,
+        origin: "http://localhost:5173",
+    })
+);
 
-// Create an HTTP server and pass the Express app
 const server = http.createServer(app);
 
-// Initialize the Socket.IO server with the HTTP server
 const io = new Server(server, {
     cors: {
         credentials: true,
-        methods: 'GET,POST',
+        methods: "GET,POST",
         optionsSuccessStatus: 201,
-        origin: 'http://localhost:5173',
-    }
+        origin: "http://localhost:5173",
+    },
 });
 
-new WebSocket(io)
+const Socket = new WebSocket(io);
 
+const chatMess = new ChatObj();
+chatMess.message = "User is live now";
 
+export const runChat = () => {
+    Socket.OnJoinRoom(chatMess);
 
-const port = process.env.PORT || 5050;
-
-app.get('/', (req, res) => {
-    res.send('Hello, TypeScript with Express!');
-});
+    Socket.getChatMessage(
+        SocketKeyName.SendMessage,
+        (res) => {
+            Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, res);
+        },
+        (err) => {
+            Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
+        }
+    );
+};
 
 // Start the HTTP server
 server.listen(port, () => {

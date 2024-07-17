@@ -13,7 +13,7 @@ export class ChatObj {
 }
 
 class Sender {
-    id: string = ''
+    _id: string = ''
 
     email: string = ''
 
@@ -26,7 +26,7 @@ class Sender {
 
 
 
-export type TSubscriber = Omit<Sender, 'id'>
+export class TSubscriber extends Sender { }
 
 
 
