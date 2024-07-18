@@ -15,6 +15,7 @@ export default function ChatViewer() {
   const [Message, setMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatObj[]>([]);
   const [socketError, setSocketError] = useState<ChatObj | null>(null);
+  const [ShowTypingLoading, setShowTypingLoading] = useState<boolean>(false);
   const [SelectedSubscriber, setSelectedSubscriber] = useState<TSubscriber>(
     new TSubscriber()
   );
@@ -33,6 +34,7 @@ export default function ChatViewer() {
       role: role as any,
     },
     GetChatMessage,
+    onUserTyping,
     GetChatError
   );
 
@@ -69,10 +71,17 @@ export default function ChatViewer() {
     let newChatObj = new ChatObj();
     newChatObj = { ...msg, date: TimeFormatter.formatTimeDifference(msg.date) };
     setChatMessages((prevMessages) => [...prevMessages, newChatObj]);
+    setShowTypingLoading(false);
   }
 
   function GetChatError(err: ChatObj) {
     setSocketError(err);
+  }
+
+  function onUserTyping(msg: ChatObj) {
+    if (!ShowTypingLoading) {
+      setShowTypingLoading(true);
+    }
   }
 
   const SendMessage = () => {
@@ -83,6 +92,14 @@ export default function ChatViewer() {
         console.log(err);
       }
     );
+  };
+
+  const OnChangeMessage = (value: string) => {
+    _Socket.sendChatMessageInRoom(
+      SocketKeyName.TypingMessage,
+      GetChatObj("user is typing")
+    );
+    setMessage(value);
   };
 
   const OnSelectSubscriber = (subscriber: TSubscriber) => {
@@ -164,13 +181,31 @@ export default function ChatViewer() {
                     </MessageTextWrapper>
                   </Box>
                 ))}
+                {ShowTypingLoading && (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-start",
+                    }}
+                  >
+                    <MessageTextWrapper>
+                      <MUIAvatar
+                        name={SelectedSubscriber.name}
+                        src={SelectedSubscriber.profileImg}
+                      />
+                      <MessageText>Typing....</MessageText>
+                    </MessageTextWrapper>
+                  </Box>
+                )}
               </div>
             </Scrollbar>
           </MessageListWrapper>
           <MessageInputWrapper>
             <MessageInputField
               placeholder="Enter Your Message.."
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => OnChangeMessage(e.target.value)}
             />
             <SendButtonWrapper onClick={SendMessage}>
               <SendMessageIcon

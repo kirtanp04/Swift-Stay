@@ -3,7 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
-import { ChatObj, SocketKeyName, WebSocket } from "./Socket";
+import { WebSocket } from "./Service/Socket";
+import { SocketKeyName } from "./Service/DataObject";
+
 
 const port = process.env.PORT || 5000;
 
@@ -35,12 +37,8 @@ const io = new Server(server, {
 
 const Socket = new WebSocket(io);
 
-const chatMess = new ChatObj();
-chatMess.message = "User is live now";
 
 export const runChat = () => {
-    Socket.OnJoinRoom(chatMess);
-
     Socket.getChatMessage(
         SocketKeyName.SendMessage,
         (res) => {

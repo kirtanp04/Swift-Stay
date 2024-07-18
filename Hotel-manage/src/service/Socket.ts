@@ -17,10 +17,10 @@ export class SocketService {
     private _Socket: Socket | null = null;
     private RoomKey: string = "";
 
-    constructor(objUser: SocketUserAuth, onMessage: (msg: ChatObj) => void, onError: (err: any) => void) {
+    constructor(objUser: SocketUserAuth, onMessage: (msg: ChatObj) => void, onUserTyping: (err: ChatObj) => void, onError: (err: any) => void) {
         this._Socket = this.ConnectToSocket(objUser);
         this.setupEventListeners();
-        this.setupMessageReception(onMessage, onError);
+        this.setupMessageReception(onMessage, onUserTyping, onError);
     }
 
     private ConnectToSocket = (objUser: SocketUserAuth) => {
@@ -115,12 +115,18 @@ export class SocketService {
         }
     };
 
-    private setupMessageReception = (onMessage: (msg: ChatObj) => void, onError: (err: ChatObj) => void) => {
+    private setupMessageReception = (onMessage: (msg: ChatObj) => void, onUserTyping: (err: ChatObj) => void, onError: (err: ChatObj) => void) => {
         this.GetChatMessage(SocketKeyName.ReceiveMessage, (data) => {
             onMessage(data);
         }, (error) => {
             onError(error);
         });
+
+        this.GetChatMessage(SocketKeyName.UserIsTyping, (data) => {
+            onUserTyping(data)
+        }, (error) => {
+            onError(error)
+        })
 
         this.GetChatMessage(SocketKeyName.ReceiveError, (data) => {
             onError(data);
