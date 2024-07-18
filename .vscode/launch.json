@@ -1,11 +1,59 @@
 {
+    "version": "0.2.0",
     "configurations": [
         {
-            "type": "node-terminal",
-            "name": "Run Script: start",
+            "type": "node",
             "request": "launch",
+            "name": "Debug Hotel Server Script",
+            "program": "${workspaceFolder}/Hotel-server/src/index.ts",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/ts-node",
+            "restart": true,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": ["<node_internals>/**"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Admin Socket Server Script",
+            "program": "${workspaceFolder}/Admin-Socket-Server/src/index.ts",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/ts-node",
+            "restart": true,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": ["<node_internals>/**"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Guest Socket Server Script",
+            "program": "${workspaceFolder}/Guest-Socket-Server/src/index.ts",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/ts-node",
+            "restart": true,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": ["<node_internals>/**"]
+        },
+        {
+            "type": "node-terminal",
+            "request": "launch",
+            "name": "Run Hotel Server Script",
+            "command": "npm run dev",
+            "cwd": "${workspaceFolder}/Hotel-server"
+        },
+        {
+            "type": "node-terminal",
+            "request": "launch",
+            "name": "Run Admin Socket Server Script",
             "command": "npm run start",
-            "cwd": "${workspaceFolder}\\Hotel-server"
+            "cwd": "${workspaceFolder}/Admin-Socket-Server"
+        },
+        {
+            "type": "node-terminal",
+            "request": "launch",
+            "name": "Run Guest Socket Server Script",
+            "command": "npm run start",
+            "cwd": "${workspaceFolder}/Guest-Socket-Server"
         }
     ]
 }

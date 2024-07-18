@@ -33,17 +33,17 @@ const SideMenuWrapper = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   padding: "0.7rem 1rem",
   borderRadius: "20px",
-  backgroundColor: theme.palette.background.neutral,
-  border: `1px solid ${theme.palette.text.secondary}`,
+  backgroundColor: theme.palette.background.default,
+  border: `1px solid ${theme.palette.border}`,
 }));
 
 const OutletWrapper = styled(Box)(({ theme }) => ({
   height: "100%",
   display: "flex",
   flex: 1,
-  backgroundColor: theme.palette.background.neutral,
+  backgroundColor: theme.palette.background.default,
   width: "calc(100vw - 300px)",
   padding: "0.7rem 1.2rem",
   borderRadius: "20px",
-  border: `1px solid ${theme.palette.text.secondary}`,
+  border: `1px solid ${theme.palette.border}`,
 }));

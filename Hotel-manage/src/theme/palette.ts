@@ -1,3 +1,4 @@
+import { PaletteMode } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 function createGradient(color1: string, color2: string) {
@@ -61,26 +62,43 @@ declare module '@mui/material' {
 const PRIMARY = {
   main: 'hsl(240, 5.9%, 10%)',
   contrastText: 'hsl(0, 0%, 98%)',
+  lighter: 'hsl(240, 5.9%, 20%)',
+  darker: 'hsl(240, 5.9%, 5%)',
 };
+
 const SECONDARY = {
   main: 'hsl(240, 4.8%, 95.9%)',
   contrastText: 'hsl(240, 5.9%, 10%)',
+  lighter: 'hsl(240, 4.8%, 97.9%)',
+  darker: 'hsl(240, 4.8%, 90.9%)',
 };
+
 const INFO = {
   main: 'hsl(240, 4.8%, 95.9%)',
   contrastText: 'hsl(240, 5.9%, 10%)',
+  lighter: 'hsl(240, 4.8%, 97.9%)',
+  darker: 'hsl(240, 4.8%, 90.9%)',
 };
+
 const SUCCESS = {
   main: 'hsl(240, 4.8%, 95.9%)',
   contrastText: 'hsl(240, 5.9%, 10%)',
+  lighter: 'hsl(240, 4.8%, 97.9%)',
+  darker: 'hsl(240, 4.8%, 90.9%)',
 };
+
 const WARNING = {
   main: 'hsl(0, 84.2%, 60.2%)',
   contrastText: 'hsl(0, 0%, 98%)',
+  lighter: 'hsl(0, 84.2%, 70.2%)',
+  darker: 'hsl(0, 84.2%, 50.2%)',
 };
+
 const ERROR = {
   main: 'hsl(0, 84.2%, 60.2%)',
   contrastText: 'hsl(0, 0%, 98%)',
+  lighter: 'hsl(0, 84.2%, 70.2%)',
+  darker: 'hsl(0, 84.2%, 50.2%)',
 };
 
 const GREY = {
@@ -143,23 +161,39 @@ const COMMON = {
   },
 };
 
-export const palette = {
+const palette = {
   light: {
     ...COMMON,
-    mode: 'light',
-    text: { primary: 'hsl(240, 10%, 3.9%)', secondary: 'hsl(240, 5.9%, 10%)', disabled: 'hsl(240, 4.8%, 95.9%)' },
-    background: { paper: 'hsl(0, 0%, 100%)', default: 'hsl(0, 0%, 100%)', neutral: 'hsl(240, 5.9%, 90%)' },
-    action: { active: 'hsl(240, 5.9%, 10%)', ...COMMON.action },
+    mode: 'light' as PaletteMode,
+    text: { primary: 'hsl(240, 5.9%, 10%)', secondary: 'hsl(240, 4.8%, 95.9%)', disabled: 'hsl(240, 3.7%, 15.9%)' },
+    background: { paper: 'hsl(0, 0%, 98%)', default: 'hsl(0, 0%, 98%)', neutral: 'hsl(240, 5.9%, 90%)' },
+    card: { paper: 'hsl(0, 0%, 98%)', default: 'hsl(0, 0%, 98%)', foreground: 'hsl(240, 5.9%, 10%)' },
+    popover: { paper: 'hsl(0, 0%, 98%)', default: 'hsl(0, 0%, 98%)', foreground: 'hsl(240, 5.9%, 10%)' },
+    primary: { ...PRIMARY },
+    secondary: { ...SECONDARY },
+    muted: { main: 'hsl(0, 0%, 98%)', contrastText: 'hsl(240, 3.7%, 15.9%)' },
+    accent: { main: 'hsl(0, 0%, 98%)', contrastText: 'hsl(240, 5.9%, 10%)' },
+    destructive: { main: 'hsl(0, 84.2%, 60.2%)', contrastText: 'hsl(0, 0%, 98%)' },
+    border: 'hsl(0, 0%, 98%)',
+    input: 'hsl(0, 0%, 98%)',
+    ring: 'hsl(240, 4.9%, 83.9%)',
+    chart: {
+      violet: ['#D1C4E9', '#B39DDB', '#9575CD', '#7E57C2'],
+      blue: ['#BBDEFB', '#90CAF9', '#64B5F6', '#42A5F5'],
+      green: ['#C8E6C9', '#A5D6A7', '#81C784', '#66BB6A'],
+      yellow: ['#FFF9C4', '#FFF59D', '#FFF176', '#FFEE58'],
+      red: ['#FFCDD2', '#EF9A9A', '#E57373', '#EF5350']
+    }
   },
   dark: {
     ...COMMON,
-    mode: 'dark',
+    mode: 'dark' as PaletteMode,
     text: { primary: 'hsl(0, 0%, 98%)', secondary: 'hsl(240, 5.9%, 90%)', disabled: 'hsl(240, 4.8%, 95.9%)' },
     background: { paper: 'hsl(240, 10%, 3.9%)', default: 'hsl(240, 10%, 3.9%)', neutral: 'hsl(240, 3.7%, 15.9%)' },
     card: { paper: 'hsl(240, 10%, 3.9%)', default: 'hsl(240, 10%, 3.9%)', foreground: 'hsl(0, 0%, 98%)' },
     popover: { paper: 'hsl(240, 10%, 3.9%)', default: 'hsl(240, 10%, 3.9%)', foreground: 'hsl(0, 0%, 98%)' },
-    primary: { main: 'hsl(0, 0%, 98%)', contrastText: 'hsl(240, 5.9%, 10%)' },
-    secondary: { main: 'hsl(240, 3.7%, 15.9%)', contrastText: 'hsl(0, 0%, 98%)' },
+    primary: { ...PRIMARY },
+    secondary: { ...SECONDARY },
     muted: { main: 'hsl(240, 3.7%, 15.9%)', contrastText: 'hsl(240, 5% 64.9%)' },
     accent: { main: 'hsl(240, 3.7%, 15.9%)', contrastText: 'hsl(0, 0%, 98%)' },
     destructive: { main: 'hsl(0, 62.8%, 30.6%)', contrastText: 'hsl(0, 0%, 98%)' },
@@ -175,4 +209,27 @@ export const palette = {
     }
   },
 };
+
+
+export default palette
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

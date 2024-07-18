@@ -3,6 +3,7 @@ import { alpha } from '@mui/material/styles';
 import { Shadows } from '@mui/material/styles/shadows';
 //
 import palette from './palette';
+import { PaletteMode } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -29,13 +30,99 @@ interface CustomShadowOptions {
 declare module '@mui/material/styles' {
   interface Theme {
     customShadows: CustomShadowOptions;
-    themeColor: string
+    themeColor: string;
+    palette: PaletteOptions; // Ensure this matches your application's structure
   }
+
   interface ThemeOptions {
     customShadows?: CustomShadowOptions;
-    themeColor: string
+    themeColor: string;
+    // palette?: PaletteOptions; // Optional in ThemeOptions
   }
 }
+
+interface PaletteOptions {
+  mode: PaletteMode;
+  text: {
+    primary: string;
+    secondary: string;
+    disabled: string;
+  };
+  background: {
+    paper: string;
+    default: string;
+    neutral: string;
+  };
+  card: {
+    paper: string;
+    default: string;
+    foreground: string;
+  };
+  popover: {
+    paper: string;
+    default: string;
+    foreground: string;
+  };
+  primary: PaletteColorOptions;
+  secondary: PaletteColorOptions;
+  muted: {
+    main: string;
+    contrastText: string;
+  };
+  accent: {
+    main: string;
+    contrastText: string;
+  };
+  destructive: {
+    main: string;
+    contrastText: string;
+  };
+  border: string;
+  input: string;
+  ring: string;
+  chart: {
+    violet: string[];
+    blue: string[];
+    green: string[];
+    yellow: string[];
+    red: string[];
+  };
+  common: {
+    black: string;
+    white: string;
+  };
+  action: {
+    hover: string;
+    selected: string;
+    disabled: string;
+    disabledBackground: string;
+    focus: string;
+    hoverOpacity: number;
+    disabledOpacity: number;
+  };
+  divider: string;
+  grey: {
+    [key: string]: string;
+  };
+  gradients: {
+    [key: string]: string[];
+  };
+
+  info: PaletteColorOptions;
+  success: PaletteColorOptions;
+  warning: PaletteColorOptions;
+  error: PaletteColorOptions;
+}
+
+
+
+interface PaletteColorOptions {
+  main: string;
+  contrastText: string;
+  lighter?: string; // Optional based on your actual usage
+  darker?: string; // Optional based on your actual usage
+}
+
 
 const LIGHT_MODE = palette.light.grey[500];
 const DARK_MODE = '#000000';

@@ -11,10 +11,9 @@ import {
 // import useSettings from '../hooks/useSettings';
 //
 import useThemeSetting from "../hooks/useThemesetting";
-import breakpoints from "./breakpoints";
 import componentsOverride from "./overrides";
 import palette from "./palette";
-import shadows, { customShadows } from "./shadows";
+import { customShadows } from "./shadows";
 
 // ----------------------------------------------------------------------
 
@@ -30,11 +29,7 @@ export default function ThemeProvider({ children }: Props) {
   const themeOptions: ThemeOptions = useMemo(
     () => ({
       palette: isLight ? palette.light : palette.dark,
-      // typography,
       themeColor: "red",
-      breakpoints,
-      shape: { borderRadius: 8 },
-      shadows: isLight ? shadows.light : shadows.dark,
       customShadows: isLight ? customShadows.light : customShadows.dark,
     }),
     [mode]
