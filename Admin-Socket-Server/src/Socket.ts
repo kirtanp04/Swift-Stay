@@ -1,13 +1,47 @@
 import { Server, Socket } from "socket.io";
-import { runChat } from "../Index";
-import { Crypt } from "../common";
-import { ChatObj, CustomSocket, SocketKeyName, SocketUserAuth } from "./DataObject";
+import { runChat } from ".";
+import { Crypt } from "./common/index";
 
 
+export const SocketKeyName = {
+    JoinRoom: "Join_room",
+    SendMessage: "Send_Message",
+    ReceiveMessage: "Receive_Message",
+    ReceiveError: "Receive_Error",
+    onJoinRoom: "roomJoined",
+    TypingMessage: "TypingMessage",
+    UserIsTyping: "UserIsTyping",
+}
 
+export class SocketUserAuth {
+    name: string = "";
+    email: string = "";
+    _id: string = "";
+    role: string = ''
+}
 
-const OnJoinChatMess = new ChatObj();
-OnJoinChatMess.message = "User is live now";
+export interface CustomSocket extends Socket {
+    userDetail?: SocketUserAuth;
+}
+
+export class ChatObj {
+    message: string = "";
+    date: Date | string = new Date();
+    key: string = "";
+    senderDetail: Sender = new Sender();
+}
+
+class Sender {
+    id: string = "";
+    email: string = "";
+    name: string = "";
+    profileImg: string = "";
+}
+
+// Sending message of user joined joom
+
+const _newMess = new ChatObj()
+_newMess.message = 'User joined room'
 
 export class WebSocket {
     private io: Server;
@@ -17,11 +51,10 @@ export class WebSocket {
         this.io = SocketServer;
         this.UserAuthMiddleWare();
         this.HandleConnections();
-        this.OnJoinRoom(OnJoinChatMess)
-        this.SendUserTypingMessage()
+
     }
 
-    public userInfo: SocketUserAuth = new SocketUserAuth();
+    public userInfo: SocketUserAuth = new SocketUserAuth()
 
     private UserAuthMiddleWare = () => {
         try {
@@ -29,12 +62,9 @@ export class WebSocket {
                 const encryptedUserInfo = socket.handshake.auth.userInfo;
                 const decryptedUserInfo = Crypt.Decryption(encryptedUserInfo);
 
-                if (
-                    decryptedUserInfo.error === "" &&
-                    decryptedUserInfo.data.role === "admin"
-                ) {
+                if (decryptedUserInfo.error === "" && decryptedUserInfo.data.role === 'admin') {
                     socket.userDetail = decryptedUserInfo.data;
-                    this.userInfo = decryptedUserInfo.data;
+                    this.userInfo = decryptedUserInfo.data
                     next();
                 } else {
                     next(new Error("Authentication error"));
@@ -47,7 +77,12 @@ export class WebSocket {
         this.io.on("connection", (socket: CustomSocket) => {
             console.log("User connected:", socket.id);
             this.Socket = socket;
-            runChat();
+            runChat()
+
+
+            this.OnJoinRoom(_newMess);
+            this.SendUserTypingMessage();
+            this.OnDisconnect();
         });
     };
 
@@ -63,31 +98,34 @@ export class WebSocket {
         } catch (error) { }
     };
 
+
     private OnJoinRoom = (ResPonseDate: ChatObj) => {
+
         this.Socket!.on(SocketKeyName.JoinRoom, (roomKey: string) => {
             const objDecryptKey: ChatObj = Crypt.Decryption(roomKey).data;
+            // console.log("Joining room:", roomKey);
             this.Socket!.join(objDecryptKey.key);
 
             if (this.ActiveRoom === objDecryptKey.key) {
                 const encryptMess = Crypt.Encryption(ResPonseDate).data;
-                this.Socket!.to(objDecryptKey.key).emit(
-                    SocketKeyName.onJoinRoom,
-                    encryptMess
-                );
+                // console.log("Emitting roomJoined event to room:", roomKey);
+                this.Socket!.to(objDecryptKey.key).emit(SocketKeyName.onJoinRoom, encryptMess);
             }
 
             this.ActiveRoom = objDecryptKey.key;
         });
+
     };
 
-    public SendChatMessageInRoom = (SocketName: string, data: ChatObj) => {
+    public SendChatMessageInRoom = (
+        SocketName: string,
+        data: ChatObj
+    ) => {
         try {
             const encryptedChat = Crypt.Encryption(data).data;
-            this.Socket!.to(data.key).compress(true).emit(SocketName, encryptedChat);
+            this.Socket!.to(data.key).emit(SocketName, encryptedChat);
         } catch (error) { }
     };
-
-
 
     public getChatMessage = (
         SocketName: string,
@@ -113,12 +151,14 @@ export class WebSocket {
         }
     };
 
-    public OnDisconnect = () => {
+    private OnDisconnect = () => {
+
         try {
             this.Socket!.on("disconnect", () => {
                 console.log("User disconnected:", this.Socket!.userDetail?.name);
             });
         } catch (error) { }
+
     };
 }
 

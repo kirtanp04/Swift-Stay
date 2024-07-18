@@ -3,8 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
-import { WebSocket } from "./Service/Socket";
-import { SocketKeyName } from "./Service/DataObject";
+import { SocketKeyName, WebSocket } from "./Socket";
+
 
 
 const port = process.env.PORT || 5000;
