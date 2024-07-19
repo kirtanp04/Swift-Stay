@@ -46,12 +46,12 @@ export class SocketService {
 
     private setupEventListeners = () => {
         this._Socket?.on('roomJoined', (data: any) => {
-            console.log('roomJoined event received:', data);
+            // console.log('roomJoined event received:', data);
             const decryptChat = Crypt.Decryption(data);
             if (decryptChat.error === "") {
-                console.log('Decrypted chat message:', decryptChat.data);
+                // console.log('Decrypted chat message:', decryptChat.data);
             } else {
-                console.error('Failed to decrypt chat message');
+                // console.error('Failed to decrypt chat message');
             }
         });
     };

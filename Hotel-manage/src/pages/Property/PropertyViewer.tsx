@@ -179,7 +179,7 @@ export default function PropertyViewer({}: Props) {
                       <Chip
                         label={Property.propertyType}
                         color={getChipColor(Property.propertyType) as any}
-                        variant="outlined"
+                        variant="filled"
                         size="small"
                         sx={{ width: 120 }}
                       />
@@ -384,7 +384,7 @@ const HeaderWrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   height: 60,
-  borderBottom: `1px dashed ${theme.palette.divider}`,
+  borderBottom: `1px solid ${theme.palette.divider}`,
   padding: "0.7rem",
 
   paddingRight: "1rem",
@@ -407,10 +407,10 @@ const EScrollbar = styled(Scrollbar)(() => ({
   width: "100%",
 }));
 
-const ContentWrapper = styled(Box)(({ theme }) => ({
+const ContentWrapper = styled(Box)(() => ({
   height: "100%",
   width: "100%",
-  border: `1px dashed ${theme.palette.divider}`,
+  // border: `1px dashed ${theme.palette.divider}`,
   padding: "1rem",
   borderRadius: "0px 0px 20px 20px",
 }));
@@ -542,7 +542,7 @@ const AmenitiesCard = styled(Box)(({ theme }) => ({
 const BottomHeader = styled(Box)(({ theme }) => ({
   width: "100%",
   display: "flex",
-  borderBottom: `1px dashed ${theme.palette.divider}`,
+  borderBottom: `1px solid ${theme.palette.divider}`,
   paddingBottom: "0.5rem",
 }));
 

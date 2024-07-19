@@ -1,7 +1,6 @@
-import { alpha, Box, styled, Typography, useTheme } from "@mui/material";
+import { Box, styled, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { SendMessageIcon } from "src/assets/iconify";
-import { TimeFormatter } from "src/common/TimeFormater";
 import MUIAvatar from "src/components/mui/MUIAvatar";
 import Page from "src/components/Page";
 import Scrollbar from "src/components/Scrollbar";
@@ -69,7 +68,7 @@ export default function ChatViewer() {
 
   function GetChatMessage(msg: ChatObj) {
     let newChatObj = new ChatObj();
-    newChatObj = { ...msg, date: TimeFormatter.formatTimeDifference(msg.date) };
+    newChatObj = { ...msg, date: msg.date };
     setChatMessages((prevMessages) => [...prevMessages, newChatObj]);
     setShowTypingLoading(false);
   }
@@ -81,6 +80,8 @@ export default function ChatViewer() {
   function onUserTyping(msg: ChatObj) {
     if (!ShowTypingLoading) {
       setShowTypingLoading(true);
+    }
+    if (msg) {
     }
   }
 
@@ -95,10 +96,12 @@ export default function ChatViewer() {
   };
 
   const OnChangeMessage = (value: string) => {
-    _Socket.sendChatMessageInRoom(
-      SocketKeyName.TypingMessage,
-      GetChatObj("user is typing")
-    );
+    if (!ShowTypingLoading) {
+      _Socket.sendChatMessageInRoom(
+        SocketKeyName.TypingMessage,
+        GetChatObj("user is typing")
+      );
+    }
     setMessage(value);
   };
 
@@ -114,7 +117,7 @@ export default function ChatViewer() {
             <SubscriberListHeader>Subscribers</SubscriberListHeader>
           </SubscriberListHeaderWrapper>
           <SubscriberList>
-            <Scrollbar>
+            <Scrollbar sx={{ height: "100%" }}>
               {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((val) => (
                 <SubscriberDetailWrapper
                   key={val}
@@ -167,7 +170,14 @@ export default function ChatViewer() {
                           : "flex-start",
                     }}
                   >
-                    <MessageTextWrapper>
+                    <MessageTextWrapper
+                      sx={{
+                        backgroundColor:
+                          objChat.senderDetail.email === email
+                            ? theme.palette.text.primary
+                            : theme.palette.grey[50012],
+                      }}
+                    >
                       <MUIAvatar
                         name={objChat.senderDetail.name}
                         src={
@@ -177,7 +187,7 @@ export default function ChatViewer() {
                         }
                       />
                       <MessageText>{objChat.message}</MessageText>
-                      <MessageDate>{objChat.date as string}</MessageDate>
+                      <MessageDate>{objChat.date as any}</MessageDate>
                     </MessageTextWrapper>
                   </Box>
                 ))}
@@ -190,7 +200,11 @@ export default function ChatViewer() {
                       justifyContent: "flex-start",
                     }}
                   >
-                    <MessageTextWrapper>
+                    <MessageTextWrapper
+                      sx={{
+                        backgroundColor: theme.palette.grey[50012],
+                      }}
+                    >
                       <MUIAvatar
                         name={SelectedSubscriber.name}
                         src={SelectedSubscriber.profileImg}
@@ -221,13 +235,13 @@ export default function ChatViewer() {
   );
 }
 
-const RootStyle = styled(Box)(({ theme }) => ({
+const RootStyle = styled(Box)(() => ({
   height: "100%",
   width: "100%",
   display: "flex",
   flexDirection: "row",
   paddingTop: "0.5rem",
-  border: `1px dashed ${theme.palette.divider}`,
+  // border: `1px dashed ${theme.palette.divider}`,
   borderRadius: "10px",
 }));
 
@@ -242,7 +256,8 @@ const MessageContentHeader = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   gap: "10px",
-  borderBottom: `1px dashed ${theme.palette.divider}`,
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  height: 40,
 }));
 
 const MessageInputWrapper = styled(Box)(({ theme }) => ({
@@ -250,7 +265,7 @@ const MessageInputWrapper = styled(Box)(({ theme }) => ({
   width: "100%",
   display: "flex",
   alignItems: "center",
-  borderTop: `1px dashed ${theme.palette.divider}`,
+  borderTop: `1px solid ${theme.palette.divider}`,
 }));
 
 const MessageInputField = styled("input")(() => ({
@@ -270,10 +285,10 @@ const SendButtonWrapper = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   cursor: "pointer",
-  borderLeft: `1px dashed ${theme.palette.divider}`,
+  borderLeft: `1px solid ${theme.palette.divider}`,
 }));
 
-const MessageTextWrapper = styled(Box)(({ theme }) => ({
+const MessageTextWrapper = styled(Box)(() => ({
   minHeight: 20,
   padding: "10px",
   display: "flex",
@@ -282,17 +297,19 @@ const MessageTextWrapper = styled(Box)(({ theme }) => ({
   borderRadius: "15px",
   maxWidth: "80%",
   textWrap: "wrap",
-  backgroundColor: theme.palette.grey[50012],
+
   gap: "10px",
-  width: "25%",
+  minWidth: "25%",
   position: "relative",
   marginTop: "10px",
+  overflow: "hidden",
 }));
 
-const MessageText = styled(Typography)(() => ({
+const MessageText = styled(Typography)(({ theme }) => ({
   fontSize: "0.85rem",
-  color: "white",
+  color: theme.palette.mode === "dark" ? "black" : "white",
   width: "100%",
+  textWrap: "wrap",
 }));
 
 const MessageListWrapper = styled(Box)(() => ({
@@ -306,28 +323,31 @@ const MessageListWrapper = styled(Box)(() => ({
 
 const MessageDate = styled(Typography)(({ theme }) => ({
   fontSize: "0.75rem",
-  color: theme.palette.text.secondary,
+  color: theme.palette.color.rose.main,
   marginLeft: "auto",
   position: "absolute",
   bottom: 5,
   right: 10,
   fontStyle: "italic",
+  fontWeight: 700,
 }));
 
 const SubscriberListWrapper = styled(Box)(({ theme }) => ({
   height: "100%",
   width: "30%",
-  borderRight: `1px dashed ${theme.palette.divider}`,
+  borderRight: `1px solid ${theme.palette.divider}`,
   maxHeight: "100%",
 }));
 
 const SubscriberListHeaderWrapper = styled(Box)(({ theme }) => ({
-  height: 20,
+  padding: "0px 10px 10px 10px",
   width: "100%",
   display: "flex",
   alignItems: "center",
+  gap: "10px",
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  height: 40,
   justifyContent: "center",
-  borderBottom: `1px dashed ${theme.palette.divider}`,
 }));
 
 const SubscriberListHeader = styled(Typography)(({ theme }) => ({
@@ -337,7 +357,7 @@ const SubscriberListHeader = styled(Typography)(({ theme }) => ({
 }));
 
 const SubscriberList = styled(Box)(() => ({
-  height: "calc(100% - 20px)",
+  height: "calc(100% - 38px)",
   overflowY: "auto",
   maxHeight: "100%",
   width: "100%",
@@ -353,9 +373,9 @@ const SubscriberDetailWrapper = styled(Box)(({ theme }) => ({
   padding: "10px",
   cursor: "pointer",
   gap: "10px",
-  borderBottom: `1px dashed ${theme.palette.divider}`,
+  borderBottom: `1px solid ${theme.palette.divider}`,
   "&:hover": {
-    backgroundColor: alpha(theme.palette.grey[500], 0.1),
+    backgroundColor: theme.palette.background.neutral,
   },
 }));
 

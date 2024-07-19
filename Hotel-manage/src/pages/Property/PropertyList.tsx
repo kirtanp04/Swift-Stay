@@ -235,16 +235,19 @@ export default function HotelList({}: Props) {
                     height={20}
                     width={20}
                     onClick={() => onEditProperty(param.row)}
+                    IconColor={theme.palette.color.warning.main}
                   />
                   <PreviewIcon
                     height={20}
                     width={20}
                     onClick={() => onPreview(param.row._id)}
+                    IconColor={theme.palette.color.info.main}
                   />
                   <DeleteIcon
                     height={20}
                     width={20}
                     onClick={() => deleteProperty(param.row._id)}
+                    IconColor={theme.palette.color.error.main}
                   />
                 </TextWrapper>
               ),
@@ -291,6 +294,7 @@ const RootStyle = styled(Box)(() => ({
   flexDirection: "column",
   gap: "1rem",
   paddingTop: "0.5rem",
+  padding: "0.7rem 1.2rem",
 }));
 
 const TextWrapper = styled(Box)(() => ({

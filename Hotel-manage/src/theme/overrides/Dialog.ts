@@ -1,12 +1,15 @@
-import { Theme, alpha } from '@mui/material/styles';
+import { alpha, Theme } from '@mui/material/styles';
 
 export default function Dialog(theme: Theme) {
   return {
     MuiDialog: {
       styleOverrides: {
         paper: {
+          backgroundColor: '#1c1c1e', // Set the background color for the dialog
+          color: '#fff', // Set the text color
           boxShadow: theme.customShadows.dialog,
-          borderRadius: theme.shape.borderRadius * 2,
+          borderRadius: theme.shape.borderRadius * 3,
+          // border: `3px solid ${theme.palette.text.secondary}`,
           '@media (max-width: 600px)': {
             margin: theme.spacing(2),
           },
@@ -32,8 +35,8 @@ export default function Dialog(theme: Theme) {
           borderTop: 0,
           borderBottom: 0,
           padding: theme.spacing(3),
-          [theme.breakpoints.down("sm")]: {
-            padding: "20px 10px",
+          [theme.breakpoints.down('sm')]: {
+            padding: '20px 10px',
           },
         },
       },
@@ -50,7 +53,10 @@ export default function Dialog(theme: Theme) {
     MuiBackdrop: {
       styleOverrides: {
         root: {
-          backgroundColor: alpha('#fff', 0.5), // Adjust the alpha value to control opacity
+          '&.MuiDialog-container': {
+
+            backgroundColor: alpha(theme.palette.color.rose.main, 0.5), // Adjust the alpha value to control opacity
+          }
         },
       },
     },

@@ -1,6 +1,9 @@
-import { Theme } from '@mui/material/styles';
-//
-import { CheckboxIcon, CheckboxCheckedIcon, CheckboxIndeterminateIcon } from './CustomIcons';
+import { Theme } from "@mui/material/styles";
+import {
+  CheckboxIcon,
+  CheckboxCheckedIcon,
+  CheckboxIndeterminateIcon,
+} from "./CustomIcons";
 
 // ----------------------------------------------------------------------
 
@@ -12,24 +15,27 @@ export default function Checkbox(theme: Theme) {
         checkedIcon: <CheckboxCheckedIcon />,
         indeterminateIcon: <CheckboxIndeterminateIcon />,
       },
-
       styleOverrides: {
         root: {
           padding: theme.spacing(1),
-          '&.Mui-checked.Mui-disabled, &.Mui-disabled': {
+          color: theme.palette.text.primary, // default color for unchecked state
+          "&.Mui-checked": {
+            color: theme.themeColor, // color for checked state
+          },
+          "&.Mui-checked.Mui-disabled, &.Mui-disabled": {
             color: theme.palette.action.disabled,
           },
-          '& .MuiSvgIcon-fontSizeMedium': {
+          "& .MuiSvgIcon-fontSizeMedium": {
             width: 24,
             height: 24,
           },
-          '& .MuiSvgIcon-fontSizeSmall': {
+          "& .MuiSvgIcon-fontSizeSmall": {
             width: 20,
             height: 20,
           },
           svg: {
             fontSize: 24,
-            '&[font-size=small]': {
+            "&[font-size=small]": {
               fontSize: 20,
             },
           },

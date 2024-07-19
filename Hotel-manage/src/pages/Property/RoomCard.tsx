@@ -98,8 +98,8 @@ export default function RoomCard({ objRoom, afterDeleteRoom }: Props) {
             sx={{
               color: `${
                 Room.isAvailable
-                  ? theme.palette.success.main
-                  : theme.palette.error.main
+                  ? theme.palette.color.success.main
+                  : theme.palette.color.error.main
               } !important`,
             }}
           >
@@ -132,7 +132,11 @@ export default function RoomCard({ objRoom, afterDeleteRoom }: Props) {
         <MenuItem>
           <MenuItemWrapper onClick={openUpdateRoomDialog}>
             <ListItemIcon>
-              <EditIcon height={17} width={17} />
+              <EditIcon
+                height={17}
+                width={17}
+                IconColor={theme.palette.color.warning.main}
+              />
             </ListItemIcon>
             <MenuList>Edit</MenuList>
           </MenuItemWrapper>
@@ -140,7 +144,11 @@ export default function RoomCard({ objRoom, afterDeleteRoom }: Props) {
         <MenuItem>
           <MenuItemWrapper>
             <ListItemIcon>
-              <PreviewIcon height={17} width={17} />
+              <PreviewIcon
+                height={17}
+                width={17}
+                IconColor={theme.palette.color.info.main}
+              />
             </ListItemIcon>
             <MenuList>Preview</MenuList>
           </MenuItemWrapper>
@@ -151,10 +159,10 @@ export default function RoomCard({ objRoom, afterDeleteRoom }: Props) {
               <DeleteIcon
                 height={17}
                 width={17}
-                IconColor={theme.palette.error.main}
+                IconColor={theme.palette.color.error.main}
               />
             </ListItemIcon>
-            <MenuList sx={{ color: theme.palette.error.main }}>Delete</MenuList>
+            <MenuList>Delete</MenuList>
           </MenuItemWrapper>
         </MenuItem>
       </MUIMenu>

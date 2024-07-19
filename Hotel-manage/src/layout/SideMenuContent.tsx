@@ -175,6 +175,10 @@ export default function SideMenuContent({}: Props) {
             />
           </Tooltip>
         )}
+
+        <ThemeColorWrapper>
+          <ThemeColor />
+        </ThemeColorWrapper>
       </ThemeWrapper>
       <ListItemWrapper sx={{ backgroundColor: theme.palette.color.error.main }}>
         <LogoutIcon height={25} width={25} />
@@ -270,4 +274,23 @@ const ThemeWrapper = styled(Box)(() => ({
   display: "flex",
   justifyContent: "space-around",
   alignItems: "center",
+}));
+
+const ThemeColorWrapper = styled(Box)(({ theme }) => ({
+  height: 30,
+  width: 30,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  border: `1px solid ${theme.palette.border}`,
+  padding: "5px",
+  borderRadius: "5px",
+  cursor: "pointer",
+}));
+
+const ThemeColor = styled(Box)(({ theme }) => ({
+  height: "100%",
+  width: "100%",
+  borderRadius: "2px",
+  backgroundColor: theme.themeColor,
 }));

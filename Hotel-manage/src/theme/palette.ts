@@ -184,7 +184,7 @@ const COMMON = {
   grey: GREY,
   gradients: GRADIENTS,
   chart: CHART_COLORS,
-  divider: 'hsl(30 6.3% 25.1%)',
+  // divider: 'hsl(30 6.3% 25.1%)',
   action: {
     hover: GREY[500_8],
     selected: GREY[500_16],
@@ -200,9 +200,10 @@ const palette = {
   light: {
     ...COMMON,
     mode: "light" as PaletteMode,
+
     text: {
       primary: "hsl(240 10% 3.9%)",
-      secondary: "hsl(0 0% 45.1%)",
+      secondary: "hsl(240 3.8% 46.1%)",
       disabled: "hsl(240 5.3% 26.1%)",
     },
     background: {
@@ -228,7 +229,8 @@ const palette = {
       main: "hsl(0, 84.2%, 60.2%)",
       contrastText: "hsl(0, 0%, 98%)",
     },
-    border: "hsl(30 6.3% 25.1%)",
+    border: "hsl(240 5.9% 90%)",
+    divider: "hsl(240 5.9% 90%)",
     input: "hsl(0, 0%, 98%)",
     ring: "hsl(240, 4.9%, 83.9%)",
     chart: {
@@ -244,7 +246,7 @@ const palette = {
     mode: "dark" as PaletteMode,
     text: {
       primary: "hsl(210 40% 98%)",
-      secondary: "hsl(0 0% 45.1%)",
+      secondary: "hsl(240 5% 64.9%)",
       disabled: "hsl(240 5.3% 26.1%)",
     },
     background: {
@@ -273,7 +275,8 @@ const palette = {
       main: "hsl(0, 62.8%, 30.6%)",
       contrastText: "hsl(0, 0%, 98%)",
     },
-    border: "hsl(30 6.3% 25.1%)",
+    border: "hsl(240 3.7% 15.9%)",
+    divider: "hsl(240 3.7% 15.9%)",
     input: "hsl(240, 3.7%, 15.9%)",
     ring: "hsl(240, 4.9%, 83.9%)",
     chart: {

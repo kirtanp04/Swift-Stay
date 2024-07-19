@@ -43,6 +43,9 @@ class Sender {
 const _newMess = new ChatObj()
 _newMess.message = 'User joined room'
 
+const UserTypingMess = new ChatObj()
+UserTypingMess.message = 'User is typing....'
+
 export class WebSocket {
     private io: Server;
     private ActiveRoom: string = "";
@@ -81,18 +84,20 @@ export class WebSocket {
 
 
             this.OnJoinRoom(_newMess);
-            this.SendUserTypingMessage();
+            this.SendUserTypingMessage()
             this.OnDisconnect();
         });
     };
+
+
 
     private SendUserTypingMessage = () => {
         try {
             this.Socket?.on(SocketKeyName.TypingMessage, (encryptString: string) => {
                 const objDecryptKey: ChatObj = Crypt.Decryption(encryptString).data;
                 this.Socket!.broadcast.to(objDecryptKey.key).emit(
-                    SocketKeyName.onJoinRoom,
-                    "User is typing"
+                    SocketKeyName.UserIsTyping,
+                    Crypt.Encryption(UserTypingMess).data
                 );
             });
         } catch (error) { }

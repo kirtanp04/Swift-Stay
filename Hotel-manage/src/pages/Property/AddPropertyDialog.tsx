@@ -29,6 +29,7 @@ import UploadImage from "src/components/UploadImage";
 import showMessage from "src/util/ShowMessage";
 import * as yup from "yup";
 import { PropertyApi, PropertyClass, enumPropertyType } from "./DataObject";
+import { Backdrop } from "@mui/material";
 
 type Props = {
   onClose: () => void;

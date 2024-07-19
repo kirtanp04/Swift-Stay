@@ -15,8 +15,8 @@ function customCheckbox(theme: Theme) {
             display: 'none',
         },
         '& .MuiCheckbox-root.Mui-checked:not(.MuiCheckbox-indeterminate) svg': {
-            backgroundColor: theme.palette.primary.dark, // '#1890ff',
-            borderColor: theme.palette.primary.dark, // '#1890ff',
+            backgroundColor: theme.palette.primary.darker, // '#1890ff',
+            borderColor: theme.palette.primary.darker, // '#1890ff',
         },
         '& .MuiCheckbox-root.Mui-checked .MuiIconButton-label:after': {
             position: 'absolute',
@@ -57,7 +57,7 @@ export const MUIDataGrid = styled(DataGrid)(({ theme }) => ({
     WebkitFontSmoothing: 'auto',
     letterSpacing: 'normal',
     '& .MuiDataGrid-columnHeader': {
-        backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.background.paper,
+        backgroundColor: theme.palette.mode === 'dark' ? theme.palette.background.paper : theme.palette.background.paper,
     },
     // '& .MuiDataGrid-iconSeparator': {
     //   display: 'none',
@@ -76,6 +76,10 @@ export const MUIDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-row:hover': {
         backgroundColor: 'primary.dark',
         cursor: 'pointer',
+    },
+    '& .MuiDataGrid-cell:focus': {
+        outline: `1px solid ${theme.themeColor}`
+
     },
     '& .MuiDataGrid-columnHeaderCheckbox .MuiDataGrid-columnHeaderTitleContainer': {
         padding: '3px',

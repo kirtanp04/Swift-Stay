@@ -5,7 +5,7 @@ import { StoreError } from "src/util/StoreError"
 export class ChatObj {
     message: string = ''
 
-    date: Date | string = new Date()
+    date: Date = new Date()
 
     key: string = ''
 
