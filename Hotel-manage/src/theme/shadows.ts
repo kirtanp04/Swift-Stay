@@ -63,8 +63,7 @@ interface PaletteOptions {
     default: string;
     foreground: string;
   };
-  primary: PaletteColorOptions;
-  secondary: PaletteColorOptions;
+
   muted: {
     main: string;
     contrastText: string;
@@ -81,11 +80,11 @@ interface PaletteOptions {
   input: string;
   ring: string;
   chart: {
-    violet: string[];
-    blue: string[];
-    green: string[];
-    yellow: string[];
-    red: string[];
+    violet: PaletteColorOptions;
+    blue: PaletteColorOptions;
+    green: PaletteColorOptions;
+    yellow: PaletteColorOptions;
+    red: PaletteColorOptions;
   };
   common: {
     black: string;
@@ -107,20 +106,28 @@ interface PaletteOptions {
   gradients: {
     [key: string]: string[];
   };
+  color: Colors
+  primary: PaletteColorOptions
+  secondary: PaletteColorOptions
+}
 
+interface Colors {
+  primary: PaletteColorOptions;
+  secondary: PaletteColorOptions;
   info: PaletteColorOptions;
   success: PaletteColorOptions;
   warning: PaletteColorOptions;
   error: PaletteColorOptions;
+  violet: PaletteColorOptions;
+  purple: PaletteColorOptions;
+  rose: PaletteColorOptions;
+  pink: PaletteColorOptions
 }
-
-
 
 interface PaletteColorOptions {
   main: string;
-  contrastText: string;
-  lighter?: string; // Optional based on your actual usage
-  darker?: string; // Optional based on your actual usage
+  lighter: string; // Optional based on your actual usage
+  darker: string; // Optional based on your actual usage
 }
 
 
@@ -171,11 +178,11 @@ const createCustomShadow = (color: string) => {
     z24: `0 24px 48px 0 ${transparent}`,
     //
     primary: `0 8px 16px 0 ${alpha(palette.light.primary.main, 0.24)}`,
-    info: `0 8px 16px 0 ${alpha(palette.light.info.main, 0.24)}`,
+    info: `0 8px 16px 0 ${alpha(palette.light.color.info.main, 0.24)}`,
     secondary: `0 8px 16px 0 ${alpha(palette.light.secondary.main, 0.24)}`,
-    success: `0 8px 16px 0 ${alpha(palette.light.success.main, 0.24)}`,
-    warning: `0 8px 16px 0 ${alpha(palette.light.warning.main, 0.24)}`,
-    error: `0 8px 16px 0 ${alpha(palette.light.error.main, 0.24)}`,
+    success: `0 8px 16px 0 ${alpha(palette.light.color.info.main, 0.24)}`,
+    warning: `0 8px 16px 0 ${alpha(palette.light.color.warning.main, 0.24)}`,
+    error: `0 8px 16px 0 ${alpha(palette.light.color.error.main, 0.24)}`,
     //
     card: `0 0 2px 0 ${alpha(color, 0.2)}, 0 12px 24px -4px ${alpha(color, 0.12)}`,
     dialog: `-40px 40px 80px -8px ${alpha(palette.light.common.black, 0.24)}`,

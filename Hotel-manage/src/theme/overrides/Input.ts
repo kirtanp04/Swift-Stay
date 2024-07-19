@@ -52,13 +52,40 @@ export default function Input(theme: Theme) {
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
+          borderRadius: theme.shape.borderRadius,
           '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: theme.palette.grey[500_32],
+            borderColor: theme.palette.border,
+          },
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: theme.palette.border,
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: theme.themeColor,
+            borderWidth: 2,
+          },
+          '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
+            borderColor: theme.palette.border,
+            // color: theme.palette.text.secondary
+          },
+        },
+        input: {
+          '&::placeholder': {
+            opacity: 1,
+            color: theme.palette.text.secondary,
+          },
+        },
+      },
+    },
+
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: theme.palette.text.secondary,
+          '&.Mui-focused': {
+            color: theme.themeColor,
           },
           '&.Mui-disabled': {
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: theme.palette.action.disabledBackground,
-            },
+            color: theme.palette.text.secondary,
           },
         },
       },

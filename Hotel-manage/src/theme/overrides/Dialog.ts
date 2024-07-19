@@ -1,6 +1,4 @@
-import { Theme } from '@mui/material/styles';
-
-// ----------------------------------------------------------------------
+import { Theme, alpha } from '@mui/material/styles';
 
 export default function Dialog(theme: Theme) {
   return {
@@ -8,22 +6,12 @@ export default function Dialog(theme: Theme) {
       styleOverrides: {
         paper: {
           boxShadow: theme.customShadows.dialog,
-          '&.MuiPaper-rounded': {
-            borderRadius: Number(theme.shape.borderRadius) * 2,
-          },
-          '&.MuiDialog-paperFullScreen': {
-            borderRadius: 0,
-          },
-          '&.MuiDialog-paper .MuiDialogActions-root': {
-            padding: theme.spacing(3),
-          },
+          borderRadius: theme.shape.borderRadius * 2,
           '@media (max-width: 600px)': {
             margin: theme.spacing(2),
           },
           '@media (max-width: 663.95px)': {
-            '&.MuiDialog-paperWidthSm.MuiDialog-paperScrollBody': {
-              maxWidth: '100%',
-            },
+            maxWidth: '100%',
           },
         },
         paperFullWidth: {
@@ -45,8 +33,8 @@ export default function Dialog(theme: Theme) {
           borderBottom: 0,
           padding: theme.spacing(3),
           [theme.breakpoints.down("sm")]: {
-            padding: "20px 10px"
-          }
+            padding: "20px 10px",
+          },
         },
       },
     },
@@ -56,6 +44,13 @@ export default function Dialog(theme: Theme) {
           '& > :not(:first-of-type)': {
             marginLeft: theme.spacing(1.5),
           },
+        },
+      },
+    },
+    MuiBackdrop: {
+      styleOverrides: {
+        root: {
+          backgroundColor: alpha('#fff', 0.5), // Adjust the alpha value to control opacity
         },
       },
     },

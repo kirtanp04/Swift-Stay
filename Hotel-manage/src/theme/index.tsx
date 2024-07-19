@@ -29,7 +29,7 @@ export default function ThemeProvider({ children }: Props) {
   const themeOptions: ThemeOptions = useMemo(
     () => ({
       palette: isLight ? palette.light : palette.dark,
-      themeColor: "red",
+      themeColor: "hsl(82 84.5% 67.1%)",
       customShadows: isLight ? customShadows.light : customShadows.dark,
     }),
     [mode]

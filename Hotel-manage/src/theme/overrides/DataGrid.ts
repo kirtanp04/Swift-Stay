@@ -7,7 +7,7 @@ export default function DataGrid(theme: Theme) {
     MuiDataGrid: {
       styleOverrides: {
         root: {
-          
+
           borderRadius: 0,
           border: `1px solid transparent`,
           '& .MuiTablePagination-root': {
@@ -32,7 +32,7 @@ export default function DataGrid(theme: Theme) {
           },
           '& .MuiDataGrid-columnHeader[data-field="__check__"]': {
             padding: 0,
-          }         
+          }
         },
       },
     },
@@ -91,7 +91,7 @@ export default function DataGrid(theme: Theme) {
               color: theme.palette.common.white,
               backgroundColor: theme.palette.primary.main,
               '&:hover': {
-                backgroundColor: theme.palette.primary.dark,
+                backgroundColor: theme.palette.primary.darker,
               },
             },
           },

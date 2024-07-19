@@ -1,6 +1,6 @@
-import { Theme } from '@mui/material/styles';
+import { Theme } from "@mui/material/styles";
 //
-import { CloseIcon } from './CustomIcons';
+import { CloseIcon } from "./CustomIcons";
 
 // ----------------------------------------------------------------------
 
@@ -13,35 +13,35 @@ export default function Chip(theme: Theme) {
 
       styleOverrides: {
         colorDefault: {
-          '& .MuiChip-avatarMedium, .MuiChip-avatarSmall': {
+          "& .MuiChip-avatarMedium, .MuiChip-avatarSmall": {
             color: theme.palette.text.secondary,
           },
         },
         outlined: {
           borderColor: theme.palette.grey[500_32],
-          '&.MuiChip-colorPrimary': {
+          "&.MuiChip-colorPrimary": {
             borderColor: theme.palette.primary.main,
           },
-          '&.MuiChip-colorSecondary': {
+          "&.MuiChip-colorSecondary": {
             borderColor: theme.palette.secondary.main,
           },
         },
         //
         avatarColorInfo: {
-          color: theme.palette.info.contrastText,
-          backgroundColor: theme.palette.info.dark,
+          // color: theme.palette.info.contrastText,
+          backgroundColor: theme.palette.color.info.darker,
         },
         avatarColorSuccess: {
-          color: theme.palette.success.contrastText,
-          backgroundColor: theme.palette.success.dark,
+          // color: theme.palette.success.contrastText,
+          backgroundColor: theme.palette.color.success.darker,
         },
         avatarColorWarning: {
-          color: theme.palette.warning.contrastText,
-          backgroundColor: theme.palette.warning.dark,
+          // color: theme.palette.warning.contrastText,
+          backgroundColor: theme.palette.color.warning.darker,
         },
         avatarColorError: {
-          color: theme.palette.error.contrastText,
-          backgroundColor: theme.palette.error.dark,
+          // color: theme.palette.error.contrastText,
+          backgroundColor: theme.palette.color.error.darker,
         },
       },
     },

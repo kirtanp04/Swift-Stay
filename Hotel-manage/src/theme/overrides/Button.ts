@@ -7,9 +7,12 @@ export default function Button(theme: Theme) {
     MuiButton: {
       styleOverrides: {
         root: {
+          border: `1px solid ${theme.themeColor}`,
+          color: theme.themeColor,
           borderRadius: 2,
           '&:hover': {
             boxShadow: 'none',
+            border: `1px solid ${theme.themeColor}`,
           },
           textTransform: "capitalize",
         },
@@ -19,29 +22,33 @@ export default function Button(theme: Theme) {
 
         // contained
         containedInherit: {
-          color: theme.palette.grey[800],
-          boxShadow: theme.customShadows.z8,
+          // color: theme.palette.text.primary,
+          // boxShadow: theme.customShadows.z8,
           '&:hover': {
             backgroundColor: theme.palette.grey[400],
+            boxShadow: 'none',
           },
         },
         containedPrimary: {
-          boxShadow: theme.customShadows.primary,
+          color: theme.palette.text.primary,
+          // boxShadow: theme.customShadows.primary,
+          backgroundColor: theme.themeColor,
+          boxShadow: 'none',
         },
         containedSecondary: {
-          boxShadow: theme.customShadows.secondary,
+          // boxShadow: theme.customShadows.secondary,
         },
         containedInfo: {
-          boxShadow: theme.customShadows.info,
+          // boxShadow: theme.customShadows.info,
         },
         containedSuccess: {
-          boxShadow: theme.customShadows.success,
+          // boxShadow: theme.customShadows.success,
         },
         containedWarning: {
-          boxShadow: theme.customShadows.warning,
+          // boxShadow: theme.customShadows.warning,
         },
         containedError: {
-          boxShadow: theme.customShadows.error,
+          // boxShadow: theme.customShadows.error,
         },
         // outlined
         outlinedInherit: {

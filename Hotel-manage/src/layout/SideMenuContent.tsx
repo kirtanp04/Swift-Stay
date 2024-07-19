@@ -137,11 +137,11 @@ export default function SideMenuContent({}: Props) {
                       "&:hover": {
                         background: theme.palette.background.neutral,
                       },
-                      background: isActive
-                        ? theme.palette.background.default
-                        : "transparent",
+                      // background: isActive
+                      //   ? theme.palette.background.default
+                      //   : "transparent",
                       border: isActive
-                        ? `1px solid ${theme.palette.text.secondary}`
+                        ? `1px solid ${theme.palette.border}`
                         : "0px solid transparent",
                     }}
                   >
@@ -176,7 +176,7 @@ export default function SideMenuContent({}: Props) {
           </Tooltip>
         )}
       </ThemeWrapper>
-      <ListItemWrapper sx={{ backgroundColor: theme.palette.error.main }}>
+      <ListItemWrapper sx={{ backgroundColor: theme.palette.color.error.main }}>
         <LogoutIcon height={25} width={25} />
         <ListText>Logout</ListText>
       </ListItemWrapper>
@@ -199,9 +199,9 @@ const UserDetailWrapper = styled(Box)(({ theme }) => ({
   alignItems: "center",
   padding: "0.5rem",
   borderRadius: "10px",
-  backgroundColor: theme.palette.background.default,
+  // backgroundColor: theme.palette.background.default,
   overflowY: "hidden",
-  border: `1px solid ${theme.palette.text.secondary}`,
+  border: `1px solid ${theme.palette.border}`,
 }));
 
 const UserContentWrapper = styled(Box)(() => ({

@@ -20,13 +20,13 @@ export default function Fab(theme: Theme) {
         primary: {
           boxShadow: theme.customShadows.primary,
           '&:hover': {
-            backgroundColor: theme.palette.primary.dark
+            backgroundColor: theme.palette.primary.darker
           }
         },
         secondary: {
           boxShadow: theme.customShadows.secondary,
           '&:hover': {
-            backgroundColor: theme.palette.secondary.dark
+            backgroundColor: theme.palette.secondary.darker
           }
         },
         extended: {
