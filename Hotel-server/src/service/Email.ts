@@ -49,7 +49,7 @@ export class Email {
     });
   }
 
-  public async sendEmail() {
+  public async sendEmail(onsuccess: () => void, callback: (err: string) => void) {
     try {
       const info = await this.transporter.sendMail({
         from: this.from,
@@ -58,14 +58,10 @@ export class Email {
         text: this.text,
         html: this.html,
       });
+      onsuccess()
 
     } catch (error: any) {
-      let userRes = new UserResponse();
-      userRes.Message = error.message;
-      userRes.isError = true;
-      userRes.statusCode = HttpStatusCodes.BAD_GATEWAY;
-      console.log(userRes);
-      SendResponseToUser(userRes, this.next!);
+      callback('Email Server Error: ' + error.message)
     }
   }
 }

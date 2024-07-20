@@ -75,7 +75,7 @@ export class Api {
     onResponse: (res: ProjectResponse) => void
   ) {
     let _res = new ProjectResponse();
-
+    debugger
     try {
       const encryptParamData = Crypt.Encryption(_Param);
 
@@ -86,7 +86,7 @@ export class Api {
           const response = await axiosCall.post(encryptParamData.data, {
             data: encryptedData.data,
           });
-
+          debugger
           if (response) {
             const objDecryptRes = Crypt.Decryption(response.data);
             if (objDecryptRes.data.isError === false) {
