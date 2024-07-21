@@ -11,4 +11,5 @@ export default defineConfig({
       'src': path.resolve(__dirname, 'src'), // Alias @ to the src directory
     },
   },
+  base: '/swiftstay',
 })

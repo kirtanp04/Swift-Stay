@@ -1,4 +1,4 @@
-export const baseUrlName: string = '/'
+export const baseUrlName: string = '/swiftstay'
 
 // helmet
 export const descriptionContent = 'Book the best hotels, resort, appartments and manymore all over India.'

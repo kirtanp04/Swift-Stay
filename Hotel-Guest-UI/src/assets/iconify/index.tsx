@@ -496,7 +496,7 @@ export function FaviconIcon() {
       width="50"
       height="50"
       viewBox="0 0 172 172"
-      fill={theme.palette.primary.main}
+      fill="hsl(142.1 70.6% 45.3%)"
     >
       <g
         fill="none"
@@ -515,7 +515,7 @@ export function FaviconIcon() {
         style={{ mixBlendMode: "normal" }}
       >
         <path d="M0,172v-172h172v172z" fill="none"></path>
-        <g fill="#1fb141">
+        <g fill="hsl(142.1 70.6% 45.3%)">
           <path d="M21.5,21.5v129h64.5v-32.25v-64.5v-32.25zM86,53.75c0,17.7805 14.4695,32.25 32.25,32.25c17.7805,0 32.25,-14.4695 32.25,-32.25c0,-17.7805 -14.4695,-32.25 -32.25,-32.25c-17.7805,0 -32.25,14.4695 -32.25,32.25zM118.25,86c-17.7805,0 -32.25,14.4695 -32.25,32.25c0,17.7805 14.4695,32.25 32.25,32.25c17.7805,0 32.25,-14.4695 32.25,-32.25c0,-17.7805 -14.4695,-32.25 -32.25,-32.25z"></path>
         </g>
       </g>
@@ -541,6 +541,69 @@ export function SendMessageIcon({ IconColor, ...other }: Props) {
         <path d="M42 6L4 20.138l20 3.87L29.005 44z"></path>
         <path strokeLinecap="round" d="m24.008 24.008l5.657-5.656"></path>
       </g>
+    </svg>
+  );
+}
+
+export function LocationIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        fillRule="evenodd"
+        d="m12.065 21.243l-.006-.005zm.182-.274a29 29 0 0 0 3.183-3.392c2.04-2.563 3.281-5.09 3.365-7.337a6.8 6.8 0 1 0-13.591 0c.085 2.247 1.327 4.774 3.366 7.337a29 29 0 0 0 3.183 3.392q.166.15.247.218zm-.985 1.165S4 16.018 4 10a8 8 0 1 1 16 0c0 6.018-7.262 12.134-7.262 12.134c-.404.372-1.069.368-1.476 0M12 12.8a2.8 2.8 0 1 0 0-5.6a2.8 2.8 0 0 0 0 5.6m0 1.2a4 4 0 1 1 0-8a4 4 0 0 1 0 8"
+      ></path>
+    </svg>
+  );
+}
+
+export function CalenderIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="M19 4h-2V3a1 1 0 0 0-2 0v1H9V3a1 1 0 0 0-2 0v1H5a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3m1 15a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7h16Zm0-9H4V7a1 1 0 0 1 1-1h2v1a1 1 0 0 0 2 0V6h6v1a1 1 0 0 0 2 0V6h2a1 1 0 0 1 1 1Z"
+      ></path>
+    </svg>
+  );
+}
+
+export function PersonIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 512 512"
+      {...other}
+    >
+      <path
+        fill="none"
+        stroke={IconColor ? IconColor : "currentColor"}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={32}
+        d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96"
+      ></path>
+      <path
+        fill="none"
+        stroke={IconColor ? IconColor : "currentColor"}
+        strokeMiterlimit={10}
+        strokeWidth={32}
+        d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304Z"
+      ></path>
     </svg>
   );
 }

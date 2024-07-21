@@ -1,3 +1,5 @@
+import { countryNames } from "src/Types";
+
 export function getFirstLetter(fullName: string) {
     let firstLetter = fullName.trim().charAt(0).toUpperCase();
     return firstLetter;
@@ -37,3 +39,20 @@ export function isUndefinedOrNull(value: any, defaultValue: any) {
         return defaultValue;
     }
 }
+
+
+
+interface CountryFlag {
+    name: string;
+    className: string;
+}
+
+const countryFlags: CountryFlag[] = Object.keys(countryNames).map((countryName) => {
+    const countryCode = countryNames[countryName as keyof typeof countryNames];
+    return {
+        name: countryName,
+        className: `fi fi-${countryCode.toLowerCase()}`,
+    };
+});
+
+export default countryFlags;

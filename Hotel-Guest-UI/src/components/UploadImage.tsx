@@ -137,7 +137,7 @@ export default function UploadImage({
                       <CloseCircleIcon
                         height={"100%"}
                         width={"100%"}
-                        IconColor={theme.palette.error.main}
+                        IconColor={theme.palette.color.error.main}
                       />
                     </CancleBtnWrapper>
                   </ImageWrapper>

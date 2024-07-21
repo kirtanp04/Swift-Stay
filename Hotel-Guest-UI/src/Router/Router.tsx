@@ -1,7 +1,9 @@
 import { ElementType, Suspense, lazy } from "react";
-import { Outlet, useRoutes } from "react-router-dom";
+import { useRoutes } from "react-router-dom";
 import LoadingPage from "src/components/LoadingPage";
-import LoginGaurd from "src/guard/LoginGaurd";
+import { UserSearchContextProvider } from "src/context/UserSearchContext";
+import Layout from "src/layout/NavBar";
+
 // import LoadingPage from "../components/LoadingPage";
 
 const Loadable = (Component: ElementType) => (props: any) => {
@@ -12,7 +14,8 @@ const Loadable = (Component: ElementType) => (props: any) => {
   );
 };
 
-const Login = Loadable(lazy(() => import("src/pages/Authentication/Login")));
+// const Login = Loadable(lazy(() => import("src/pages/Authentication/Login")));
+const HomePage = Loadable(lazy(() => import("src/pages/Home/HomePage")));
 
 const SignUp = Loadable(
   lazy(() => import("src/pages/Authentication/Register"))
@@ -20,22 +23,37 @@ const SignUp = Loadable(
 
 export default function Router() {
   return useRoutes([
+    // {
+    //   path: "/",
+    //   element: <Outlet />,
+    //   children: [
+    //     {
+    //       path: "",
+    //       element: (
+    //         <LoginGaurd>
+    //           <Login />
+    //         </LoginGaurd>
+    //       ),
+    //       index: true,
+    //     },
+    //     { path: "register", element: <SignUp /> },
+    //     { path: "about", element: <>About</> },
+    //     { path: "contact", element: <>About</> },
+    //   ],
+    // },
+
     {
       path: "/",
-      element: <Outlet />,
+      element: (
+        <UserSearchContextProvider>
+          <Layout />
+        </UserSearchContextProvider>
+      ),
       children: [
-        {
-          path: "",
-          element: (
-            <LoginGaurd>
-              <Login />
-            </LoginGaurd>
-          ),
-          index: true,
-        },
+        { path: "", element: <HomePage />, index: true },
         { path: "register", element: <SignUp /> },
         { path: "about", element: <>About</> },
-        { path: "contact", element: <>About</> },
+        { path: "contact", element: <>Contact</> },
       ],
     },
   ]);
