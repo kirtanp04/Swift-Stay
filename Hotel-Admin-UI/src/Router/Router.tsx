@@ -24,6 +24,9 @@ const PropertyViewer = Loadable(
 const RoomList = Loadable(lazy(() => import("src/pages/room/RoomList")));
 const Errorlogs = Loadable(lazy(() => import("src/pages/ErrorLogs/Errorlogs")));
 const ChatViewer = Loadable(lazy(() => import("src/pages/Chat/ChatViewer")));
+const EmailVerification = Loadable(
+  lazy(() => import("src/pages/Authentication/EmailVerification"))
+);
 const SignUp = Loadable(
   lazy(() => import("src/pages/Authentication/Register"))
 );
@@ -46,6 +49,15 @@ export default function Router() {
         { path: "register", element: <SignUp /> },
         { path: "about", element: <>About</> },
         { path: "contact", element: <>About</> },
+        {
+          path: ":username/email/verification/:token",
+          element: (
+            <LoginGaurd>
+              <EmailVerification />
+            </LoginGaurd>
+          ),
+        },
+        // { path: "", element: <>About</> },
       ],
     },
 

@@ -3,10 +3,8 @@ import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Resp
 import { TParam } from '../types/Type';
 import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
 import { Login, User, UserClass, enumUserRole } from '../models/UserModel';
-import { Param } from '../Constant';
+import { EmailTemplate, Param } from '../Constant';
 import { Email } from '../service/Email';
-
-
 
 const _CreateGuestAccount: string = Param.function.guest.register;
 
@@ -15,6 +13,8 @@ const _CreateManagerAccount: string = Param.function.manager.register;
 const _GuestLogin: string = Param.function.guest.login;
 
 const _ManagerLogin: string = Param.function.manager.login;
+
+const _ManagerEmailVerification: string = Param.function.manager.EmailVerification;
 
 export class UserFunction {
     private static objUserResponse: UserResponse = new UserResponse();
@@ -37,6 +37,9 @@ export class UserFunction {
             this.objUserResponse = _res;
         } else if (objParam.function === _GuestLogin) {
             const _res = await _Function.GuestLogin();
+            this.objUserResponse = _res;
+        } else if (objParam.function === _ManagerEmailVerification) {
+            const _res = await _Function.ManagerEmailVerification();
             this.objUserResponse = _res;
         } else {
             this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
@@ -153,9 +156,32 @@ class Functions {
                         role,
                         createdAt,
                     });
-                    newUser.save();
 
-                    this.objUserResponse = GetUserSuccessObj('User has been created', HttpStatusCodes.CREATED);
+                    const Token = Jwt.SignJwt({ _id: newUser._id, email: newUser.email }, '5m');
+
+                    if (Token.error === '') {
+                        let Mail = new Email({ next: this.next! });
+                        Mail.from = 'kirtanpatel6189@gmail.com';
+                        Mail.to = email;
+                        Mail.subject = 'Email Verification';
+                        Mail.html = EmailTemplate.EmailVerification(name, Token.data);
+
+                        let isError: boolean = false;
+
+                        Mail.sendEmail(
+                            () => { },
+                            (err) => {
+                                this.objUserResponse = GetUserErrorObj(err, HttpStatusCodes.BAD_REQUEST);
+                                isError = true;
+                            }
+                        );
+                        if (!isError) {
+                            this.objUserResponse = GetUserSuccessObj('We have sent an Email for verification.', HttpStatusCodes.CREATED);
+                            newUser.save();
+                        }
+                    } else {
+                        this.objUserResponse = GetUserErrorObj(Token.error, HttpStatusCodes.BAD_REQUEST);
+                    }
                 }
             }
         } catch (error: any) {
@@ -175,66 +201,62 @@ class Functions {
                 const isVerifiePass = await Crypt.compareHash(isUser.password, password);
 
                 if (isVerifiePass.error === '') {
-                    if (isUser.role !== enumUserRole.guest) {
-                        const getToken = await Jwt.SignJwt({ email: isUser.email, name: isUser.name, profileImg: isUser.profileImg, role: isUser.role, });
-                        if (getToken.error === '') {
-                            const setCookie = Storage.setCookie('Auth', getToken.data, this.res!);
+                    if (isUser.isEmailVerified) {
+                        if (isUser.role !== enumUserRole.guest) {
+                            const getToken = await Jwt.SignJwt({
+                                email: isUser.email,
+                                name: isUser.name,
+                                profileImg: isUser.profileImg,
+                                role: isUser.role,
+                            });
+                            if (getToken.error === '') {
+                                const setCookie = Storage.setCookie('Auth', getToken.data, this.res!);
 
-                            if (setCookie.error === '') {
+                                if (setCookie.error === '') {
+                                    let _Email = new Email({ next: this.next! });
 
-                                let _Email = new Email({ next: this.next! })
+                                    _Email.from = 'kirtanpatel6189@gmail.com';
+                                    _Email.to = email;
+                                    _Email.subject = 'login Activity';
+                                    _Email.html = EmailTemplate.LogedIn(isUser.name);
 
-                                _Email.from = 'kirtanpatel6189@gmail.com'
-                                _Email.to = email
-                                _Email.subject = 'login Activity'
-                                _Email.html = `
-    <div style="font-family: Arial, sans-serif; color: #333;">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <img src="https://example.com/path/to/company-logo.png" alt="Company Logo" style="max-width: 150px;">
-      </div>
-      <h1 style="color: #4CAF50;">Welcome to Our Service!</h1>
-      <p style="font-size: 16px; color: #555;">Hello,</p>
-      <p style="font-size: 16px; color: #555;">
-        We're excited to have you on board. Here's a summary of what you can expect from our service:
-      </p>
-      <ul style="list-style-type: none; padding: 0;">
-        <li style="background-color: #f9f9f9; margin: 10px 0; padding: 10px; border-radius: 5px;">
-          <strong>Feature 1:</strong> Description of feature 1.
-        </li>
-        <li style="background-color: #f9f9f9; margin: 10px 0; padding: 10px; border-radius: 5px;">
-          <strong>Feature 2:</strong> Description of feature 2.
-        </li>
-        <li style="background-color: #f9f9f9; margin: 10px 0; padding: 10px; border-radius: 5px;">
-          <strong>Feature 3:</strong> Description of feature 3.
-        </li>
-      </ul>
-      <p style="font-size: 16px; color: #555;">
-        If you have any questions, feel free to <a href="mailto:support@example.com" style="color: #4CAF50;">contact us</a>.
-      </p>
-      <div style="text-align: center; margin: 20px 0;">
-        <a href="https://frontend.example.com" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
-          Visit Our Website
-        </a>
-      </div>
-      <p style="font-size: 16px; color: #555;">Best regards,<br/>The Team</p>
-    </div>
-  `
+                                    let isError: boolean = false
 
-                                _Email.sendEmail()
+                                    _Email.sendEmail(
+                                        () => {
 
-                                this.objUserResponse = GetUserSuccessObj(
-                                    { email: isUser.email, name: isUser.name, profile: isUser.profileImg, role: isUser.role, id: isUser._id },
-                                    HttpStatusCodes.ACCEPTED
-                                );
+                                        },
+                                        (err) => {
+                                            if (err) {
+                                                this.objUserResponse = GetUserErrorObj(err, HttpStatusCodes.BAD_REQUEST);
+                                                isError = true
+                                            }
+                                        }
+
+                                    );
+
+                                    if (!isError) {
+                                        this.objUserResponse = GetUserSuccessObj(
+                                            { email: isUser.email, name: isUser.name, profile: isUser.profileImg, role: isUser.role, id: isUser._id, isEmailVerified: isUser.isEmailVerified },
+                                            HttpStatusCodes.ACCEPTED
+                                        );
+                                    }
+
+                                } else {
+                                    this.objUserResponse = GetUserErrorObj('Server error: not able to setcookie', HttpStatusCodes.BAD_REQUEST);
+                                }
                             } else {
-                                this.objUserResponse = GetUserErrorObj('Server error: not able to setcookie', HttpStatusCodes.BAD_REQUEST);
+                                this.objUserResponse = GetUserErrorObj(getToken.error, HttpStatusCodes.BAD_REQUEST);
                             }
                         } else {
-                            this.objUserResponse = GetUserErrorObj(getToken.error, HttpStatusCodes.BAD_REQUEST);
+                            this.objUserResponse = GetUserErrorObj(
+                                'You cannot use your guest account for login.',
+                                HttpStatusCodes.NOT_ACCEPTABLE
+                            );
                         }
                     } else {
                         this.objUserResponse = GetUserErrorObj(
-                            'You cannot use your guest account for login.',
+                            'Your Email is not verified. verified your email first.',
                             HttpStatusCodes.NOT_ACCEPTABLE
                         );
                     }
@@ -243,6 +265,66 @@ class Functions {
                 }
             } else {
                 this.objUserResponse = GetUserErrorObj('No User has been found. Create new account.', HttpStatusCodes.NOT_FOUND);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    public ManagerEmailVerification = async (): Promise<UserResponse> => {
+        try {
+            const { token } = this.objParam.data;
+            const JwtObj = Jwt.VerifyJwt(token);
+
+            if (JwtObj.error === '') {
+                const { _id, email } = JwtObj.data;
+
+                const isUser: UserClass | null = await User.findOne({
+                    $and: [
+                        {
+                            _id: _id,
+                        },
+                        {
+                            email: email,
+                        },
+                    ],
+                });
+
+                if (isUser) {
+                    if (isUser?.isEmailVerified === false) {
+                        const isUserUpdated = await User.findOneAndUpdate(
+                            {
+                                $and: [
+                                    {
+                                        _id: _id,
+                                    },
+                                    {
+                                        email: email,
+                                    },
+                                ],
+                            },
+                            {
+                                $set: {
+                                    isEmailVerified: true,
+                                },
+                            }
+                        );
+                        if (isUserUpdated) {
+                            this.objUserResponse = GetUserSuccessObj(
+                                { email: isUser.email, name: isUser.name, profile: isUser.profileImg, role: isUser.role, id: isUser._id, isEmailVerified: isUser.isEmailVerified },
+                                HttpStatusCodes.ACCEPTED
+                            );
+                        }
+                    } else {
+                        this.objUserResponse = GetUserErrorObj('Email is already been verifyed.', HttpStatusCodes.BAD_REQUEST);
+                    }
+                } else {
+                    this.objUserResponse = GetUserErrorObj('Server Error: No User Found / Invalid Token provided', HttpStatusCodes.BAD_REQUEST);
+                }
+            } else {
+                this.objUserResponse = GetUserErrorObj('Server Error: Invalid Token provided', HttpStatusCodes.BAD_REQUEST);
             }
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);

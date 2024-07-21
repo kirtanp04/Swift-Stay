@@ -1,5 +1,5 @@
 import { Param } from "src/Constant";
-import { Api, getPostParamData } from "src/common/ApiCall";
+import { Api, getGETParamData, getPostParamData } from "src/common/ApiCall";
 
 export enum enumUserRole {
     guest = 'guest',
@@ -18,6 +18,7 @@ export class _Register {
     name: string = "";
     email: string = "";
     password: string = "";
+    isEmailVerified: boolean = false;
     confirmPassword: string = "";
     profileImg: string = "";
     phone: string = "";
@@ -67,4 +68,25 @@ export class Auth {
             onFail(error);
         }
     };
+
+    public static EmailVerification = async (token: string,
+        onsuccess: (res: any) => void,
+        onFail: (err: any) => void) => {
+        const _Param = getGETParamData(Param.broker.manager.Auth, Param.function.manager.EmailVerification, { token: token });
+
+        try {
+            await Api.get(_Param, (res) => {
+                if (res.error === "") {
+                    onsuccess(res.data);
+                } else {
+                    onFail(res.error);
+                }
+            })
+        } catch (error: any) {
+
+            onFail(error.message);
+
+        }
+
+    }
 }

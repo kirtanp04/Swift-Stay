@@ -29,6 +29,7 @@ export const Param = {
         manager: {
             register: 'CreateManagerAccount',
             login: 'ManagerLogin',
+            EmailVerification: 'ManagerEmailVerification',
             Property: {
                 AddProperty: 'ManagerAddProperty',
                 GetSingleProperty: 'ManagerGetSingleProperty',

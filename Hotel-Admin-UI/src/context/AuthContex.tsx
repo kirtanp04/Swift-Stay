@@ -1,7 +1,8 @@
 import { useTheme } from "@mui/material";
 import { ReactNode, createContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Path } from "src/Router/path";
 import { Storage } from "src/common/Storage";
-import { TimeFormatter } from "src/common/TimeFormater";
 import { Auth, _Login } from "src/pages/Authentication/AuthMgr";
 import showLoading from "src/util/ShowLoading";
 import showMessage from "src/util/ShowMessage";
@@ -18,6 +19,7 @@ export class TUser {
   role: string = "";
   id: string = "";
   loginPeriod: Date = new Date();
+  isEmailVerified: boolean = false;
 }
 
 export class TAuth {
@@ -32,17 +34,20 @@ type _TUser = {
   user: TAuth;
   UpdateUser: <K extends keyof TAuth>(propertyName: K, value: TAuth[K]) => void;
   LoginManager: (objLoginDetail: _Login) => void;
+  VerifyEmail: (token: string) => void;
 };
 
 const CreateAuthContext = createContext<_TUser>({
   user: new TAuth(),
   UpdateUser: () => null,
   LoginManager: () => null,
+  VerifyEmail: () => null,
 });
 
 function AuthContexProvider({ children }: Props) {
   const [user, setUser] = useState<TAuth>(new TAuth());
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const checkUserToken = () => {
     const Authdata = Storage.getFromSessionStorage("Auth");
@@ -56,11 +61,10 @@ function AuthContexProvider({ children }: Props) {
     }
 
     if (Authdata.data !== "") {
-      let _userInfo: TUser = Authdata.data;
-      const _loginPeriod = TimeFormatter.formatTimeDifference(
-        _userInfo.loginPeriod
-      );
-
+      // let _userInfo: TUser = Authdata.data;
+      // const _loginPeriod = TimeFormatter.formatTimeDifference(
+      //   _userInfo.loginPeriod
+      // );
       // if (_loginPeriod === "1 day ago") {
       //   showMessage("Your Session get's expire. Login again", theme, () => {
       //     setUser({
@@ -124,6 +128,7 @@ function AuthContexProvider({ children }: Props) {
         _user.role = res.role;
         _user.id = res.id;
         _user.loginPeriod = new Date();
+        _user.isEmailVerified = res.isEmailVerified;
         setUser({ ...user, isAuthenticated: true, userInfo: _user });
         Storage.setToSessionStorage("Auth", _user);
       },
@@ -134,8 +139,33 @@ function AuthContexProvider({ children }: Props) {
       }
     );
   };
+
+  const VerifyEmail = (token: string) => {
+    debugger;
+    Auth.EmailVerification(
+      token,
+      (res) => {
+        let _user = new TUser();
+        _user.email = res.email;
+        _user.name = res.name;
+        _user.profileImg = res.profile;
+        _user.role = res.role;
+        _user.id = res.id;
+        _user.loginPeriod = new Date();
+        _user.isEmailVerified = res.isEmailVerified;
+        setUser({ ...user, isAuthenticated: true, userInfo: _user });
+        Storage.setToSessionStorage("Auth", _user);
+        navigate(Path.dashboard);
+      },
+      (err) => {
+        showMessage(err, theme, () => {});
+      }
+    );
+  };
   return (
-    <CreateAuthContext.Provider value={{ user, UpdateUser, LoginManager }}>
+    <CreateAuthContext.Provider
+      value={{ user, UpdateUser, LoginManager, VerifyEmail }}
+    >
       {children}
     </CreateAuthContext.Provider>
   );

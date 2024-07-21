@@ -14,7 +14,7 @@ export default function AuthGaurd({ children }: Props) {
     user: {
       isAuthenticated,
       isProcessing,
-      userInfo: { role },
+      userInfo: { role, isEmailVerified },
     },
   } = useAuth();
 
@@ -35,7 +35,7 @@ export default function AuthGaurd({ children }: Props) {
     return <Login />;
   }
 
-  if (role === enumUserRole.admin) {
+  if (role === enumUserRole.admin && isEmailVerified) {
     if (requestedLocation && pathname !== requestedLocation) {
       setRequestedLocation(null);
       return <Navigate to={requestedLocation} />;

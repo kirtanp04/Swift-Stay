@@ -17,6 +17,7 @@ export class UserClass {
     name: string = '';
     email: string = '';
     password: string = '';
+    isEmailVerified: boolean = false;
     profileImg: string = '';
     phone: string = '';
     role: enumUserRole = enumUserRole.guest;
@@ -32,6 +33,10 @@ const UserSchema = new Schema<UserClass>({
         type: String,
         required: [true, 'Email is required.'],
         unique: true,
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
     },
     password: {
         type: String,
