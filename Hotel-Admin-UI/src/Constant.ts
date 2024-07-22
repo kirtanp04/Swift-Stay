@@ -1,3 +1,5 @@
+import { countryNames } from "./Types";
+
 export const baseUrlName: string = '/'
 
 // helmet
@@ -62,3 +64,13 @@ export const SocketKeyName = {
     TypingMessage: 'TypingMessage',
     UserIsTyping: 'UserIsTyping'
 }
+
+
+export const countryNamesArray = Object.entries(countryNames).map(([name, code]) => ({ name, code }));
+
+// Example output:
+// [
+//   { name: 'Afghanistan', code: 'AF' },
+//   { name: 'Albania', code: 'AL' },
+//   // ... other countries
+// ]

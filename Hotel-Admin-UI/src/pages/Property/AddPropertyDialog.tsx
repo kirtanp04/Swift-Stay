@@ -10,7 +10,7 @@ import {
   styled,
   useTheme,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import {
   CloseCircleIcon,
@@ -29,7 +29,15 @@ import UploadImage from "src/components/UploadImage";
 import showMessage from "src/util/ShowMessage";
 import * as yup from "yup";
 import { PropertyApi, PropertyClass, enumPropertyType } from "./DataObject";
-import { Backdrop } from "@mui/material";
+import {
+  Country,
+  State,
+  City,
+  ICountry,
+  IState,
+  ICity,
+} from "country-state-city";
+import FormAutoComplete from "src/components/Form/FormAutoComplete";
 
 type Props = {
   onClose: () => void;
@@ -64,6 +72,10 @@ export default function AddPropertyDialog({
 
   const [_objProperty, setObjProperty] = useState<PropertyClass>(objProperty);
 
+  const [Countries] = useState<ICountry[]>(Country.getAllCountries());
+  const [States, setState] = useState<IState[]>([]);
+  const [Cities, setCities] = useState<ICity[]>([]);
+
   const theme = useTheme();
 
   //------------------------------- Form
@@ -72,13 +84,82 @@ export default function AddPropertyDialog({
     defaultValues: objProperty,
     resolver: yupResolver(AddHotelSchema) as any,
   });
-  const { handleSubmit, control } = _Method;
+  const { handleSubmit, control, watch } = _Method;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "amenities",
   });
 
   //---------------------------------------------
+
+  useEffect(() => {
+    const _watch = watch();
+
+    if (_watch.country !== "") {
+      const stateList = getAllStatesOfoneCountry(_watch.country);
+      setState(stateList);
+    }
+  }, [watch("country")]);
+
+  useEffect(() => {
+    const _watch = watch();
+
+    if (_watch.state !== "") {
+      const cities = getAllCities(_watch.country, _watch.state);
+      setCities(cities);
+    }
+  }, [watch("state")]);
+  //----------------------------------------------------------------
+
+  const getAllStatesOfoneCountry = (countryName: string): IState[] => {
+    let States: IState[] = [];
+    for (let index = 0; index < Countries.length; index++) {
+      const element = Countries[index];
+
+      if (element.name === countryName) {
+        States = State.getStatesOfCountry(element.isoCode);
+
+        break;
+      }
+    }
+
+    return States;
+  };
+
+  const getAllCities = (countryName: string, stateName: string): ICity[] => {
+    let Cities: ICity[] = [];
+    let find: boolean = false;
+
+    do {
+      for (
+        let CountryIndex = 0;
+        CountryIndex < Countries.length;
+        CountryIndex++
+      ) {
+        const objCountry = Countries[CountryIndex];
+
+        if (objCountry.name === countryName) {
+          for (let StateIndex = 0; StateIndex < States.length; StateIndex++) {
+            const objState = States[StateIndex];
+            if (objState.name === stateName) {
+              Cities = City.getCitiesOfState(
+                objCountry.isoCode,
+                objState.isoCode
+              );
+              find = true;
+              break;
+            }
+          }
+
+          break;
+        }
+      }
+    } while (!find);
+
+    return Cities;
+  };
+
+  // ----------------------------------------------------------
 
   const openUploadImageDialog = () => {
     setShowUploadImageDialog(true);
@@ -195,32 +276,52 @@ export default function AddPropertyDialog({
               </InputWrapper>
 
               <InputWrapper>
-                <FormTextFiels
-                  name="city"
-                  label="City"
-                  fullWidth
+                <FormSelectField
                   variant="outlined"
-                />
+                  label="Country"
+                  name="country"
+                >
+                  <option value=""></option>
+                  {Countries.map((objCountry) => (
+                    <option value={objCountry.name} key={objCountry.isoCode}>
+                      {objCountry.name}
+                    </option>
+                  ))}
+                </FormSelectField>
               </InputWrapper>
             </FieldWrapper>
 
             <FieldWrapper>
               <InputWrapper>
-                <FormTextFiels
+                <FormSelectField
+                  variant="outlined"
                   name="state"
                   label="State"
-                  fullWidth
-                  variant="outlined"
-                />
+                  disabled={States.length === 0}
+                >
+                  <option value=""></option>
+                  {States.map((objState) => (
+                    <option value={objState.name} key={objState.isoCode}>
+                      {objState.name}
+                    </option>
+                  ))}
+                </FormSelectField>
               </InputWrapper>
 
               <InputWrapper>
-                <FormTextFiels
-                  name="country"
-                  label="Country"
-                  fullWidth
+                <FormSelectField
                   variant="outlined"
-                />
+                  name="city"
+                  label="City"
+                  disabled={Cities.length === 0}
+                >
+                  <option value=""></option>
+                  {Cities.map((objCity) => (
+                    <option value={objCity.name} key={objCity.countryCode}>
+                      {objCity.name}
+                    </option>
+                  ))}
+                </FormSelectField>
               </InputWrapper>
             </FieldWrapper>
 
