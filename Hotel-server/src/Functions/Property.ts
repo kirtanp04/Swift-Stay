@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Cache, GetUserErrorObj, GetUserSuccessObj, HttpStatusCodes, UserResponse } from '../common';
 import { TParam } from '../types/Type';
 import { Param, CacheKey } from '../Constant';
-import { Property as PropertyModel, PropertyClass } from '../models/PropertyModel';
+import { Property as PropertyModel, PropertyClass, enumPropertyType } from '../models/PropertyModel';
 // import { User, UserClass, enumUserRole } from '';
 import { checkAdminVerification } from '../middleware/AdiminVerification';
 import { Room } from '../models/RoomModel';
@@ -103,6 +103,8 @@ class Functions {
                     zipCode: zipCode,
                     updatedAt: updatedAt,
                 });
+
+                // const insert = await PropertyModel.insertMany(dummy)
 
                 const isSave = await _Property.save();
 
@@ -377,3 +379,117 @@ class Functions {
 }
 
 //const ids= ['hgihgiy','ojgorg','hrgrhguh'] her i want to delete all the room whose _id is indide this using mongoose operators not bu any js loop
+
+
+const dummy = [
+    {
+        adminID: "669de20b25ab0a21e2079728",
+        name: "Desert Resort",
+        propertyType: enumPropertyType.Resort,
+        address: "303 Sand Dunes Road",
+        city: "Jaisalmer",
+        state: "Rajasthan",
+        country: "India",
+        zipCode: "345001",
+        phone: "6789012345",
+        email: "info@desertresort.com",
+        website: "http://www.desertresort.com",
+        description: "A luxurious resort in the heart of the desert.",
+        amenities: ["Camel Rides", "Swimming Pool", "Cultural Programs"],
+        images: [
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
+            "data:image/png;base64,AAAANSUhEUgAAAAEAAAABCAAAA",
+        ],
+        rooms: [], // Add RoomClass objects if needed
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        adminID: "669de20b25ab0a21e2079728",
+        name: "Forest Retreat",
+        propertyType: enumPropertyType.Bungalow,
+        address: "404 Woodland Avenue",
+        city: "Dehradun",
+        state: "Uttarakhand",
+        country: "India",
+        zipCode: "248001",
+        phone: "7890123456",
+        email: "stay@forestretreat.com",
+        website: "http://www.forestretreat.com",
+        description: "A peaceful retreat nestled in the forest.",
+        amenities: ["Nature Trails", "Bird Watching", "Yoga Classes"],
+        images: [
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
+            "data:image/png;base64,AAAANSUhEUgAAAAEAAAABCAAAA",
+        ],
+        rooms: [], // Add RoomClass objects if needed
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        adminID: "669de20b25ab0a21e2079728",
+        name: "City Center Apartment",
+        propertyType: enumPropertyType.Apartment,
+        address: "505 Downtown Street",
+        city: "Bangalore",
+        state: "Karnataka",
+        country: "India",
+        zipCode: "560001",
+        phone: "8901234567",
+        email: "admin@citycenterapartment.com",
+        website: "http://www.citycenterapartment.com",
+        description: "Modern apartments in the heart of the city.",
+        amenities: ["Rooftop Garden", "Gym", "Concierge Service"],
+        images: [
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
+            "data:image/png;base64,AAAANSUhEUgAAAAEAAAABCAAAA",
+        ],
+        rooms: [], // Add RoomClass objects if needed
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        adminID: "669de20b25ab0a21e2079728",
+        name: "Riverside Hotel",
+        propertyType: enumPropertyType.Hotel,
+        address: "606 Riverbank Drive",
+        city: "Kochi",
+        state: "Kerala",
+        country: "India",
+        zipCode: "682001",
+        phone: "9012345678",
+        email: "contact@riversidehotel.com",
+        website: "http://www.riversidehotel.com",
+        description: "A scenic hotel by the river.",
+        amenities: ["Boat Rides", "Fishing", "Restaurant"],
+        images: [
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
+            "data:image/png;base64,AAAANSUhEUgAAAAEAAAABCAAAA",
+        ],
+        rooms: [], // Add RoomClass objects if needed
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+    {
+        adminID: "669de20b25ab0a21e2079728",
+        name: "Lakeside Bungalow",
+        propertyType: enumPropertyType.Bungalow,
+        address: "707 Lakeside Avenue",
+        city: "Udaipur",
+        state: "Rajasthan",
+        country: "India",
+        zipCode: "313001",
+        phone: "0123456789",
+        email: "stay@lakesidebungalow.com",
+        website: "http://www.lakesidebungalow.com",
+        description: "A charming bungalow by the lake.",
+        amenities: ["Lake View", "Boating", "Free WiFi"],
+        images: [
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA",
+            "data:image/png;base64,AAAANSUhEUgAAAAEAAAABCAAAA",
+        ],
+        rooms: [], // Add RoomClass objects if needed
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    },
+];

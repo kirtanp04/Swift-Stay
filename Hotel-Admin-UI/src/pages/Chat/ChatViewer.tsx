@@ -225,7 +225,7 @@ export default function ChatViewer() {
               <SendMessageIcon
                 height={25}
                 width={25}
-                IconColor={theme.palette.text.secondary}
+                IconColor={theme.themeColor}
               />
             </SendButtonWrapper>
           </MessageInputWrapper>

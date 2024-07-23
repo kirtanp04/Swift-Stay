@@ -10,6 +10,14 @@ import {
   styled,
   useTheme,
 } from "@mui/material";
+import {
+  City,
+  Country,
+  ICity,
+  ICountry,
+  IState,
+  State,
+} from "country-state-city";
 import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import {
@@ -29,15 +37,6 @@ import UploadImage from "src/components/UploadImage";
 import showMessage from "src/util/ShowMessage";
 import * as yup from "yup";
 import { PropertyApi, PropertyClass, enumPropertyType } from "./DataObject";
-import {
-  Country,
-  State,
-  City,
-  ICountry,
-  IState,
-  ICity,
-} from "country-state-city";
-import FormAutoComplete from "src/components/Form/FormAutoComplete";
 
 type Props = {
   onClose: () => void;
@@ -267,15 +266,6 @@ export default function AddPropertyDialog({
 
             <FieldWrapper>
               <InputWrapper>
-                <FormTextFiels
-                  name="address"
-                  label="Address"
-                  fullWidth
-                  variant="outlined"
-                />
-              </InputWrapper>
-
-              <InputWrapper>
                 <FormSelectField
                   variant="outlined"
                   label="Country"
@@ -289,9 +279,7 @@ export default function AddPropertyDialog({
                   ))}
                 </FormSelectField>
               </InputWrapper>
-            </FieldWrapper>
 
-            <FieldWrapper>
               <InputWrapper>
                 <FormSelectField
                   variant="outlined"
@@ -307,7 +295,9 @@ export default function AddPropertyDialog({
                   ))}
                 </FormSelectField>
               </InputWrapper>
+            </FieldWrapper>
 
+            <FieldWrapper>
               <InputWrapper>
                 <FormSelectField
                   variant="outlined"
@@ -322,6 +312,15 @@ export default function AddPropertyDialog({
                     </option>
                   ))}
                 </FormSelectField>
+              </InputWrapper>
+
+              <InputWrapper>
+                <FormTextFiels
+                  name="address"
+                  label="Address"
+                  fullWidth
+                  variant="outlined"
+                />
               </InputWrapper>
             </FieldWrapper>
 

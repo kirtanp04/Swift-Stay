@@ -1,6 +1,4 @@
-import { alpha, styled } from "@mui/material";
-import { MenuProps } from "@mui/material";
-import { Menu } from "@mui/material";
+import { Menu, MenuProps, styled } from "@mui/material";
 
 export const MUIMenu = styled((props: MenuProps) => (
   <Menu
@@ -31,10 +29,10 @@ export const MUIMenu = styled((props: MenuProps) => (
       marginRight: "9px",
     },
     "&:active": {
-      backgroundColor: alpha(
-        theme.palette.primary.main,
-        theme.palette.action.selectedOpacity
-      ),
+      // backgroundColor: alpha(
+      //   theme.palette.primary.main,
+      //   // theme.palette.action.selectedOpacity
+      // ),
     },
   },
   "& .MuiList-root": {

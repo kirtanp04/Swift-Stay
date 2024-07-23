@@ -171,8 +171,8 @@ export default function HotelList({}: Props) {
               ),
             },
             {
-              field: "city",
-              headerName: "City",
+              field: "country",
+              headerName: "Country",
               width: 200,
             },
             {
@@ -181,8 +181,8 @@ export default function HotelList({}: Props) {
               width: 200,
             },
             {
-              field: "country",
-              headerName: "Country",
+              field: "city",
+              headerName: "City",
               width: 200,
             },
             {

@@ -2,13 +2,16 @@ import {
   Box,
   Divider,
   List,
+  MenuItem,
   Tooltip,
   Typography,
   Zoom,
   styled,
   useTheme,
 } from "@mui/material";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { ThemeColorPairs } from "src/Constant";
 import { Path } from "src/Router/path";
 import { TMenuList } from "src/Types";
 import {
@@ -25,6 +28,7 @@ import {
 } from "src/assets/iconify";
 import ScrollBar from "src/components/Scrollbar";
 import MUIAvatar from "src/components/mui/MUIAvatar";
+import { MUIMenu } from "src/components/mui/MUIMenu";
 import useAuth from "src/hooks/useAuth";
 import useThemeSetting from "src/hooks/useThemesetting";
 
@@ -33,7 +37,9 @@ type Props = {};
 export default function SideMenuContent({}: Props) {
   const { user } = useAuth();
   const theme = useTheme();
-  const { mode, ChangeMode } = useThemeSetting();
+  const { mode, ChangeMode, ChangeThemeColor } = useThemeSetting();
+  const [anchorPoint, setAnchorPoint] = useState<null | HTMLElement>(null);
+  const openCtxMenuPoint = Boolean(anchorPoint);
 
   const MenuList: TMenuList[] = [
     {
@@ -176,7 +182,7 @@ export default function SideMenuContent({}: Props) {
           </Tooltip>
         )}
 
-        <ThemeColorWrapper>
+        <ThemeColorWrapper onClick={(e) => setAnchorPoint(e.currentTarget)}>
           <ThemeColor />
         </ThemeColorWrapper>
       </ThemeWrapper>
@@ -184,6 +190,57 @@ export default function SideMenuContent({}: Props) {
         <LogoutIcon height={25} width={25} />
         <ListText>Logout</ListText>
       </ListItemWrapper>
+
+      {openCtxMenuPoint && (
+        <MUIMenu
+          open={openCtxMenuPoint}
+          anchorEl={anchorPoint}
+          onClose={() => setAnchorPoint(null)}
+          sx={{
+            "& .MuiMenuItem-root": {
+              paddingLeft: "4px !important",
+              paddingRight: "4px !important",
+              borderBottom: "0px solid transparent !important",
+            },
+          }}
+        >
+          <FlexWrap>
+            {theme.palette.mode === "dark"
+              ? ThemeColorPairs.map((objColor) => (
+                  <MenuItem
+                    onClick={() => {
+                      ChangeThemeColor(objColor.darkMode);
+                      setAnchorPoint(null);
+                    }}
+                  >
+                    <ThemeColorWrapper>
+                      <ThemeColor
+                        sx={{
+                          backgroundColor: `${objColor.darkMode} !important`,
+                        }}
+                      />
+                    </ThemeColorWrapper>
+                  </MenuItem>
+                ))
+              : ThemeColorPairs.map((objColor) => (
+                  <MenuItem
+                    onClick={() => {
+                      ChangeThemeColor(objColor.lightMode);
+                      setAnchorPoint(null);
+                    }}
+                  >
+                    <ThemeColorWrapper>
+                      <ThemeColor
+                        sx={{
+                          backgroundColor: `${objColor.lightMode} !important`,
+                        }}
+                      />
+                    </ThemeColorWrapper>
+                  </MenuItem>
+                ))}
+          </FlexWrap>
+        </MUIMenu>
+      )}
     </RootStyle>
   );
 }
@@ -293,4 +350,13 @@ const ThemeColor = styled(Box)(({ theme }) => ({
   width: "100%",
   borderRadius: "2px",
   backgroundColor: theme.themeColor,
+}));
+
+const FlexWrap = styled(Box)(() => ({
+  display: "flex",
+  width: "100%",
+  alignItems: "center",
+  maxWidth: 200,
+  flexWrap: "wrap",
+  justifyContent: "space-between",
 }));

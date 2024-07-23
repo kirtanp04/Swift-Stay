@@ -22,17 +22,17 @@ type Props = {
 };
 
 export default function ThemeProvider({ children }: Props) {
-  const { mode } = useThemeSetting();
+  const { mode, themeColor } = useThemeSetting();
 
   const isLight = mode === "light";
 
   const themeOptions: ThemeOptions = useMemo(
     () => ({
       palette: isLight ? palette.light : palette.dark,
-      themeColor: "hsl(82 84.5% 67.1%)",
+      themeColor: themeColor,
       customShadows: isLight ? customShadows.light : customShadows.dark,
     }),
-    [mode]
+    [mode, themeColor]
   );
 
   const theme = createTheme(themeOptions);
