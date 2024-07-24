@@ -6,9 +6,13 @@ import {
   LocationIcon,
   PersonIcon,
 } from "src/assets/iconify";
-import DateRange from "src/components/DateRange";
 import { UserSearchObj as TUserSearchObj } from "src/context/UserSearchContext";
 import useUserSearch from "src/hooks/useUserSearch";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+// import { DatePicker } from "@mui/x-date-pickers";
+// import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
+// import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 
 const IconSize = {
   height: 22,
@@ -55,7 +59,14 @@ export default function HomePage() {
           <CalenderIcon {...IconSize} IconColor={theme.palette.text.disabled} />
           <FilterBoxButton>
             <FilterBoxButtonText>
-              Check-in date - Check-out date
+              {/* <LocalizationProvider dateAdapter={AdapterDayjs}> */}
+              {/* <DemoContainer components={["SingleInputDateRangeField"]}> */}
+              {/* <DatePicker
+                // slots={{ field: SingleInputDateRangeField }}
+                name="allowedRange"
+              /> */}
+              {/* </DemoContainer> */}
+              {/* </LocalizationProvider> */}
             </FilterBoxButtonText>
           </FilterBoxButton>
           {UserSearch.checkInDate !== null ||
@@ -82,14 +93,6 @@ export default function HomePage() {
         <Divider />
         <FilterSearchButtonWrapper>Search</FilterSearchButtonWrapper>
       </FilterBox>
-
-      {ShowDateRange && (
-        <DateRange
-          startingDate={UserSearch.checkInDate!}
-          endingDate={UserSearch.checkOutDate!}
-          onChange={OnChangeDatePicker}
-        />
-      )}
     </RootStyle>
   );
 }
