@@ -23,6 +23,7 @@
     "browser-image-compression": "^2.0.2",
     "country-state-city": "^3.2.1",
     "crypto-ts": "^1.0.2",
+    "date-fns": "^3.6.0",
     "moment": "^2.30.1",
     "path": "^0.12.7",
     "pintura": "^0.3.10",

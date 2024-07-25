@@ -93,7 +93,7 @@ export const MUIDataGrid = styled(DataGrid)(({ theme }) => ({
         backgroundColor: theme.palette.background.neutral,
     },
     '& ::-webkit-scrollbar-thumb': {
-        backgroundColor: theme.palette.grey[500],
+        backgroundColor: theme.palette.text.primary,
     },
 
     // Media query for small screens

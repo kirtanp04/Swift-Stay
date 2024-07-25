@@ -17,4 +17,5 @@ body{
 .lazyload-wrapper {
   height: 100%;
   width: 100%;
+  /* text-transform: capitalize; */
 }

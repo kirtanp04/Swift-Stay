@@ -6,13 +6,10 @@ import {
   LocationIcon,
   PersonIcon,
 } from "src/assets/iconify";
+import DateFormatter from "src/common/DateFormate";
+import DataPickerDialog from "src/components/DataPickerDialog";
 import { UserSearchObj as TUserSearchObj } from "src/context/UserSearchContext";
 import useUserSearch from "src/hooks/useUserSearch";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// import { DatePicker } from "@mui/x-date-pickers";
-// import { SingleInputDateRangeField } from "@mui/x-date-pickers-pro/SingleInputDateRangeField";
-// import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 
 const IconSize = {
   height: 22,
@@ -24,6 +21,7 @@ export default function HomePage() {
   const [UserSearch, setUserSearch] = useState<TUserSearchObj>(UserSearchObj);
   const [ShowDateRange, setShowDateRange] = useState<boolean>(false);
   const theme = useTheme();
+  const _Date = DateFormatter.getInstance();
 
   const UpdateUserSearch = <K extends keyof TUserSearchObj>(
     PropertyName: K,
@@ -32,16 +30,24 @@ export default function HomePage() {
     setUserSearch({ ...UserSearch, [PropertyName]: value });
   };
 
-  const OnChangeDatePicker = (res: any) => {
-    console.log(res);
+  const onSelectDateRange = (startDate: Date, endDate: Date) => {
+    setUserSearch({
+      ...UserSearch,
+      checkInDate: startDate,
+      checkOutDate: endDate,
+    });
+    console.log(_Date.formatToDDMMYYYY(startDate));
   };
 
   return (
     <RootStyle>
       <FilterBox>
         <FilterBoxContainer>
-          <LocationIcon {...IconSize} IconColor={theme.palette.text.disabled} />
-          <FilterBoxButton onClick={() => setShowDateRange(true)}>
+          <LocationIcon
+            {...IconSize}
+            IconColor={theme.palette.text.secondary}
+          />
+          <FilterBoxButton>
             <FilterBoxButtonText>Where are you going?</FilterBoxButtonText>
           </FilterBoxButton>
           {UserSearch.selectedCity !== "" && (
@@ -55,18 +61,20 @@ export default function HomePage() {
 
         <Divider />
 
-        <FilterBoxContainer>
-          <CalenderIcon {...IconSize} IconColor={theme.palette.text.disabled} />
+        <FilterBoxContainer onClick={() => setShowDateRange(true)}>
+          <CalenderIcon
+            {...IconSize}
+            IconColor={theme.palette.text.secondary}
+          />
           <FilterBoxButton>
             <FilterBoxButtonText>
-              {/* <LocalizationProvider dateAdapter={AdapterDayjs}> */}
-              {/* <DemoContainer components={["SingleInputDateRangeField"]}> */}
-              {/* <DatePicker
-                // slots={{ field: SingleInputDateRangeField }}
-                name="allowedRange"
-              /> */}
-              {/* </DemoContainer> */}
-              {/* </LocalizationProvider> */}
+              {UserSearch.checkInDate !== null
+                ? _Date.formatToDDMMYYYY(UserSearch.checkInDate)
+                : "Check-in date"}{" "}
+              |{" "}
+              {UserSearch.checkOutDate !== null
+                ? _Date.formatToDDMMYYYY(UserSearch.checkOutDate)
+                : "Check-out date"}
             </FilterBoxButtonText>
           </FilterBoxButton>
           {UserSearch.checkInDate !== null ||
@@ -82,7 +90,7 @@ export default function HomePage() {
         <Divider />
 
         <FilterBoxContainer>
-          <PersonIcon {...IconSize} IconColor={theme.palette.text.disabled} />
+          <PersonIcon {...IconSize} IconColor={theme.palette.text.secondary} />
           <FilterBoxButton>
             <FilterBoxButtonText>
               {UserSearch.adults} adults . {UserSearch.children} children .{" "}
@@ -93,6 +101,15 @@ export default function HomePage() {
         <Divider />
         <FilterSearchButtonWrapper>Search</FilterSearchButtonWrapper>
       </FilterBox>
+
+      {ShowDateRange && (
+        <DataPickerDialog
+          defaultStartDate={UserSearch.checkInDate}
+          onClose={() => setShowDateRange(false)}
+          defaultEndDate={UserSearch.checkOutDate}
+          onSelectDateRange={onSelectDateRange}
+        />
+      )}
     </RootStyle>
   );
 }
