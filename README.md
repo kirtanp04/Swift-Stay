@@ -1,4 +1,4 @@
-<img src='https://i.postimg.cc/02RP6r8X/logos-squarespace.png' alt='logo'/>  # Concepts that are followed in this Project
+# Concepts that are followed in this Project
 
 <div style="display: flex; justify-content: space-between;">
 
