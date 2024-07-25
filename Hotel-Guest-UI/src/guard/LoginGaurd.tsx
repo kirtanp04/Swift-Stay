@@ -13,7 +13,7 @@ export default function LoginGaurd({ children }: Props) {
   } = useAuth();
 
   if (isAuthenticated) {
-    return <Navigate to={Path.dashboard} />;
+    return <Navigate to={Path.root} />;
   }
 
   return <>{children}</>;

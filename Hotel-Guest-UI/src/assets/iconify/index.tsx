@@ -486,7 +486,7 @@ export function HorizontalMenuIcon({ IconColor, ...other }: Props) {
   );
 }
 
-export function FaviconIcon() {
+export function FaviconIcon({ IconColor, ...other }: Props) {
   const theme = useTheme();
   return (
     <svg
@@ -496,26 +496,27 @@ export function FaviconIcon() {
       width="50"
       height="50"
       viewBox="0 0 172 172"
-      fill="hsl(142.1 70.6% 45.3%)"
+      fill={theme.themeColor}
+      {...other}
     >
       <g
         fill="none"
-        fill-rule="nonzero"
+        fillRule="nonzero"
         stroke="none"
-        stroke-width="1"
-        stroke-linecap="butt"
-        stroke-linejoin="miter"
-        stroke-miterlimit="10"
-        stroke-dasharray=""
-        stroke-dashoffset="0"
-        font-family="none"
-        font-weight="none"
-        font-size="none"
-        text-anchor="none"
+        strokeWidth="1"
+        strokeLinecap="butt"
+        strokeLinejoin="miter"
+        strokeMiterlimit="10"
+        strokeDasharray=""
+        strokeDashoffset="0"
+        fontFamily="none"
+        fontWeight="none"
+        fontSize="none"
+        textAnchor="none"
         style={{ mixBlendMode: "normal" }}
       >
         <path d="M0,172v-172h172v172z" fill="none"></path>
-        <g fill="hsl(142.1 70.6% 45.3%)">
+        <g fill={IconColor}>
           <path d="M21.5,21.5v129h64.5v-32.25v-64.5v-32.25zM86,53.75c0,17.7805 14.4695,32.25 32.25,32.25c17.7805,0 32.25,-14.4695 32.25,-32.25c0,-17.7805 -14.4695,-32.25 -32.25,-32.25c-17.7805,0 -32.25,14.4695 -32.25,32.25zM118.25,86c-17.7805,0 -32.25,14.4695 -32.25,32.25c0,17.7805 14.4695,32.25 32.25,32.25c17.7805,0 32.25,-14.4695 32.25,-32.25c0,-17.7805 -14.4695,-32.25 -32.25,-32.25z"></path>
         </g>
       </g>

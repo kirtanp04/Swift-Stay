@@ -1,14 +1,11 @@
 
 
-export const CommonPath = {
-    login: '/',
-    signUp: '/register',
-    aboutus: '/about',
-    contact: '/contact-us'
-}
 
-const rootPath = '/swiftstay'
+
+const rootPath = '/'
 
 export const Path = {
-    root: rootPath
+    root: rootPath,
+    login: rootPath + 'signin',
+    signup: rootPath + 'signup'
 }

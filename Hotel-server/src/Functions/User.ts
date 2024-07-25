@@ -61,13 +61,20 @@ class Functions {
     public objParam: TParam = new TParam();
 
     public CreateGuestAccount = async (): Promise<UserResponse> => {
-        const { createdAt, email, name, password, phone, profileImg, role } = this.objParam!.data as UserClass;
+        const { createdAt, email, name, password, phone, profileImg, role, country } = this.objParam!.data as UserClass;
 
         try {
             const isUser: UserClass | null = await User.findOne({ email: email });
 
             if (isUser) {
-                this.objUserResponse = GetUserErrorObj('Email ID already exist. Enter another Email ID.', HttpStatusCodes.BAD_REQUEST);
+                if (isUser.role === enumUserRole.admin) {
+                    this.objUserResponse = GetUserErrorObj(
+                        'Email ID already use as Admin Email. Enter another Email ID.',
+                        HttpStatusCodes.BAD_REQUEST
+                    );
+                } else {
+                    this.objUserResponse = GetUserErrorObj('Email ID already exist. Enter another Email ID.', HttpStatusCodes.BAD_REQUEST);
+                }
             } else {
                 const objHashPass = await Crypt.hashValue(password);
 
@@ -75,17 +82,42 @@ class Functions {
                     this.objUserResponse = GetUserErrorObj(objHashPass.error, HttpStatusCodes.BAD_REQUEST);
                 } else {
                     const newUser = await User.create({
-                        createdAt,
-                        email,
                         name,
-                        phone,
-                        profileImg,
-                        role,
+                        email,
                         password: objHashPass.data,
+                        profileImg,
+                        country,
+                        phone,
+                        role,
+                        createdAt,
                     });
                     newUser.save();
+                    const Token = Jwt.SignJwt({ _id: newUser._id, email: newUser.email }, '5m');
+                    if (Token.error === '') {
+                        let Mail = new Email({ next: this.next! });
+                        Mail.from = 'kirtanpatel6189@gmail.com';
+                        Mail.to = email;
+                        Mail.subject = 'Email Verification';
+                        Mail.html = EmailTemplate.EmailVerification(name, Token.data);
 
-                    this.objUserResponse = GetUserSuccessObj('User has been created', HttpStatusCodes.CREATED);
+                        let isError: boolean = false;
+
+                        Mail.sendEmail(
+                            () => { },
+                            (err) => {
+                                this.objUserResponse = GetUserErrorObj(err, HttpStatusCodes.BAD_REQUEST);
+                                isError = true;
+                            }
+                        );
+                        if (!isError) {
+                            this.objUserResponse = GetUserSuccessObj('We have sent an Email for verification.', HttpStatusCodes.CREATED);
+
+                        }
+                    } else {
+                        this.objUserResponse = GetUserErrorObj(Token.error, HttpStatusCodes.BAD_REQUEST);
+                    }
+
+                    //   this.objUserResponse = GetUserSuccessObj('User has been created', HttpStatusCodes.CREATED);
                 }
             }
         } catch (error: any) {
@@ -106,15 +138,73 @@ class Functions {
             } else {
                 const isVerifiedPassword = await Crypt.compareHash(isUser.password, password);
 
-                if (isVerifiedPassword) {
-                    if (isUser.role === enumUserRole.admin) {
+                if (isVerifiedPassword.error === '') {
+
+                    if (isUser.isEmailVerified) {
+                        if (isUser.role === enumUserRole.guest) {
+                            const getToken = await Jwt.SignJwt({
+                                email: isUser.email,
+                                name: isUser.name,
+                                profileImg: isUser.profileImg,
+                                role: isUser.role,
+                                country: isUser.country
+                            });
+                            if (getToken.error === '') {
+                                const setCookie = Storage.setCookie('Auth', getToken.data, this.res!);
+
+                                if (setCookie.error === '') {
+                                    let _Email = new Email({ next: this.next! });
+
+                                    _Email.from = 'kirtanpatel6189@gmail.com';
+                                    _Email.to = email;
+                                    _Email.subject = 'login Activity';
+                                    _Email.html = EmailTemplate.LogedIn(isUser.name);
+
+                                    let isError: boolean = false;
+
+                                    _Email.sendEmail(
+                                        () => { },
+                                        (err) => {
+                                            if (err) {
+                                                this.objUserResponse = GetUserErrorObj(err, HttpStatusCodes.BAD_REQUEST);
+                                                isError = true;
+                                            }
+                                        }
+                                    );
+
+                                    if (!isError) {
+                                        this.objUserResponse = GetUserSuccessObj(
+                                            {
+                                                email: isUser.email,
+                                                name: isUser.name,
+                                                profile: isUser.profileImg,
+                                                role: isUser.role,
+                                                id: isUser._id,
+                                                isEmailVerified: isUser.isEmailVerified,
+                                                country: isUser.country
+                                            },
+                                            HttpStatusCodes.ACCEPTED
+                                        );
+                                    }
+                                } else {
+                                    this.objUserResponse = GetUserErrorObj('Server error: not able to setcookie', HttpStatusCodes.BAD_REQUEST);
+                                }
+                            } else {
+                                this.objUserResponse = GetUserErrorObj(getToken.error, HttpStatusCodes.BAD_REQUEST);
+                            }
+                        } else {
+                            this.objUserResponse = GetUserErrorObj(
+                                'You cannot login through your admin account. Use your guest account / Create new one.',
+                                HttpStatusCodes.NOT_ACCEPTABLE
+                            );
+                        }
+                    } else {
                         this.objUserResponse = GetUserErrorObj(
-                            'You cannot login through your admin account. Use your guest account / Create new one.',
+                            'Your Email is not verified. verified your email first.',
                             HttpStatusCodes.NOT_ACCEPTABLE
                         );
-                    } else {
-                        this.objUserResponse = GetUserSuccessObj('login: Success');
                     }
+
                 } else {
                     this.objUserResponse = GetUserErrorObj('Wrong credentials, enter correct password.', HttpStatusCodes.NOT_ACCEPTABLE);
                 }
@@ -128,7 +218,7 @@ class Functions {
 
     public CreateManagerAccount = async (): Promise<UserResponse> => {
         try {
-            const { createdAt, email, name, password, phone, profileImg, role } = this.objParam!.data as UserClass;
+            const { createdAt, email, name, password, phone, profileImg, role, country } = this.objParam!.data as UserClass;
 
             const isUser: UserClass | null = await User.findOne({ email: email });
 
@@ -152,11 +242,12 @@ class Functions {
                         email,
                         password: objHashPass.data,
                         profileImg,
+                        country,
                         phone,
                         role,
                         createdAt,
                     });
-
+                    newUser.save();
                     const Token = Jwt.SignJwt({ _id: newUser._id, email: newUser.email }, '5m');
 
                     if (Token.error === '') {
@@ -177,7 +268,7 @@ class Functions {
                         );
                         if (!isError) {
                             this.objUserResponse = GetUserSuccessObj('We have sent an Email for verification.', HttpStatusCodes.CREATED);
-                            newUser.save();
+
                         }
                     } else {
                         this.objUserResponse = GetUserErrorObj(Token.error, HttpStatusCodes.BAD_REQUEST);
@@ -202,7 +293,7 @@ class Functions {
 
                 if (isVerifiePass.error === '') {
                     if (isUser.isEmailVerified) {
-                        if (isUser.role !== enumUserRole.guest) {
+                        if (isUser.role === enumUserRole.admin) {
                             const getToken = await Jwt.SignJwt({
                                 email: isUser.email,
                                 name: isUser.name,
@@ -220,28 +311,31 @@ class Functions {
                                     _Email.subject = 'login Activity';
                                     _Email.html = EmailTemplate.LogedIn(isUser.name);
 
-                                    let isError: boolean = false
+                                    let isError: boolean = false;
 
                                     _Email.sendEmail(
-                                        () => {
-
-                                        },
+                                        () => { },
                                         (err) => {
                                             if (err) {
                                                 this.objUserResponse = GetUserErrorObj(err, HttpStatusCodes.BAD_REQUEST);
-                                                isError = true
+                                                isError = true;
                                             }
                                         }
-
                                     );
 
                                     if (!isError) {
                                         this.objUserResponse = GetUserSuccessObj(
-                                            { email: isUser.email, name: isUser.name, profile: isUser.profileImg, role: isUser.role, id: isUser._id, isEmailVerified: isUser.isEmailVerified },
+                                            {
+                                                email: isUser.email,
+                                                name: isUser.name,
+                                                profile: isUser.profileImg,
+                                                role: isUser.role,
+                                                id: isUser._id,
+                                                isEmailVerified: isUser.isEmailVerified,
+                                            },
                                             HttpStatusCodes.ACCEPTED
                                         );
                                     }
-
                                 } else {
                                     this.objUserResponse = GetUserErrorObj('Server error: not able to setcookie', HttpStatusCodes.BAD_REQUEST);
                                 }
@@ -313,7 +407,14 @@ class Functions {
                         );
                         if (isUserUpdated) {
                             this.objUserResponse = GetUserSuccessObj(
-                                { email: isUser.email, name: isUser.name, profile: isUser.profileImg, role: isUser.role, id: isUser._id, isEmailVerified: isUser.isEmailVerified },
+                                {
+                                    email: isUser.email,
+                                    name: isUser.name,
+                                    profile: isUser.profileImg,
+                                    role: isUser.role,
+                                    id: isUser._id,
+                                    isEmailVerified: isUser.isEmailVerified,
+                                },
                                 HttpStatusCodes.ACCEPTED
                             );
                         }
@@ -321,7 +422,10 @@ class Functions {
                         this.objUserResponse = GetUserErrorObj('Email is already been verifyed.', HttpStatusCodes.BAD_REQUEST);
                     }
                 } else {
-                    this.objUserResponse = GetUserErrorObj('Server Error: No User Found / Invalid Token provided', HttpStatusCodes.BAD_REQUEST);
+                    this.objUserResponse = GetUserErrorObj(
+                        'Server Error: No User Found / Invalid Token provided',
+                        HttpStatusCodes.BAD_REQUEST
+                    );
                 }
             } else {
                 this.objUserResponse = GetUserErrorObj('Server Error: Invalid Token provided', HttpStatusCodes.BAD_REQUEST);

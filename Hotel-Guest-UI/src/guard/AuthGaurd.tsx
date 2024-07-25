@@ -35,7 +35,7 @@ export default function AuthGaurd({ children }: Props) {
     return <Login />;
   }
 
-  if (role === enumUserRole.admin) {
+  if (role === enumUserRole.guest) {
     if (requestedLocation && pathname !== requestedLocation) {
       setRequestedLocation(null);
       return <Navigate to={requestedLocation} />;

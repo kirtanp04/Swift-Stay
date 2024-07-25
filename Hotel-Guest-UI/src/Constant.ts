@@ -11,25 +11,20 @@ export const BackendBaseApi = 'http://localhost:8080' // main api for manager
 
 export const Param = {
     broker: {
-        manager: {
-            Auth: 'ManagerAuthBroker',
-            Property: 'ManagerPropertyBroker',
-            Room: 'ManagerRoomBroker',
-            chat: 'ManagerChatBroker'
-        },
 
-        guest: {
-            Auth: 'GuestAuthBroker',
-            Property: 'GuestPropertyBroker',
-            Room: 'GuestRoomBroker',
-        },
+
+
+        Auth: 'GuestAuthBroker',
+        Property: 'GuestPropertyBroker',
+        Room: 'GuestRoomBroker',
+
     },
 
     function: {
-        guest: {
-            register: 'CreateGuestAccount',
-            login: 'GuestLogin',
-        },
+
+        register: 'CreateGuestAccount',
+        login: 'GuestLogin',
+
     },
 };
 

@@ -18,7 +18,9 @@ export class _Register {
     name: string = "";
     email: string = "";
     password: string = "";
+    isEmailVerified: boolean = false;
     confirmPassword: string = "";
+    country?: string = '';
     profileImg: string = "";
     phone: string = "";
     role: enumUserRole = enumUserRole.guest;
@@ -33,7 +35,7 @@ export class Auth {
         onFail: (err: any) => void
     ) => {
         try {
-            const _Param = getPostParamData(Param.broker.manager.Auth, Param.function.guest.register);
+            const _Param = getPostParamData(Param.broker.Auth, Param.function.register);
 
             await Api.post(_Param, objRegister, (res) => {
                 if (res.error === "") {
@@ -54,7 +56,7 @@ export class Auth {
         onFail: (err: any) => void
     ) => {
         try {
-            const _Param = getPostParamData(Param.broker.manager.Auth, Param.function.guest.login);
+            const _Param = getPostParamData(Param.broker.Auth, Param.function.login);
             await Api.post(_Param, objLogin, (res) => {
                 if (res.error === "") {
                     onsuccess(res.data);

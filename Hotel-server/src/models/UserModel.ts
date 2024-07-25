@@ -13,13 +13,15 @@ export class Login {
 }
 
 export class UserClass {
-    _id: string = '';
-    name: string = '';
-    email: string = '';
-    password: string = '';
+    _id?: string = "";
+    name: string = "";
+    email: string = "";
+    password: string = "";
     isEmailVerified: boolean = false;
-    profileImg: string = '';
-    phone: string = '';
+    confirmPassword: string = "";
+    country: string = '';
+    profileImg: string = "";
+    phone: string = "";
     role: enumUserRole = enumUserRole.guest;
     createdAt: Date = new Date();
 }
@@ -44,6 +46,11 @@ const UserSchema = new Schema<UserClass>({
     },
     profileImg: {
         type: String,
+    },
+    country: {
+        type: String,
+        required: [true, 'Country is required.'],
+        unique: true,
     },
     phone: {
         type: String,

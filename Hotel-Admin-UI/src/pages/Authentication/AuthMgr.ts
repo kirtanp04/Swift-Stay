@@ -20,9 +20,10 @@ export class _Register {
     password: string = "";
     isEmailVerified: boolean = false;
     confirmPassword: string = "";
+    country: string = '';
     profileImg: string = "";
     phone: string = "";
-    role: enumUserRole = enumUserRole.admin;
+    role: enumUserRole = enumUserRole.guest;
     createdAt: Date = new Date();
 }
 

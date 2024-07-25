@@ -17,7 +17,7 @@ export const MUITextField = styled(TextField)(({ theme }) => ({
   },
 }));
 
-export default function FormTextFiels<T extends FieldValues>({
+export default function FormTextField<T extends FieldValues>({
   name,
   ...other
 }: Props<T>) {

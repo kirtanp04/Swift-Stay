@@ -3,24 +3,27 @@ import {
   Box,
   Button,
   Divider,
-  Typography,
   styled,
+  Typography,
   useTheme,
 } from "@mui/material";
+import { Country, ICountry } from "country-state-city";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { NavLink } from "react-router-dom";
 import { CommonPath } from "src/Router/path";
 import { FaviconIcon } from "src/assets/iconify";
 import FormProvider from "src/components/Form/FormProvider";
+import FormSelectField from "src/components/Form/FormSelectField";
 import FormTextField from "src/components/Form/FormTextField";
 import Page from "src/components/Page";
-import showMessage from "src/util/ShowMessage";
 import * as yup from "yup";
-import { Auth, _Register } from "./AuthMgr";
-import { NavLink } from "react-router-dom";
+import { _Register, Auth } from "./AuthMgr";
 
 const registerSchema = yup.object().shape({
   _id: yup.string(),
   name: yup.string().required("Name is required"),
+  country: yup.string().required("Country is required"),
   email: yup
     .string()
     .email("Email must be a valid email")
@@ -45,6 +48,7 @@ const registerSchema = yup.object().shape({
 });
 
 export default function Register() {
+  const [Countries] = useState<ICountry[]>(Country.getAllCountries());
   const _Method = useForm<_Register>({
     defaultValues: new _Register(),
     resolver: yupResolver(registerSchema) as any,
@@ -55,10 +59,10 @@ export default function Register() {
     Auth.Register(
       objRegister,
       (res) => {
-        showMessage(res, theme, () => {});
+        alert(res);
       },
       (err) => {
-        showMessage(err, theme, () => {});
+        alert(err);
       }
     );
   };
@@ -88,7 +92,7 @@ export default function Register() {
                 textTransform={"uppercase"}
                 fontSize={"1.5rem"}
               >
-                Quick Stay
+                Stay Swift
               </Typography>
             </Row>
 
@@ -110,6 +114,23 @@ export default function Register() {
                     variant="outlined"
                   />
 
+                  <FormSelectField
+                    variant="outlined"
+                    label="Country"
+                    name="country"
+                  >
+                    <option value=""></option>
+                    {Countries.map((objCountry) => (
+                      <option
+                        value={objCountry.name + "-" + objCountry.isoCode}
+                        key={objCountry.isoCode}
+                      >
+                        {objCountry.name}
+                      </option>
+                    ))}
+                  </FormSelectField>
+                </InputWrapper>
+                <InputWrapper>
                   <FormTextField
                     name="phone"
                     label="Phone"
@@ -193,7 +214,7 @@ const RootStyle = styled(Box)(({ theme }) => ({
   flexDirection: "column",
 }));
 
-const FieldWrapper = styled(Box)(() => ({
+const FieldWrapper = styled(Box)(({ theme }) => ({
   width: "100%",
   padding: "0.8rem",
   display: "flex",
@@ -201,6 +222,9 @@ const FieldWrapper = styled(Box)(() => ({
   flexDirection: "column",
   marginTop: "2rem",
   gap: "0.5rem",
+  [theme.breakpoints.down("xl")]: {
+    marginTop: "1.5rem",
+  },
 }));
 
 const InputWrapper = styled(Box)(({ theme }) => ({
@@ -220,7 +244,7 @@ const Row = styled(Box)(() => ({
   width: "100%",
 }));
 
-const ContentWrapper = styled(Box)(() => ({
+const ContentWrapper = styled(Box)(({ theme }) => ({
   boxSizing: "border-box",
   display: "flex",
   flexFlow: "wrap",
@@ -229,6 +253,12 @@ const ContentWrapper = styled(Box)(() => ({
   alignItems: "center",
   minHeight: "calc(100vh - 70px)",
   margin: "auto",
+  [theme.breakpoints.down("xl")]: {
+    width: "35%",
+  },
+  [theme.breakpoints.down("md")]: {
+    width: "40%",
+  },
 }));
 
 const Footer = styled(Box)(() => ({
@@ -253,13 +283,16 @@ const Text = styled(NavLink)(({ theme }) => ({
   cursor: "pointer",
 }));
 
-const SignUpTextWrapper = styled(Typography)(() => ({
+const SignUpTextWrapper = styled(Typography)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   justifyContent: "space-between",
   width: "100%",
   alignItems: "center",
   marginTop: "2.5rem",
+  [theme.breakpoints.down("xl")]: {
+    marginTop: "1rem",
+  },
 }));
 
 const SignUpText = styled(Typography)(({ theme }) => ({

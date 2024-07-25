@@ -1,10 +1,19 @@
 import { Box, styled, Typography } from "@mui/material";
+import { useNavigate, useNavigation } from "react-router-dom";
 
 import FlagIcon from "src/components/FlagIcon";
+import useAuth from "src/hooks/useAuth";
+import { Path } from "src/Router/path";
 
 type Props = {};
 
 export default function NavBarContent({}: Props) {
+  const navigate = useNavigate();
+  const {
+    user: {
+      userInfo: { country },
+    },
+  } = useAuth();
   return (
     <RootStyle>
       <LogoWrapper>
@@ -14,15 +23,17 @@ export default function NavBarContent({}: Props) {
 
       <RightContentWrapper>
         <CountryDetailWrapper>
-          <CountryName>IND</CountryName>
-          <FlagIcon countryName="India" />
+          <CountryName>{country.split("-")[1]}</CountryName>
+          <FlagIcon countryName={country.split("-")[0] as any} />
         </CountryDetailWrapper>
 
         <ListPropertyButton>List your property</ListPropertyButton>
 
         <AuthWrapper>
           <LoginButton>Sign in</LoginButton>
-          <SignupButton>Sign up</SignupButton>
+          <SignupButton onClick={() => navigate(Path.signup)}>
+            Sign up
+          </SignupButton>
         </AuthWrapper>
       </RightContentWrapper>
     </RootStyle>
