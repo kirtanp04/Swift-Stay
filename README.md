@@ -13,6 +13,10 @@
 - **Real_Time_Chat**
 
   - Socket.io
+ 
+- **Authentication**
+
+  - Email Authentication (for email verification)
 
 - **Protection**
 
