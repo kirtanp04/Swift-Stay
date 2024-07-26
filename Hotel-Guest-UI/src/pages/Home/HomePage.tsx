@@ -7,8 +7,10 @@ import {
   PersonIcon,
 } from "src/assets/iconify";
 import DateFormatter from "src/common/DateFormate";
-import DataPickerDialog from "src/components/DataPickerDialog";
+import DataPickerDialog from "src/components/UserSearchInput/DataPickerDialog";
+import SearchCityDialog from "src/components/UserSearchInput/SearchCityDialog";
 import { UserSearchObj as TUserSearchObj } from "src/context/UserSearchContext";
+import useAuth from "src/hooks/useAuth";
 import useUserSearch from "src/hooks/useUserSearch";
 
 const IconSize = {
@@ -20,7 +22,14 @@ export default function HomePage() {
   const { UserSearchObj } = useUserSearch();
   const [UserSearch, setUserSearch] = useState<TUserSearchObj>(UserSearchObj);
   const [ShowDateRange, setShowDateRange] = useState<boolean>(false);
+  const [ShowSelectCityDialog, setShowSelectCityDialog] =
+    useState<boolean>(false);
   const theme = useTheme();
+  const {
+    user: {
+      userInfo: { country },
+    },
+  } = useAuth();
   const _Date = DateFormatter.getInstance();
 
   const UpdateUserSearch = <K extends keyof TUserSearchObj>(
@@ -36,7 +45,10 @@ export default function HomePage() {
       checkInDate: startDate,
       checkOutDate: endDate,
     });
-    console.log(_Date.formatToDDMMYYYY(startDate));
+  };
+
+  const onSelectState = (stateName: string) => {
+    UpdateUserSearch("selectedState", stateName);
   };
 
   return (
@@ -47,44 +59,57 @@ export default function HomePage() {
             {...IconSize}
             IconColor={theme.palette.text.secondary}
           />
-          <FilterBoxButton>
-            <FilterBoxButtonText>Where are you going?</FilterBoxButtonText>
+          <FilterBoxButton onClick={() => setShowSelectCityDialog(true)}>
+            <FilterBoxButtonText>
+              {UserSearch.selectedState !== ""
+                ? UserSearch.selectedState
+                : "Where are you going?"}
+            </FilterBoxButtonText>
           </FilterBoxButton>
-          {UserSearch.selectedCity !== "" && (
+          {UserSearch.selectedState !== "" && (
             <CloseIcon
               {...IconSize}
               IconColor={theme.palette.text.disabled}
               style={{ marginLeft: "auto" }}
+              onClick={() =>
+                setUserSearch({ ...UserSearch, selectedState: "" })
+              }
             />
           )}
         </FilterBoxContainer>
 
         <Divider />
 
-        <FilterBoxContainer onClick={() => setShowDateRange(true)}>
+        <FilterBoxContainer>
           <CalenderIcon
             {...IconSize}
             IconColor={theme.palette.text.secondary}
           />
-          <FilterBoxButton>
+          <FilterBoxButton onClick={() => setShowDateRange(true)}>
             <FilterBoxButtonText>
               {UserSearch.checkInDate !== null
                 ? _Date.formatToDDMMYYYY(UserSearch.checkInDate)
-                : "Check-in date"}{" "}
-              |{" "}
+                : "Check-in date"}
+              {"  "}|{"  "}
               {UserSearch.checkOutDate !== null
                 ? _Date.formatToDDMMYYYY(UserSearch.checkOutDate)
                 : "Check-out date"}
             </FilterBoxButtonText>
           </FilterBoxButton>
-          {UserSearch.checkInDate !== null ||
-            (UserSearch.checkOutDate !== null && (
-              <CloseIcon
-                {...IconSize}
-                IconColor={theme.palette.text.disabled}
-                style={{ marginLeft: "auto" }}
-              />
-            ))}
+          {UserSearch.checkInDate !== null && (
+            <CloseIcon
+              {...IconSize}
+              IconColor={theme.palette.text.disabled}
+              style={{ marginLeft: "auto" }}
+              onClick={() =>
+                setUserSearch({
+                  ...UserSearch,
+                  checkInDate: null,
+                  checkOutDate: null,
+                })
+              }
+            />
+          )}
         </FilterBoxContainer>
 
         <Divider />
@@ -108,6 +133,14 @@ export default function HomePage() {
           onClose={() => setShowDateRange(false)}
           defaultEndDate={UserSearch.checkOutDate}
           onSelectDateRange={onSelectDateRange}
+        />
+      )}
+
+      {ShowSelectCityDialog && (
+        <SearchCityDialog
+          onClose={() => setShowSelectCityDialog(false)}
+          countryCode={country.split("-")[1]}
+          onSelectState={onSelectState}
         />
       )}
     </RootStyle>
@@ -166,6 +199,7 @@ const FilterBoxButtonText = styled("span")(({ theme }) => ({
   overflow: "hidden",
   textOverflow: "ellipsis",
   lineHeight: "20px",
+  cursor: "pointer",
 }));
 
 const FilterSearchButtonWrapper = styled(Box)(({ theme }) => ({

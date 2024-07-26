@@ -3,7 +3,7 @@ import { Crypt } from "src/common/Crypt";
 import { Storage } from "src/common/Storage";
 
 export class UserSearchObj {
-  selectedCity: string = "";
+  selectedState: string = "";
   checkInDate: Date | null = null;
   checkOutDate: Date | null = null;
   totalRoom: number = 1;
