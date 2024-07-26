@@ -41,6 +41,9 @@ export const Param = {
         guest: {
             register: 'CreateGuestAccount',
             login: 'GuestLogin',
+            property: {
+                GetAllPropertyByState: 'GuestGetAllPropertyByState'
+            }
         },
     },
 };

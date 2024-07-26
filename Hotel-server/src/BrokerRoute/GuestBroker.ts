@@ -14,26 +14,32 @@ const _GuestAuthBroker: string = Param.broker.guest.Auth;
 const _GuestPropertyBroker: string = Param.broker.guest.Property;
 const _GuestRoomBroker: string = Param.broker.guest.Room;
 
-GuestBrokerRouter.get('/:param', (req: Request, res: Response, next: NextFunction) => {
-    const { param } = req.params;
+GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const isDBConnected = await MongoDB.ConnectDB(next)
 
-    console.log(param)
+        if (isDBConnected.isError === false) {
+            const { param } = req.params;
+            const objDecrypt = Crypt.Decryption(param);
+
+            if (objDecrypt.error === '') {
+                const paramObj: TParam = objDecrypt.data;
 
 
-    const objDecrypt = Crypt.Decryption(param);
+                if (paramObj.Broker === _GuestPropertyBroker) {
+                    const _res = await Functions.PropertyFunction.findFunction(paramObj, req, res, next)
+                    return SendResponseToUser(_res, next);
+                }
 
-    console.log(objDecrypt)
-    // const paramObj = objDecrypt.data as TParam;
 
-    // if (paramObj.Broker === _GuestBroker) {
-    //     const _UserFunction = new Functions.UserFunction(paramObj, req, res, next);
-    //     return SendResponseToUser(_UserFunction.objUserResponse, next);
-    // }
+            } else {
+                return SendResponseToUser(GetUserErrorObj(`Server Error: ${objDecrypt.error}`, 404), next);
+            }
+        }
 
-    // if (paramObj.Broker === _GuestHotelBroker) {
-    //     const _HotelFunction = new Functions.HotelFunction(paramObj, req, res, next)
-    //     return SendResponseToUser(_HotelFunction.objUserResponse, next)
-    // }
+    } catch (error: any) {
+        return SendResponseToUser(GetUserErrorObj(`Server Error: ${error.message}`, 404), next);
+    }
 });
 
 GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: NextFunction) => {

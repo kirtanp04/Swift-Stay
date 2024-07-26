@@ -13,6 +13,9 @@ const _GetAllProperty = Param.function.manager.Property.GetAllProperty;
 const _UpdateProperty = Param.function.manager.Property.UpdateProperty;
 const _DeleteProperty = Param.function.manager.Property.DeleteProperty;
 
+// Guest--
+const _GetAllPropertyByState = Param.function.guest.property.GetAllPropertyByState
+
 export class PropertyFunction {
     private static objUserResponse: UserResponse = new UserResponse();
 

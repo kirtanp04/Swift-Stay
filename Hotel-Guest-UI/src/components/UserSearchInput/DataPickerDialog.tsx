@@ -36,9 +36,62 @@ export default function DataPickerDialog({
       const RangeWrapper = document.querySelectorAll(
         ".rdrDefinedRangesWrapper "
       );
+
+      const MonthAndYearWrapper = document.querySelectorAll(
+        ".rdrMonthAndYearWrapper"
+      );
+
+      const DayNumber = document.querySelectorAll(".rdrDayNumber");
+
+      const DateDisplayWrapper = document.querySelectorAll(".rdrDay");
+
+      const Day = document.querySelectorAll(".rdrDay");
+
+      const DayDisabled = document.querySelectorAll(".rdrDayDisabled");
+
+      // const DayDisabled = document.querySelectorAll("rdrDayDisabled");
+      const MonthWrapper = document.querySelectorAll(".rdrMonth");
+
+      const DateDisplayItem = document.querySelectorAll(
+        ".rdrDateDisplayWrapper"
+      );
+
+      const NextPrevButton = document.querySelectorAll(".rdrNextPrevButton");
       staticRangeSpans.forEach((span: any) => {
         span.style.color = theme.palette.background.default;
         span.style.textTransform = "capitalize";
+      });
+
+      NextPrevButton.forEach((span: any) => {
+        span.style.backgroundColor = theme.palette.text.primary;
+      });
+
+      MonthAndYearWrapper.forEach((span: any) => {
+        span.style.backgroundColor = theme.palette.background.neutral;
+      });
+
+      // DayDisabled.forEach((span: any) => {
+      //   span.style.backgroundColor = theme.palette.background.neutral;
+      // });
+
+      MonthWrapper.forEach((span: any) => {
+        span.style.backgroundColor = theme.palette.background.neutral;
+      });
+
+      DateDisplayItem.forEach((span: any) => {
+        span.style.backgroundColor = theme.palette.background.neutral;
+      });
+
+      DateDisplayWrapper.forEach((span: any) => {
+        span.style.backgroundColor = theme.palette.background.neutral;
+      });
+
+      DayDisabled.forEach((span: any) => {
+        span.style.backgroundColor = theme.palette.background.neutral;
+      });
+
+      Day.forEach((span: any) => {
+        span.style.color = theme.palette.text.primary;
       });
 
       RangeWrapper.forEach((span: any) => {
@@ -50,6 +103,31 @@ export default function DataPickerDialog({
         const spans = div.querySelectorAll("span");
         spans.forEach((span) => {
           span.style.color = theme.palette.background.default;
+          span.style.textTransform = "capitalize";
+        });
+      });
+      DayNumber.forEach((div) => {
+        const spans = div.querySelectorAll("span");
+        spans.forEach((span) => {
+          span.style.color = theme.palette.text.primary;
+          span.style.textTransform = "capitalize";
+        });
+      });
+
+      const MonthPicker = document.querySelectorAll(".rdrMonthPicker");
+      MonthPicker.forEach((div) => {
+        const select = div.querySelectorAll("select");
+        select.forEach((span) => {
+          span.style.color = theme.palette.text.primary;
+          span.style.textTransform = "capitalize";
+        });
+      });
+
+      const YearPicker = document.querySelectorAll(".rdrYearPicker");
+      YearPicker.forEach((div) => {
+        const select = div.querySelectorAll("select");
+        select.forEach((span) => {
+          span.style.color = theme.palette.text.primary;
           span.style.textTransform = "capitalize";
         });
       });
@@ -97,6 +175,9 @@ export default function DataPickerDialog({
         "& .MuiDialog-paper": {
           maxWidth: "max-content !important",
           position: "relative",
+          border: `1px solid ${theme.palette.text.secondary}`,
+          padding: "2px",
+          backgroundColor: theme.palette.background.neutral,
         },
       }}
     >

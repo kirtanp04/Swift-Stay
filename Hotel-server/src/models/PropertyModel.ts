@@ -1,6 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
 import { RoomClass } from './RoomModel';
-import { UserClass } from './UserModel';
 
 export enum enumPropertyType {
     Hotel = 'Hotel',
