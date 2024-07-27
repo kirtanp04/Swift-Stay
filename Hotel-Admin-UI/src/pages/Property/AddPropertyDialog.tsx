@@ -68,7 +68,6 @@ export default function AddPropertyDialog({
   const [showUploadImageDialog, setShowUploadImageDialog] =
     useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-
   const [_objProperty, setObjProperty] = useState<PropertyClass>(objProperty);
 
   const [Countries] = useState<ICountry[]>(Country.getAllCountries());
@@ -80,7 +79,7 @@ export default function AddPropertyDialog({
   //------------------------------- Form
 
   const _Method = useForm<PropertyClass>({
-    defaultValues: objProperty,
+    defaultValues: PropertyClass.getCopy(_objProperty),
     resolver: yupResolver(AddHotelSchema) as any,
   });
   const { handleSubmit, control, watch } = _Method;
@@ -95,8 +94,9 @@ export default function AddPropertyDialog({
     const _watch = watch();
 
     if (_watch.country !== "") {
-      const stateList = getAllStatesOfoneCountry(_watch.country);
-      setState(stateList);
+      const countryCode = _watch.country.split("-")[1];
+      const _states = State.getStatesOfCountry(countryCode);
+      setState(_states);
     }
   }, [watch("country")]);
 
@@ -104,59 +104,13 @@ export default function AddPropertyDialog({
     const _watch = watch();
 
     if (_watch.state !== "") {
-      const cities = getAllCities(_watch.country, _watch.state);
+      const countryCode = _watch.country.split("-")[1];
+      const stateCode = _watch.state.split("-")[1];
+      const cities = City.getCitiesOfState(countryCode, stateCode);
       setCities(cities);
     }
   }, [watch("state")]);
   //----------------------------------------------------------------
-
-  const getAllStatesOfoneCountry = (countryName: string): IState[] => {
-    let States: IState[] = [];
-    for (let index = 0; index < Countries.length; index++) {
-      const element = Countries[index];
-
-      if (element.name === countryName) {
-        States = State.getStatesOfCountry(element.isoCode);
-
-        break;
-      }
-    }
-
-    return States;
-  };
-
-  const getAllCities = (countryName: string, stateName: string): ICity[] => {
-    let Cities: ICity[] = [];
-    let find: boolean = false;
-
-    do {
-      for (
-        let CountryIndex = 0;
-        CountryIndex < Countries.length;
-        CountryIndex++
-      ) {
-        const objCountry = Countries[CountryIndex];
-
-        if (objCountry.name === countryName) {
-          for (let StateIndex = 0; StateIndex < States.length; StateIndex++) {
-            const objState = States[StateIndex];
-            if (objState.name === stateName) {
-              Cities = City.getCitiesOfState(
-                objCountry.isoCode,
-                objState.isoCode
-              );
-              find = true;
-              break;
-            }
-          }
-
-          break;
-        }
-      }
-    } while (!find);
-
-    return Cities;
-  };
 
   // ----------------------------------------------------------
 
@@ -273,7 +227,10 @@ export default function AddPropertyDialog({
                 >
                   <option value=""></option>
                   {Countries.map((objCountry) => (
-                    <option value={objCountry.name} key={objCountry.isoCode}>
+                    <option
+                      value={objCountry.name + "-" + objCountry.isoCode}
+                      key={objCountry.isoCode}
+                    >
                       {objCountry.name}
                     </option>
                   ))}
@@ -289,7 +246,10 @@ export default function AddPropertyDialog({
                 >
                   <option value=""></option>
                   {States.map((objState) => (
-                    <option value={objState.name} key={objState.isoCode}>
+                    <option
+                      value={objState.name + "-" + objState.isoCode}
+                      key={objState.isoCode}
+                    >
                       {objState.name}
                     </option>
                   ))}

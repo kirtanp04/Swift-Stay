@@ -49,4 +49,6 @@ const PropertySchema = new Schema<PropertyClass>({
     updatedAt: { type: Date, default: Date.now },
 });
 
+PropertySchema.index({ adminID: 1 })
+
 export const Property = mongoose.model<PropertyClass>('Property', PropertySchema);

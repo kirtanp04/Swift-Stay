@@ -23,7 +23,7 @@ type Props = {};
 export default function HotelList({}: Props) {
   const [propertyList, setPropertyList] = useState<PropertyClass[]>([]);
   const [openAddHotelDialog, setOpenAddHotelDialog] = useState<boolean>(false);
-  const [objPropert, setObjPropert] = useState<PropertyClass>(
+  const [objProperty, setObjPropert] = useState<PropertyClass>(
     new PropertyClass()
   );
   const {
@@ -47,6 +47,7 @@ export default function HotelList({}: Props) {
       (res) => {
         if (res.length > 0) {
           setPropertyList(res);
+          console.log(res);
         }
         showLoading(theme, false);
       },
@@ -83,9 +84,20 @@ export default function HotelList({}: Props) {
     }
   };
 
-  const onEditProperty = (objProperty: PropertyClass) => {
-    setObjPropert(objProperty);
-    setOpenAddHotelDialog(true);
+  useEffect(() => {
+    console.log(objProperty);
+    if (objProperty._id !== "") {
+      setOpenAddHotelDialog(true);
+    }
+  }, [objProperty]);
+
+  const onEditProperty = (_objProperty: PropertyClass) => {
+    // console.log(objPropert);
+    _objProperty.images = [];
+    let newProp = PropertyClass.getCopy(_objProperty);
+    // console.log("copy", newProp);
+    // console.log("original", _objProperty);
+    setObjPropert(newProp);
   };
 
   const onAddNewHotel = () => {
@@ -259,7 +271,7 @@ export default function HotelList({}: Props) {
       {openAddHotelDialog && (
         <AddPropertyDialog
           onClose={closeAddHotelDialogBox}
-          objProperty={objPropert}
+          objProperty={objProperty}
           afterSave={AfterSaveProperty}
         />
       )}

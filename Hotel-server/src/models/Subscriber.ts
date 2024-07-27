@@ -1,14 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
-import { RoomClass } from './RoomModel';
-import { UserClass } from './UserModel';
 import { PropertyClass } from './PropertyModel';
+import { UserClass } from './UserModel';
 
-export enum enumPropertyType {
-    Hotel = 'Hotel',
-    Resort = 'Resort',
-    Apartment = 'Apartment',
-    Bungalow = 'Bungalow'
-}
 
 class SubscribeDetail {
     property: PropertyClass = new PropertyClass()
@@ -17,13 +10,13 @@ class SubscribeDetail {
 
 export class SubscriberClass {
     _id: string = '';
-    admin: UserClass = new UserClass();
+    adminID: string = '';
     SubscribeDetail: SubscribeDetail[] = []
 }
 
 const SubscriberSchema = new Schema<SubscriberClass>({
 
-    admin: { type: Schema.Types.ObjectId, ref: 'User' },
+    adminID: { type: String, required: [true, 'Admin ID is required.'] },
     SubscribeDetail: [
         {
             property: { type: Schema.Types.ObjectId, ref: 'Property' },
@@ -34,5 +27,7 @@ const SubscriberSchema = new Schema<SubscriberClass>({
     ]
 
 });
+
+SubscriberSchema.index({ adminID: 1 })
 
 export const Subscriber = mongoose.model<SubscriberClass>('Subscriber', SubscriberSchema);

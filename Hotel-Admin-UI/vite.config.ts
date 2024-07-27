@@ -11,4 +11,10 @@ export default defineConfig({
       'src': path.resolve(__dirname, 'src'), // Alias @ to the src directory
     },
   },
+  optimizeDeps: {
+    include: ['src/workers/GetAllCountryStates.ts']
+  },
+  worker: {
+    format: 'es'
+  }
 })

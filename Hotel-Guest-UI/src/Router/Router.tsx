@@ -49,11 +49,11 @@ export default function Router() {
     {
       path: "/",
       element: (
-        <AuthGaurd>
-          <UserSearchContextProvider>
-            <Layout />
-          </UserSearchContextProvider>
-        </AuthGaurd>
+        // <AuthGaurd>
+        <UserSearchContextProvider>
+          <Layout />
+        </UserSearchContextProvider>
+        // </AuthGaurd>
       ),
       children: [
         { path: "", element: <HomePage />, index: true },

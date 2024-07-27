@@ -192,7 +192,7 @@ class Functions {
                                 path: 'property',
                             },
                         })
-                        .exec();
+                        ;
                     if (allProperties) {
                         Cache.SetCache(CacheKey.manager.property(checkUser.data.email), allProperties);
                         this.objUserResponse = GetUserSuccessObj(allProperties, HttpStatusCodes.OK);

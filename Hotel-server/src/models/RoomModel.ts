@@ -43,4 +43,6 @@ const RoomSchema = new Schema<RoomClass>({
     updatedAt: { type: Date }
 });
 
+RoomSchema.index({ adminID: 1 })
+
 export const Room = mongoose.model<RoomClass>('Room', RoomSchema);
