@@ -25,6 +25,7 @@ export class PropertyClass {
     amenities: string[] = [];
     images: string[] = [];
     rooms: RoomClass[] = [];
+    jobHiring: boolean = false
     createdAt: Date = new Date();
     updatedAt: Date = new Date();
 }
@@ -45,6 +46,7 @@ const PropertySchema = new Schema<PropertyClass>({
     rooms: [{ type: Schema.Types.ObjectId, ref: 'Room' }],
     amenities: [String],
     images: [String],
+    jobHiring: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
