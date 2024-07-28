@@ -1,5 +1,5 @@
-import { Box, styled, useTheme } from "@mui/material";
-import { useState } from "react";
+import { Box, styled, Typography, useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
 import {
   CalenderIcon,
   CloseIcon,
@@ -8,10 +8,10 @@ import {
 } from "src/assets/iconify";
 import DateFormatter from "src/common/DateFormate";
 import DataPickerDialog from "src/components/UserSearchInput/DataPickerDialog";
-import SearchCityDialog from "src/components/UserSearchInput/SearchCityDialog";
+import SearchStateDialog from "src/components/UserSearchInput/SearchStateDialog";
 import { UserSearchObj as TUserSearchObj } from "src/context/UserSearchContext";
-import useAuth from "src/hooks/useAuth";
 import useUserSearch from "src/hooks/useUserSearch";
+import TrendingDestinations from "./components/TrendingDestinations";
 
 const IconSize = {
   height: 22,
@@ -20,17 +20,19 @@ const IconSize = {
 
 export default function HomePage() {
   const { UserSearchObj } = useUserSearch();
-  const [UserSearch, setUserSearch] = useState<TUserSearchObj>(UserSearchObj);
+  const [UserSearch, setUserSearch] = useState<TUserSearchObj>(
+    new TUserSearchObj()
+  );
   const [ShowDateRange, setShowDateRange] = useState<boolean>(false);
-  const [ShowSelectCityDialog, setShowSelectCityDialog] =
+  const [ShowSearchStateDialog, setShowSearchStateDialog] =
     useState<boolean>(false);
   const theme = useTheme();
-  const {
-    user: {
-      userInfo: { country },
-    },
-  } = useAuth();
+
   const _Date = DateFormatter.getInstance();
+
+  useEffect(() => {
+    setUserSearch(UserSearchObj);
+  }, [UserSearchObj]);
 
   const UpdateUserSearch = <K extends keyof TUserSearchObj>(
     PropertyName: K,
@@ -59,7 +61,7 @@ export default function HomePage() {
             {...IconSize}
             IconColor={theme.palette.text.secondary}
           />
-          <FilterBoxButton onClick={() => setShowSelectCityDialog(true)}>
+          <FilterBoxButton onClick={() => setShowSearchStateDialog(true)}>
             <FilterBoxButtonText>
               {UserSearch.selectedState !== ""
                 ? UserSearch.selectedState
@@ -127,6 +129,17 @@ export default function HomePage() {
         <FilterSearchButtonWrapper>Search</FilterSearchButtonWrapper>
       </FilterBox>
 
+      <ContentWrapper>
+        <HeaderWrapper>
+          <HeaderTitle>Trending destinations</HeaderTitle>
+          <HeaderSubtitle>
+            Most popular choices for travellers from
+            {UserSearch.selectedCountry}
+          </HeaderSubtitle>
+        </HeaderWrapper>
+        <TrendingDestinations />
+      </ContentWrapper>
+
       {ShowDateRange && (
         <DataPickerDialog
           defaultStartDate={UserSearch.checkInDate}
@@ -136,10 +149,10 @@ export default function HomePage() {
         />
       )}
 
-      {ShowSelectCityDialog && (
-        <SearchCityDialog
-          onClose={() => setShowSelectCityDialog(false)}
-          countryCode={country.split("-")[1]}
+      {ShowSearchStateDialog && (
+        <SearchStateDialog
+          onClose={() => setShowSearchStateDialog(false)}
+          countryCode={UserSearch.selectedCountry.split("-")[1]}
           onSelectState={onSelectState}
         />
       )}
@@ -212,4 +225,32 @@ const FilterSearchButtonWrapper = styled(Box)(({ theme }) => ({
   cursor: "pointer",
   padding: "1rem",
   justifyContent: "center",
+}));
+const ContentWrapper = styled(Box)(() => ({
+  height: "auto",
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  gap: "15px",
+  marginTop: "3rem",
+}));
+
+const HeaderWrapper = styled(Box)(({ theme }) => ({
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  gap: "6px",
+  borderBottom: `1px solid ${theme.palette.border}`,
+  justifyContent: "flex-start",
+  paddingBottom: "10px",
+}));
+
+const HeaderTitle = styled(Typography)(({ theme }) => ({
+  fontSize: "1.4rem",
+  color: theme.palette.text.primary,
+}));
+
+const HeaderSubtitle = styled(Typography)(({ theme }) => ({
+  fontSize: "0.9rem",
+  color: theme.palette.text.secondary,
 }));

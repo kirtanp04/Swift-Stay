@@ -1,19 +1,45 @@
-import { Box, styled, Typography } from "@mui/material";
-import { useNavigate, useNavigation } from "react-router-dom";
-
-import FlagIcon from "src/components/FlagIcon";
-import useAuth from "src/hooks/useAuth";
+import {
+  Box,
+  ListItemIcon,
+  MenuItem,
+  MenuList,
+  styled,
+  Typography,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import "/node_modules/flag-icons/css/flag-icons.min.css";
+import { Country, ICountry } from "country-state-city";
+import { useEffect, useState } from "react";
+import { MUIMenu } from "src/components/mui/MUIMenu";
+import useUserSearch from "src/hooks/useUserSearch";
 import { Path } from "src/Router/path";
+import getFlagClassName from "src/util/getCountryFlagUrl";
 
 type Props = {};
 
 export default function NavBarContent({}: Props) {
   const navigate = useNavigate();
+  const [anchorPoint, setAnchorPoint] = useState<null | HTMLElement>(null);
+  const openCtxMenuPoint = Boolean(anchorPoint);
+  const [countryList, setCountryList] = useState<ICountry[]>([]);
   const {
-    user: {
-      userInfo: { country },
-    },
-  } = useAuth();
+    UserSearchObj: { selectedCountry },
+    UpdateSearchObj,
+  } = useUserSearch();
+
+  useEffect(() => {
+    if (countryList.length === 0) {
+      setCountryList(Country.getAllCountries());
+    }
+  }, []);
+
+  const onSelectCountry = (objCountry: ICountry) => {
+    UpdateSearchObj(
+      "selectedCountry",
+      objCountry.name + "-" + objCountry.isoCode
+    );
+    setAnchorPoint(null);
+  };
   return (
     <RootStyle>
       <LogoWrapper>
@@ -22,9 +48,11 @@ export default function NavBarContent({}: Props) {
       </LogoWrapper>
 
       <RightContentWrapper>
-        <CountryDetailWrapper>
-          <CountryName>{country.split("-")[1]}</CountryName>
-          <FlagIcon countryName={country.split("-")[0] as any} />
+        <CountryDetailWrapper onClick={(e) => setAnchorPoint(e.currentTarget)}>
+          <CountryName>{selectedCountry.split("-")[1]}</CountryName>
+          <span
+            className={getFlagClassName(selectedCountry.split("-")[1] as any)}
+          />
         </CountryDetailWrapper>
 
         <ListPropertyButton>List your property</ListPropertyButton>
@@ -36,6 +64,30 @@ export default function NavBarContent({}: Props) {
           </SignupButton>
         </AuthWrapper>
       </RightContentWrapper>
+
+      {/* {openCtxMenuPoint && ( */}
+      <MUIMenu
+        open={openCtxMenuPoint}
+        anchorEl={anchorPoint}
+        onClose={() => setAnchorPoint(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        {countryList.map((objCountry) => (
+          <MenuItem
+            key={objCountry.isoCode}
+            onClick={() => onSelectCountry(objCountry)}
+          >
+            <MenuItemWrapper>
+              <ListItemIcon>
+                <span className={getFlagClassName(objCountry.isoCode as any)} />
+              </ListItemIcon>
+              <MenuList>{objCountry.name}</MenuList>
+            </MenuItemWrapper>
+          </MenuItem>
+        ))}
+      </MUIMenu>
+      {/* )} */}
     </RootStyle>
   );
 }
@@ -70,6 +122,7 @@ const CountryDetailWrapper = styled(Box)(() => ({
   display: "flex",
   alignItems: "center",
   gap: "10px",
+  cursor: "pointer",
 }));
 
 const CountryName = styled(Typography)(({ theme }) => ({
@@ -115,4 +168,12 @@ const SignupButton = styled("button")(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
   cursor: "pointer",
   fontSize: "1rem",
+}));
+
+const MenuItemWrapper = styled(Box)(() => ({
+  display: "flex",
+  // justifyContent: "center",
+  width: "100%",
+  alignItems: "center",
+  // gap: "10px",
 }));

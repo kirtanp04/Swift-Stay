@@ -32,6 +32,7 @@ export class PropertyClass {
     amenities: string[] = [];
     images: string[] = [];
     rooms: RoomClass[] = [];
+    jobHiring: boolean = false;
     createdAt: Date = new Date();
     updatedAt: Date = new Date();
 

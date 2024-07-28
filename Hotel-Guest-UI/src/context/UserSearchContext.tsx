@@ -1,6 +1,7 @@
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useEffect, useState } from "react";
 import { Crypt } from "src/common/Crypt";
 import { Storage } from "src/common/Storage";
+import useAuth from "src/hooks/useAuth";
 
 export class UserSearchObj {
   selectedState: string = "";
@@ -9,6 +10,7 @@ export class UserSearchObj {
   totalRoom: number = 1;
   adults: number = 1;
   children: number = 0;
+  selectedCountry: string = "India-IN";
 }
 
 const getDefaultUserSearchObj = (): UserSearchObj => {
@@ -36,10 +38,20 @@ const getDefaultUserSearchObj = (): UserSearchObj => {
 
 interface CTX {
   UserSearchObj: UserSearchObj;
+  UpdateSearchObj: <K extends keyof UserSearchObj>(
+    PropertyName: K,
+    value: UserSearchObj[K]
+  ) => void;
 }
 
 const UserSearchContext = createContext<CTX>({
   UserSearchObj: getDefaultUserSearchObj(),
+  UpdateSearchObj(PropertyName, value) {
+    return {
+      PropertyName,
+      value,
+    };
+  },
 });
 
 interface Props {
@@ -47,10 +59,31 @@ interface Props {
 }
 
 function UserSearchContextProvider({ children }: Props) {
-  const [UserSearchObj] = useState<UserSearchObj>(getDefaultUserSearchObj());
+  const [UserSearchObj, setUserSearchObj] = useState<UserSearchObj>(
+    getDefaultUserSearchObj()
+  );
+
+  const {
+    user: {
+      userInfo: { country },
+    },
+  } = useAuth();
+
+  useEffect(() => {
+    if (country !== "") {
+      UpdateSearchObj("selectedCountry", country);
+    }
+  }, [country]);
+
+  const UpdateSearchObj = <K extends keyof UserSearchObj>(
+    PropertyName: K,
+    value: UserSearchObj[K]
+  ) => {
+    setUserSearchObj({ ...UserSearchObj, [PropertyName]: value });
+  };
 
   return (
-    <UserSearchContext.Provider value={{ UserSearchObj }}>
+    <UserSearchContext.Provider value={{ UserSearchObj, UpdateSearchObj }}>
       {children}
     </UserSearchContext.Provider>
   );

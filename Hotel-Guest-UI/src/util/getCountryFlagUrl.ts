@@ -1,7 +1,7 @@
-import { CountryCode } from "src/Types";
+import { CountryName } from "src/Types";
 
 
-const getFlagClassName = (countryCode: CountryCode): string => {
+const getFlagClassName = (countryCode: CountryName): string => {
     return `fi fi-${countryCode.toLowerCase()}`;
 };
 

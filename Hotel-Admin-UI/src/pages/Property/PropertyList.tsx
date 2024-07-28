@@ -1,4 +1,12 @@
-import { Box, Button, Chip, Typography, styled, useTheme } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Theme,
+  Typography,
+  styled,
+  useTheme,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -164,10 +172,16 @@ export default function HotelList({}: Props) {
                 <TextWrapper>
                   <Chip
                     label={param.row.propertyType}
-                    color={getChipColor(param.row.propertyType) as any}
+                    // color={getChipColor(param.row.propertyType,theme) as any}
                     variant="filled"
                     size="small"
-                    sx={{ width: 120 }}
+                    sx={{
+                      width: 120,
+                      backgroundColor: getChipColor(
+                        param.row.propertyType,
+                        theme
+                      ) as any,
+                    }}
                   />
                 </TextWrapper>
               ),
@@ -211,6 +225,26 @@ export default function HotelList({}: Props) {
               field: "email",
               headerName: "Public Email",
               width: 200,
+            },
+            {
+              field: "jobHiring",
+              headerName: "Job Hiring",
+              width: 80,
+              renderCell: (param: any) => (
+                <TextWrapper>
+                  <Box
+                    sx={{
+                      height: 15,
+                      width: 15,
+                      borderRadius: "50%",
+                      backgroundColor:
+                        param.row.jobHiring === false
+                          ? theme.palette.color.error.main
+                          : theme.palette.color.success.main,
+                    }}
+                  />
+                </TextWrapper>
+              ),
             },
             {
               field: "createdAt",
@@ -279,20 +313,23 @@ export default function HotelList({}: Props) {
   );
 }
 
-export const getChipColor = (_PropertyType: enumPropertyType): string => {
+export const getChipColor = (
+  _PropertyType: enumPropertyType,
+  theme: Theme
+): string => {
   let color: string = "";
 
   if (_PropertyType === enumPropertyType.Apartment) {
-    color = "primary";
+    color = theme.palette.color.info.main;
   }
   if (_PropertyType === enumPropertyType.Bungalow) {
-    color = "warning";
+    color = theme.palette.color.warning.main;
   }
   if (_PropertyType === enumPropertyType.Hotel) {
-    color = "error";
+    color = theme.palette.color.error.main;
   }
   if (_PropertyType === enumPropertyType.Resort) {
-    color = "secondary";
+    color = theme.palette.color.pink.main;
   }
 
   return color;

@@ -43,7 +43,14 @@ const MessageDialog = ({
           },
         }}
       >
-        <Button onClick={onOK} color="primary" variant="outlined">
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            onOK();
+          }}
+          color="primary"
+          variant="outlined"
+        >
           OK
         </Button>
       </DialogActions>

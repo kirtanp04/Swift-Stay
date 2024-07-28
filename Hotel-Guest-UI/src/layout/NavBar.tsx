@@ -1,19 +1,22 @@
 import { Box, styled } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import NavBarContent from "./NavBarContent";
+import Scrollbar from "src/components/Scrollbar";
 
 type Props = {};
 
 export default function Layout({}: Props) {
   return (
     <RootStyle>
-      <NavBarWrapper>
-        <NavBarContent />
-      </NavBarWrapper>
+      <Scrollbar>
+        <NavBarWrapper>
+          <NavBarContent />
+        </NavBarWrapper>
 
-      <OutletWrapper>
-        <Outlet />
-      </OutletWrapper>
+        <OutletWrapper>
+          <Outlet />
+        </OutletWrapper>
+      </Scrollbar>
     </RootStyle>
   );
 }
