@@ -21,22 +21,11 @@ export default function Layout({}: Props) {
   );
 }
 
-const RootStyle = styled(Box)(({ theme }) => ({
+const RootStyle = styled(Box)(() => ({
   minHeight: "100vh",
   display: "flex",
   width: "100%",
-  // gap: "1rem",
   flexDirection: "column",
-  "& ::-webkit-scrollbar": {
-    width: "7px",
-    height: "7px",
-  },
-  "& ::-webkit-scrollbar-track": {
-    backgroundColor: theme.palette.background.neutral,
-  },
-  "& ::-webkit-scrollbar-thumb": {
-    backgroundColor: theme.palette.grey[500],
-  },
 }));
 
 const NavBarWrapper = styled(Box)(({ theme }) => ({

@@ -178,7 +178,9 @@ export default function PropertyViewer({}: Props) {
                       <Label>Type :</Label>
                       <Chip
                         label={Property.propertyType}
-                        color={getChipColor(Property.propertyType) as any}
+                        color={
+                          getChipColor(Property.propertyType, theme) as any
+                        }
                         variant="filled"
                         size="small"
                         sx={{ width: 120 }}

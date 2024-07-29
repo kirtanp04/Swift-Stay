@@ -11,7 +11,10 @@ import DataPickerDialog from "src/components/UserSearchInput/DataPickerDialog";
 import SearchStateDialog from "src/components/UserSearchInput/SearchStateDialog";
 import { UserSearchObj as TUserSearchObj } from "src/context/UserSearchContext";
 import useUserSearch from "src/hooks/useUserSearch";
+
 import TrendingDestinations from "./components/TrendingDestinations";
+import ExploreCountryState from "./components/ExploreCountryState";
+import ExploreByProperty from "./components/ExploreByProperty";
 
 const IconSize = {
   height: 22,
@@ -26,6 +29,8 @@ export default function HomePage() {
   const [ShowDateRange, setShowDateRange] = useState<boolean>(false);
   const [ShowSearchStateDialog, setShowSearchStateDialog] =
     useState<boolean>(false);
+
+  //--------------------------
   const theme = useTheme();
 
   const _Date = DateFormatter.getInstance();
@@ -130,14 +135,48 @@ export default function HomePage() {
       </FilterBox>
 
       <ContentWrapper>
+        {/* --------------------------------------------- Trending------------------------------------------------------------- */}
         <HeaderWrapper>
           <HeaderTitle>Trending destinations</HeaderTitle>
           <HeaderSubtitle>
             Most popular choices for travellers from
-            {UserSearch.selectedCountry}
+            <span
+              style={{
+                color: theme.palette.color.info.main,
+                marginLeft: "10px",
+                fontSize: "1rem",
+              }}
+            >
+              {UserSearch.selectedCountry.split("-")[0]}
+            </span>
           </HeaderSubtitle>
         </HeaderWrapper>
         <TrendingDestinations />
+        {/* --------------------------------------------- Explore More------------------------------------------------------------- */}
+        <HeaderWrapper>
+          <HeaderTitle>
+            Explore
+            <span
+              style={{
+                color: theme.palette.color.info.main,
+                marginLeft: "5px",
+              }}
+            >
+              {UserSearch.selectedCountry.split("-")[0]}
+            </span>
+          </HeaderTitle>
+          <HeaderSubtitle>
+            These popular destinations have a lot to offer
+          </HeaderSubtitle>
+        </HeaderWrapper>
+
+        <ExploreCountryState />
+
+        {/* --------------------------------------------- Explore by Propertry type------------------------------------------------------------- */}
+        <HeaderWrapper>
+          <HeaderTitle>Browse by property type</HeaderTitle>
+        </HeaderWrapper>
+        <ExploreByProperty />
       </ContentWrapper>
 
       {ShowDateRange && (
@@ -166,6 +205,7 @@ const RootStyle = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
   position: "relative",
+  paddingBottom: "3rem",
 }));
 
 const FilterBox = styled(Box)(({ theme }) => ({
@@ -231,7 +271,7 @@ const ContentWrapper = styled(Box)(() => ({
   width: "100%",
   display: "flex",
   flexDirection: "column",
-  gap: "15px",
+  gap: "3rem",
   marginTop: "3rem",
 }));
 
@@ -239,7 +279,7 @@ const HeaderWrapper = styled(Box)(({ theme }) => ({
   width: "100%",
   display: "flex",
   flexDirection: "column",
-  gap: "6px",
+  gap: "2px",
   borderBottom: `1px solid ${theme.palette.border}`,
   justifyContent: "flex-start",
   paddingBottom: "10px",

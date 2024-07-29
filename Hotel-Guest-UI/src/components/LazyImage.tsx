@@ -15,7 +15,7 @@ function LazyImage({ src, alt, ...other }: TProps) {
   const [loading, setLoading] = useState(true);
 
   return (
-    <LazyLoad width="100%" height="100%">
+    <LazyLoad style={{ height: "100%", width: "100%" }}>
       {loading && <Skeleton variant="rectangular" width="100%" height="100%" />}
       <Image
         src={src}
@@ -32,8 +32,6 @@ function LazyImage({ src, alt, ...other }: TProps) {
 export default LazyImage;
 
 const Image = styled("img")(() => ({
-  height: "100%",
-  width: "100%",
   objectFit: "fill",
   borderRadius: "15px",
 }));

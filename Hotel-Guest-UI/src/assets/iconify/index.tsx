@@ -608,3 +608,38 @@ export function PersonIcon({ IconColor, ...other }: Props) {
     </svg>
   );
 }
+
+export function NextIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="M10.02 6L8.61 7.41L13.19 12l-4.58 4.59L10.02 18l6-6z"
+      ></path>
+    </svg>
+  );
+}
+
+export function PreviousIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...other}
+      style={{ transform: "rotate(180deg)" }}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        d="M10.02 6L8.61 7.41L13.19 12l-4.58 4.59L10.02 18l6-6z"
+      ></path>
+    </svg>
+  );
+}
