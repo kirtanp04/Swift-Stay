@@ -38,6 +38,6 @@ const RootStyle = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  height: "100%",
+  // height: "100%",
   // padding: "1rem",
 }));

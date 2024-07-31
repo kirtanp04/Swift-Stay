@@ -73,7 +73,7 @@ const SubGrid = styled(Grid)(() => ({
 const StateName = styled(Typography)(({ theme }) => ({
   fontSize: "1.4rem",
   color: theme.palette.text.primary,
-  textAlign: "right",
+  textAlign: "left",
   // flex: 0.3,
   marginTop: "auto",
 }));

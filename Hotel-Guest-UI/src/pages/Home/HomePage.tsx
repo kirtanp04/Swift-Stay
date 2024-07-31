@@ -9,12 +9,14 @@ import {
 import DateFormatter from "src/common/DateFormate";
 import DataPickerDialog from "src/components/UserSearchInput/DataPickerDialog";
 import SearchStateDialog from "src/components/UserSearchInput/SearchStateDialog";
-import { UserSearchObj as TUserSearchObj } from "src/context/UserSearchContext";
+import { _UserSearchObj as TUserSearchObj } from "src/context/UserSearchContext";
 import useUserSearch from "src/hooks/useUserSearch";
 
-import TrendingDestinations from "./components/TrendingDestinations";
-import ExploreCountryState from "./components/ExploreCountryState";
+import { useNavigate } from "react-router-dom";
+import { Path } from "src/Router/path";
 import ExploreByProperty from "./components/ExploreByProperty";
+import ExploreCountryState from "./components/ExploreCountryState";
+import TrendingDestinations from "./components/TrendingDestinations";
 
 const IconSize = {
   height: 22,
@@ -22,13 +24,15 @@ const IconSize = {
 };
 
 export default function HomePage() {
-  const { UserSearchObj } = useUserSearch();
-  const [UserSearch, setUserSearch] = useState<TUserSearchObj>(
-    new TUserSearchObj()
-  );
+  const { UserSearchObj, UpdateFullobj } = useUserSearch();
+  const [UserSearch, setUserSearch] = useState<TUserSearchObj>(UserSearchObj);
   const [ShowDateRange, setShowDateRange] = useState<boolean>(false);
   const [ShowSearchStateDialog, setShowSearchStateDialog] =
     useState<boolean>(false);
+
+  // console.log(UserSearchObj);
+
+  const navigate = useNavigate();
 
   //--------------------------
   const theme = useTheme();
@@ -56,6 +60,16 @@ export default function HomePage() {
 
   const onSelectState = (stateName: string) => {
     UpdateUserSearch("selectedState", stateName);
+  };
+
+  const OnSearch = () => {
+    navigate(
+      Path.PropertyListByState.root(
+        UserSearch.selectedCountry,
+        UserSearch.selectedState
+      )
+    );
+    UpdateFullobj(UserSearch);
   };
 
   return (
@@ -131,7 +145,9 @@ export default function HomePage() {
           </FilterBoxButton>
         </FilterBoxContainer>
         <Divider />
-        <FilterSearchButtonWrapper>Search</FilterSearchButtonWrapper>
+        <FilterSearchButtonWrapper onClick={OnSearch}>
+          Search
+        </FilterSearchButtonWrapper>
       </FilterBox>
 
       <ContentWrapper>

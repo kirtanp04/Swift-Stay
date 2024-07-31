@@ -1,8 +1,11 @@
-import { Box, Stack, styled, Typography } from "@mui/material";
-import { useRef } from "react";
+import { Box, Stack, styled, Typography, useTheme } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { NextIcon, PreviousIcon } from "src/assets/iconify";
 import Img from "src/assets/img/GujaratIMG.jpeg";
 import LazyImage from "src/components/LazyImage";
+import useUserSearch from "src/hooks/useUserSearch";
+import { Property } from "src/ObjMgr/Property";
+import showMessage from "src/util/ShowMessage";
 import "swiper/css";
 import "swiper/css/navigation";
 import { A11y, Navigation } from "swiper/modules";
@@ -11,9 +14,34 @@ import { Swiper, SwiperSlide } from "swiper/react";
 type Props = {};
 
 export default function ExploreByProperty({}: Props) {
+  const { UserSearchObj } = useUserSearch();
   // Explore Country------------------------------------------------------------
   const ExploreCountrySwiperPrevButton = useRef<HTMLButtonElement>(null);
   const ExploreCountrySwiperNextButton = useRef<HTMLButtonElement>(null);
+  const [TotalPropertByCountryState, setTotalPropertByCountryState] = useState<
+    { propertyType: string; totalProperties: number }[]
+  >([]);
+  const theme = useTheme();
+
+  useEffect(() => {
+    if (UserSearchObj.selectedCountry !== "") {
+      if (TotalPropertByCountryState.length === 0) {
+        loadTotalPropertByPropertyType();
+      }
+    }
+  }, [UserSearchObj]);
+
+  const loadTotalPropertByPropertyType = () => {
+    Property.GetTotalPropertByPropertyType(
+      UserSearchObj.selectedCountry,
+      (res) => {
+        setTotalPropertByCountryState(res);
+      },
+      (err) => {
+        showMessage(err, theme, () => {});
+      }
+    );
+  };
 
   return (
     <SwiperWrapper>
@@ -41,25 +69,29 @@ export default function ExploreByProperty({}: Props) {
           nextEl: ExploreCountrySwiperNextButton.current,
         }}
       >
-        <SwiperSlide
-          style={{
-            height: "100%",
-            width: "250px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-          }}
-        >
-          <LazyImage
-            alt=""
-            src={Img}
-            style={{ width: "100%", height: "100%" }}
-          />
-          <Box>
-            <StateName>Hotel</StateName>
-            <TotalProperties>445 Hotels</TotalProperties>
-          </Box>
-        </SwiperSlide>
+        {TotalPropertByCountryState.map((objProperty) => (
+          <SwiperSlide
+            style={{
+              height: "100%",
+              width: "250px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}
+          >
+            <LazyImage
+              alt=""
+              src={Img}
+              style={{ width: "100%", height: "100%" }}
+            />
+            <Box>
+              <StateName>{objProperty.propertyType}</StateName>
+              <TotalProperties>
+                {objProperty.totalProperties} {objProperty.propertyType}
+              </TotalProperties>
+            </Box>
+          </SwiperSlide>
+        ))}
       </Swiper>
 
       <Stack direction={"row"} gap={"10px"} justifyContent={"flex-end"}>

@@ -77,7 +77,7 @@ function AuthContexProvider({ children }: Props) {
     let _TimeInterval: any;
 
     _TimeInterval = setInterval(() => {
-      checkUserToken();
+      // checkUserToken();
     }, 1500);
 
     return () => {

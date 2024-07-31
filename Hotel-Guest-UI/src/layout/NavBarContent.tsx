@@ -14,6 +14,8 @@ import { MUIMenu } from "src/components/mui/MUIMenu";
 import useUserSearch from "src/hooks/useUserSearch";
 import { Path } from "src/Router/path";
 import getFlagClassName from "src/util/getCountryFlagUrl";
+import IfLogedin from "src/components/IfLogedin";
+import { _UserSearchObj } from "src/context/UserSearchContext";
 
 type Props = {};
 
@@ -22,10 +24,7 @@ export default function NavBarContent({}: Props) {
   const [anchorPoint, setAnchorPoint] = useState<null | HTMLElement>(null);
   const openCtxMenuPoint = Boolean(anchorPoint);
   const [countryList, setCountryList] = useState<ICountry[]>([]);
-  const {
-    UserSearchObj: { selectedCountry },
-    UpdateSearchObj,
-  } = useUserSearch();
+  const { UserSearchObj, UpdateFullobj } = useUserSearch();
 
   useEffect(() => {
     if (countryList.length === 0) {
@@ -34,10 +33,10 @@ export default function NavBarContent({}: Props) {
   }, []);
 
   const onSelectCountry = (objCountry: ICountry) => {
-    UpdateSearchObj(
-      "selectedCountry",
-      objCountry.name + "-" + objCountry.isoCode
-    );
+    let __UserSearchObj = new _UserSearchObj();
+    __UserSearchObj.selectedCountry =
+      objCountry.name + "-" + objCountry.isoCode;
+    UpdateFullobj(__UserSearchObj);
     setAnchorPoint(null);
   };
   return (
@@ -49,19 +48,31 @@ export default function NavBarContent({}: Props) {
 
       <RightContentWrapper>
         <CountryDetailWrapper onClick={(e) => setAnchorPoint(e.currentTarget)}>
-          <CountryName>{selectedCountry.split("-")[1]}</CountryName>
+          <CountryName>
+            {UserSearchObj.selectedCountry.split("-")[1]}
+          </CountryName>
           <span
-            className={getFlagClassName(selectedCountry.split("-")[1] as any)}
+            className={getFlagClassName(
+              UserSearchObj.selectedCountry.split("-")[1] as any
+            )}
           />
         </CountryDetailWrapper>
 
         <ListPropertyButton>List your property</ListPropertyButton>
 
         <AuthWrapper>
-          <LoginButton>Sign in</LoginButton>
-          <SignupButton onClick={() => navigate(Path.signup)}>
-            Sign up
-          </SignupButton>
+          <IfLogedin
+            Else={
+              <>
+                <LoginButton>Sign in</LoginButton>
+                <SignupButton onClick={() => navigate(Path.signup)}>
+                  Sign up
+                </SignupButton>
+              </>
+            }
+          >
+            <Logoutbutton>Logout</Logoutbutton>
+          </IfLogedin>
         </AuthWrapper>
       </RightContentWrapper>
 
@@ -155,6 +166,17 @@ const LoginButton = styled("button")(({ theme }) => ({
   border: `0px solid transparent`,
   color: theme.palette.background.default,
   backgroundColor: theme.palette.text.primary,
+  cursor: "pointer",
+  fontSize: "1rem",
+}));
+
+const Logoutbutton = styled("button")(({ theme }) => ({
+  width: "max-content",
+  padding: "0.5rem",
+  borderRadius: "5px",
+  border: `0px solid transparent`,
+  color: theme.palette.text.primary,
+  backgroundColor: theme.palette.color.error.main,
   cursor: "pointer",
   fontSize: "1rem",
 }));

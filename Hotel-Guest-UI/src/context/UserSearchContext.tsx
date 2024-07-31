@@ -1,9 +1,8 @@
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { Crypt } from "src/common/Crypt";
 import { Storage } from "src/common/Storage";
 import useAuth from "src/hooks/useAuth";
 
-export class UserSearchObj {
+export class _UserSearchObj {
   selectedState: string = "";
   checkInDate: Date | null = null;
   checkOutDate: Date | null = null;
@@ -13,54 +12,24 @@ export class UserSearchObj {
   selectedCountry: string = "India-IN";
 }
 
-const getDefaultUserSearchObj = (): UserSearchObj => {
-  let _UserSearchObj = new UserSearchObj();
-  try {
-    const userSearchEncryptString =
-      Storage.getFromSessionStorage("guest_search");
-    if (userSearchEncryptString.error === "") {
-      const decryptObj = Crypt.Decryption(userSearchEncryptString.data);
-
-      if (decryptObj.error === "") {
-        _UserSearchObj = decryptObj.data;
-      } else {
-        _UserSearchObj = new UserSearchObj();
-      }
-    } else {
-      _UserSearchObj = new UserSearchObj();
-    }
-  } catch (error) {
-    _UserSearchObj = new UserSearchObj();
-  } finally {
-    return _UserSearchObj;
-  }
-};
-
 interface CTX {
-  UserSearchObj: UserSearchObj;
-  UpdateSearchObj: <K extends keyof UserSearchObj>(
+  UserSearchObj: _UserSearchObj;
+  UpdateSearchObj: <K extends keyof _UserSearchObj>(
     PropertyName: K,
-    value: UserSearchObj[K]
+    value: _UserSearchObj[K]
   ) => void;
+  UpdateFullobj: (obj: _UserSearchObj) => void;
 }
 
-const UserSearchContext = createContext<CTX>({
-  UserSearchObj: getDefaultUserSearchObj(),
-  UpdateSearchObj(PropertyName, value) {
-    return {
-      PropertyName,
-      value,
-    };
-  },
-});
+const UserSearchContext = createContext<CTX | null>(null);
 
 interface Props {
   children: ReactNode;
 }
 
 function UserSearchContextProvider({ children }: Props) {
-  const [UserSearchObj, setUserSearchObj] = useState<UserSearchObj>(
-    getDefaultUserSearchObj()
+  const [UserSearchObj, setUserSearchObj] = useState<_UserSearchObj>(
+    new _UserSearchObj()
   );
 
   const {
@@ -70,20 +39,48 @@ function UserSearchContextProvider({ children }: Props) {
   } = useAuth();
 
   useEffect(() => {
+    debugger;
+    let __UserSearchObj = new _UserSearchObj();
+    try {
+      const userSearchEncryptString =
+        Storage.getFromSessionStorage("guest_search");
+      if (userSearchEncryptString.error === "") {
+        __UserSearchObj = userSearchEncryptString.data;
+      } else {
+        __UserSearchObj.selectedCountry = country !== "" ? country : "India-IN";
+
+        __UserSearchObj = new _UserSearchObj();
+      }
+    } catch (error) {
+      __UserSearchObj.selectedCountry = country !== "" ? country : "India-IN";
+      __UserSearchObj = new _UserSearchObj();
+    } finally {
+      setUserSearchObj(__UserSearchObj);
+    }
+  }, []);
+
+  useEffect(() => {
     if (country !== "") {
       UpdateSearchObj("selectedCountry", country);
     }
-  }, [country]);
+  }, []);
 
-  const UpdateSearchObj = <K extends keyof UserSearchObj>(
+  const UpdateSearchObj = <K extends keyof _UserSearchObj>(
     PropertyName: K,
-    value: UserSearchObj[K]
+    value: _UserSearchObj[K]
   ) => {
     setUserSearchObj({ ...UserSearchObj, [PropertyName]: value });
   };
 
+  const UpdateFullobj = (obj: _UserSearchObj) => {
+    setUserSearchObj(obj);
+    Storage.setToSessionStorage("guest_search", obj);
+  };
+
   return (
-    <UserSearchContext.Provider value={{ UserSearchObj, UpdateSearchObj }}>
+    <UserSearchContext.Provider
+      value={{ UserSearchObj, UpdateSearchObj, UpdateFullobj }}
+    >
       {children}
     </UserSearchContext.Provider>
   );

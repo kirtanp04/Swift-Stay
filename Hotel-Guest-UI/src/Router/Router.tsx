@@ -2,7 +2,6 @@ import { ElementType, Suspense, lazy } from "react";
 import { useRoutes } from "react-router-dom";
 import LoadingPage from "src/components/LoadingPage";
 import { UserSearchContextProvider } from "src/context/UserSearchContext";
-import AuthGaurd from "src/guard/AuthGaurd";
 import LoginGaurd from "src/guard/LoginGaurd";
 import Layout from "src/layout/NavBar";
 // import Login from "src/pages/Authentication/Login";
@@ -24,28 +23,12 @@ const SignUp = Loadable(
   lazy(() => import("src/pages/Authentication/Register"))
 );
 const Login = Loadable(lazy(() => import("src/pages/Authentication/Login")));
+const PropertyListByState = Loadable(
+  lazy(() => import("src/pages/PropertylistByState/PropertyListByState"))
+);
 
 export default function Router() {
   return useRoutes([
-    // {
-    //   path: "/",
-    //   element: <Outlet />,
-    //   children: [
-    //     {
-    //       path: "",
-    //       element: (
-    //         <LoginGaurd>
-    //           <Login />
-    //         </LoginGaurd>
-    //       ),
-    //       index: true,
-    //     },
-    //     { path: "register", element: <SignUp /> },
-    //     { path: "about", element: <>About</> },
-    //     { path: "contact", element: <>About</> },
-    //   ],
-    // },
-
     {
       path: "/",
       element: (
@@ -57,7 +40,10 @@ export default function Router() {
       ),
       children: [
         { path: "", element: <HomePage />, index: true },
-
+        {
+          path: ":country/:state",
+          element: <PropertyListByState />,
+        },
         { path: "about", element: <>About</> },
         { path: "contact", element: <>Contact</> },
       ],

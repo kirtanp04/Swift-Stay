@@ -54,7 +54,16 @@ export class Api {
             }
           },
         });
-        console.log(response);
+        if (response) {
+          const objDecryptRes = Crypt.Decryption(response.data);
+          if (objDecryptRes.data.isError === false) {
+            _res.data = objDecryptRes.data.data;
+          } else {
+            _res.error = objDecryptRes.data.Message;
+          }
+        } else {
+          _res.error = "Getting response Undefine";
+        }
       } else {
         _res.error = encryptData.error;
       }
