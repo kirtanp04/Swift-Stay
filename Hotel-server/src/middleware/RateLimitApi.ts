@@ -7,7 +7,7 @@ import { SendResponseToUser } from './UserResponse'
 
 export const MainApiLimit = rateLimit({
     windowMs: 60 * 1000, // 1min,
-    limit: 5, // 5 call
+    limit: 100, // 5 call
     legacyHeaders: true,
     standardHeaders: true,
     requestPropertyName: 'MainApiLimit',

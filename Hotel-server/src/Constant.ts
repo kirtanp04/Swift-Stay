@@ -42,7 +42,10 @@ export const Param = {
             register: 'CreateGuestAccount',
             login: 'GuestLogin',
             property: {
-                GetAllPropertyByState: 'GuestGetAllPropertyByState'
+                GetAllPropertyByState: 'GuestGetAllPropertyByState',
+                GetAllPropertyByCountry: 'GetAllPropertyByCountry',
+                GetTotalPropertByCountry: 'GetTotalPropertByCountry',
+                GetTotalPropertyByType: 'GetTotalPropertyByType'
             }
         },
     },

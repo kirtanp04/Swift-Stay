@@ -15,6 +15,9 @@ const _DeleteProperty = Param.function.manager.Property.DeleteProperty;
 
 // Guest--
 const _GetAllPropertyByState = Param.function.guest.property.GetAllPropertyByState;
+const _GetAllPropertiesByCountry = Param.function.guest.property.GetAllPropertyByCountry;
+const _GetTotalPropertByCountry = Param.function.guest.property.GetTotalPropertByCountry;
+const _GetTotalPropertyByType = Param.function.guest.property.GetTotalPropertyByType;
 
 export class PropertyFunction {
     private static objUserResponse: UserResponse = new UserResponse();
@@ -40,6 +43,15 @@ export class PropertyFunction {
             this.objUserResponse = _res;
         } else if (objParam.function === _DeleteProperty) {
             const _res = await _Function.deleteProperty();
+            this.objUserResponse = _res;
+        } else if (objParam.function === _GetAllPropertiesByCountry) {
+            const _res = await _Function.getAllPropertyByCountry();
+            this.objUserResponse = _res;
+        } else if (objParam.function === _GetTotalPropertByCountry) {
+            const _res = await _Function.getTotalPropertyByCountry();
+            this.objUserResponse = _res;
+        } else if (objParam.function === _GetTotalPropertyByType) {
+            const _res = await _Function.getTotalPropertyByPropertType();
             this.objUserResponse = _res;
         } else {
             this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
@@ -88,9 +100,11 @@ class Functions {
             const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
 
             if (checkUser.error === '') {
-
                 if (email === checkUser.data.email) {
-                    this.objUserResponse = GetUserErrorObj('You cannot use your register email as public email.', HttpStatusCodes.NOT_ACCEPTABLE);
+                    this.objUserResponse = GetUserErrorObj(
+                        'You cannot use your register email as public email.',
+                        HttpStatusCodes.NOT_ACCEPTABLE
+                    );
                 } else {
                     const _Property = await PropertyModel.create({
                         address: address,
@@ -135,7 +149,6 @@ class Functions {
                         );
                     }
                 }
-
             } else {
                 this.objUserResponse = GetUserErrorObj(checkUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
             }
@@ -241,9 +254,11 @@ class Functions {
             const checkUser = await checkAdminVerification(adminID);
 
             if (checkUser.error === '') {
-
                 if (email === checkUser.data.email) {
-                    this.objUserResponse = GetUserErrorObj('You cannot use your register email as public email.', HttpStatusCodes.NOT_ACCEPTABLE);
+                    this.objUserResponse = GetUserErrorObj(
+                        'You cannot use your register email as public email.',
+                        HttpStatusCodes.NOT_ACCEPTABLE
+                    );
                 } else {
                     const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
                     const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
@@ -300,7 +315,6 @@ class Functions {
                         );
                     }
                 }
-
             } else {
                 this.objUserResponse = GetUserErrorObj(checkUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
             }
@@ -389,6 +403,93 @@ class Functions {
             }
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    public getAllPropertyByCountry = async (): Promise<UserResponse> => {
+        try {
+            const { country } = this.objParam.data;
+
+            const Properties: PropertyClass[] = await PropertyModel.find({ country: country }).populate({
+                path: 'rooms',
+                populate: {
+                    path: 'property',
+                },
+            });
+
+            this.objUserResponse = GetUserSuccessObj(Properties, HttpStatusCodes.OK);
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    public getTotalPropertyByCountry = async (): Promise<UserResponse> => {
+        try {
+            const { country } = this.objParam.data;
+
+            const propertiesByState = await PropertyModel.aggregate([
+                {
+                    $match: {
+                        country: country
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$state",
+                        totalProperties: { $sum: 1 }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        state: "$_id",
+                        totalProperties: 1
+                    }
+                }
+            ]);
+
+
+            this.objUserResponse = GetUserSuccessObj(propertiesByState, HttpStatusCodes.OK);
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    public getTotalPropertyByPropertType = async (): Promise<UserResponse> => {
+        try {
+            const { country } = this.objParam.data;
+
+            const propertiesByState = await PropertyModel.aggregate([
+                {
+                    $match: {
+                        country: country
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$propertyType",
+                        totalProperties: { $sum: 1 }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        propertyType: "$_id",
+                        totalProperties: 1
+                    }
+                }
+            ]);
+
+
+            this.objUserResponse = GetUserSuccessObj(propertiesByState, HttpStatusCodes.OK);
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
         } finally {
             return this.objUserResponse;
         }
