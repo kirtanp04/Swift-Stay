@@ -6,6 +6,8 @@ import * as Functions from '../functions';
 import { GetUserErrorObj, HttpStatusCodes } from '../common';
 import { Param } from '../Constant'
 import { MongoDB } from '../DB/MongoDB';
+import { Room, RoomClass } from '../models/RoomModel';
+import { Property } from '../models/PropertyModel';
 
 const ManagerBrokerRouter: Router = express.Router();
 
@@ -19,6 +21,33 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
     const isDBConnected = await MongoDB.ConnectDB(next)
 
     if (isDBConnected.isError === false) {
+
+
+      // const getAllRooms = async () => {
+      //   const _Rooms: RoomClass[] = await Room.find()
+
+      //   _Rooms.forEach(async (objRoom) => {
+      //     const isUp = await Property.findOneAndUpdate({ _id: objRoom.property }, {
+      //       $push: {
+      //         rooms: objRoom._id
+      //       }
+      //     })
+      //     console.log(isUp)
+
+      //     // const property = await Property.findOne({ _id: objRoom.property })
+
+      //     // const isUp = await Room.findOneAndUpdate({ _id: objRoom._id }, {
+      //     //   $set: {
+      //     //     property: property?._id
+      //     //   }
+      //     // })
+      //     console.log(isUp)
+      //   })
+      //   // console.log(_Rooms)
+      // }
+
+      // getAllRooms()
+
       const { param } = req.params;
       const objDecrypt = Crypt.Decryption(param);
 
