@@ -2,7 +2,7 @@ import express, { NextFunction, Request, Response, Router } from 'express';
 import { Crypt } from '../common/Crypt';
 import { SendResponseToUser } from '../middleware/UserResponse';
 import { TParam } from '../types/Type';
-import * as Functions from '../functions'
+import * as Functions from '../Functions/index'
 import { Param } from '../Constant';
 import { MongoDB } from '../DB/MongoDB';
 import { GetUserErrorObj, HttpStatusCodes } from '../common';

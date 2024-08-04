@@ -45,7 +45,8 @@ export const Param = {
                 GetAllPropertyByState: 'GuestGetAllPropertyByState',
                 GetAllPropertyByCountry: 'GetAllPropertyByCountry',
                 GetTotalPropertByCountry: 'GetTotalPropertByCountry',
-                GetTotalPropertyByType: 'GetTotalPropertyByType'
+                GetTotalPropertyByType: 'GetTotalPropertyByType',
+                GetPropertyListByFilterSearch: 'GetPropertyListByFilterSearch'
             }
         },
     },

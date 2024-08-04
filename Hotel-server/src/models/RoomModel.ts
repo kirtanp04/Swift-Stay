@@ -23,6 +23,7 @@ export class RoomClass {
     images: string[] = []
     price: number = 0
     maxOccupancy: number = 0
+    rating: number = 0
     isAvailable: boolean = true
     createdAt: Date = new Date()
     updatedAt: Date = new Date()
@@ -38,6 +39,7 @@ const RoomSchema = new Schema<RoomClass>({
     images: [String],
     price: { type: Number, required: [true, 'Room price is required'] },
     maxOccupancy: { type: Number, required: [true, 'Room max occupancy is required'] },
+    rating: { type: Number, max: 5 },
     isAvailable: { type: Boolean, default: true },
     createdAt: { type: Date },
     updatedAt: { type: Date }

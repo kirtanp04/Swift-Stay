@@ -21,10 +21,11 @@ export class RoomClass {
     roomNumber: number = 0
     type: enumRoomType = enumRoomType.Single_Room // e.g., single, double, suite
     description: string = ''
-    amenities: string[] = ['cricket']
+    amenities: string[] = []
     images: string[] = []
     price: number = 0
     maxOccupancy: number = 0
+    rating: number = 0
     isAvailable: boolean = true
     createdAt: Date = new Date()
     updatedAt: Date = new Date()

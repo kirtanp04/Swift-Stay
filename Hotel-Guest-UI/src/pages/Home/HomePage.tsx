@@ -67,7 +67,7 @@ export default function HomePage() {
       Path.PropertyListByState.root(
         UserSearch.selectedCountry,
         UserSearch.selectedState
-      )
+      ) + "?page=1"
     );
     UpdateFullobj(UserSearch);
   };

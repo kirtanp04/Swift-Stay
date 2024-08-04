@@ -84,7 +84,9 @@ export default function SearchStateDialog({
             .map((objState) => (
               <EListItem
                 key={objState.isoCode}
-                onClick={() => onStateSelect(objState.name)}
+                onClick={() =>
+                  onStateSelect(objState.name + "-" + objState.isoCode)
+                }
               >
                 <ListItemIcon>
                   <LocationIcon

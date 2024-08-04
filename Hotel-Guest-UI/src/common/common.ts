@@ -1,3 +1,4 @@
+import { City } from "country-state-city";
 import { countryNames } from "src/Types";
 
 export function getFirstLetter(fullName: string) {
@@ -8,9 +9,9 @@ export function getFirstLetter(fullName: string) {
 export function getAvatarColor(fullName: string): string {
     const firstLetter = getFirstLetter(fullName);
 
-    const group1 = 'ABCDEFGabcdefg0123!@#'.split('');
-    const group2 = 'HIJKLMNhijklmn456$%^'.split('');
-    const group3 = 'OPQRSTUVWXYZopqrstuvwxyz789&*()'.split('');
+    const group1 = "ABCDEFGabcdefg0123!@#".split("");
+    const group2 = "HIJKLMNhijklmn456$%^".split("");
+    const group3 = "OPQRSTUVWXYZopqrstuvwxyz789&*()".split("");
 
     const colorGroup1 = "#365E32";
     const colorGroup2 = "#E7D37F";
@@ -27,7 +28,6 @@ export function getAvatarColor(fullName: string): string {
     }
 }
 
-
 export function isUndefinedOrNull(value: any, defaultValue: any) {
     try {
         if (value === undefined || value === null) {
@@ -40,19 +40,38 @@ export function isUndefinedOrNull(value: any, defaultValue: any) {
     }
 }
 
-
-
 interface CountryFlag {
     name: string;
     className: string;
 }
 
-const countryFlags: CountryFlag[] = Object.keys(countryNames).map((countryName) => {
-    const countryCode = countryNames[countryName as keyof typeof countryNames];
-    return {
-        name: countryName,
-        className: `fi fi-${countryCode.toLowerCase()}`,
-    };
-});
+const countryFlags: CountryFlag[] = Object.keys(countryNames).map(
+    (countryName) => {
+        const countryCode = countryNames[countryName as keyof typeof countryNames];
+        return {
+            name: countryName,
+            className: `fi fi-${countryCode.toLowerCase()}`,
+        };
+    }
+);
 
 export default countryFlags;
+
+export const GetAllCityByCountryAndState = (
+    countryCode: string,
+    stateCode: string
+): Promise<any> => {
+    const Cities: Promise<any> = new Promise((resolve, reject) => {
+        try {
+            const allCities = City.getCitiesOfState(countryCode, stateCode);
+            if (allCities.length > 0) {
+                resolve(allCities);
+            }
+
+            return Cities;
+        } catch (error: any) {
+            reject(error.message);
+        }
+    });
+    return Cities;
+};

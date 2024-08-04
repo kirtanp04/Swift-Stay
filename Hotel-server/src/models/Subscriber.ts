@@ -3,27 +3,20 @@ import { PropertyClass } from './PropertyModel';
 import { UserClass } from './UserModel';
 
 
-class SubscribeDetail {
-    property: PropertyClass = new PropertyClass()
-    users: UserClass[] = []
-}
-
 export class SubscriberClass {
     _id: string = '';
-    adminID: string = '';
-    SubscribeDetail: SubscribeDetail[] = []
+    property: PropertyClass = new PropertyClass();
+    adminID: UserClass = new UserClass()
+    subscribers: UserClass[] = []
+
 }
 
 const SubscriberSchema = new Schema<SubscriberClass>({
 
     adminID: { type: String, required: [true, 'Admin ID is required.'] },
-    SubscribeDetail: [
-        {
-            property: { type: Schema.Types.ObjectId, ref: 'Property' },
-            users: [
-                { type: Schema.Types.ObjectId, ref: 'User' }
-            ]
-        }
+    property: { type: Schema.Types.ObjectId, ref: 'Property' },
+    subscribers: [
+        { type: Schema.Types.ObjectId, ref: 'User' }
     ]
 
 });

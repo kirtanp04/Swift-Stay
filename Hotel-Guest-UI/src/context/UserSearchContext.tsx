@@ -39,7 +39,6 @@ function UserSearchContextProvider({ children }: Props) {
   } = useAuth();
 
   useEffect(() => {
-    debugger;
     let __UserSearchObj = new _UserSearchObj();
     try {
       const userSearchEncryptString =

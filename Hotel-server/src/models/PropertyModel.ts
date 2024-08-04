@@ -1,11 +1,15 @@
 import mongoose, { Schema } from 'mongoose';
 import { RoomClass } from './RoomModel';
+import { ReviewClass } from './Review';
+import { SubscriberClass } from './Subscriber';
 
 export enum enumPropertyType {
     Hotel = 'Hotel',
     Resort = 'Resort',
     Apartment = 'Apartment',
-    Bungalow = 'Bungalow'
+    Bungalow = 'Bungalow',
+    Villa = 'Villa',
+    Cottage = 'Cottage'
 }
 
 export class PropertyClass {
@@ -25,6 +29,8 @@ export class PropertyClass {
     amenities: string[] = [];
     images: string[] = [];
     rooms: RoomClass[] = [];
+    reviews: ReviewClass = new ReviewClass();
+    subscribers: SubscriberClass = new SubscriberClass();
     jobHiring: boolean = false
     createdAt: Date = new Date();
     updatedAt: Date = new Date();
@@ -44,6 +50,8 @@ const PropertySchema = new Schema<PropertyClass>({
     website: { type: String },
     description: { type: String },
     rooms: [{ type: Schema.Types.ObjectId, ref: 'Room' }],
+    reviews: { type: Schema.Types.ObjectId, ref: 'Review' },
+    subscribers: { type: Schema.Types.ObjectId, ref: 'Subscriber' },
     amenities: [String],
     images: [String],
     jobHiring: { type: Boolean, default: false },

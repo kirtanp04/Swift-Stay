@@ -15,13 +15,21 @@ function LazyImage({ src, alt, ...other }: TProps) {
   const [loading, setLoading] = useState(true);
 
   return (
-    <LazyLoad style={{ height: "100%", width: "100%" }}>
+    <LazyLoad style={{ height: "100%", width: "100%", overflow: "hidden" }}>
       {loading && <Skeleton variant="rectangular" width="100%" height="100%" />}
       <Image
         src={src}
         alt={alt}
-        onLoad={() => setLoading(false)}
-        onError={() => setLoading(false)}
+        onLoad={() =>
+          setTimeout(() => {
+            setLoading(false);
+          }, 1500)
+        }
+        onError={() =>
+          setTimeout(() => {
+            setLoading(false);
+          }, 1500)
+        }
         style={{ display: loading ? "none" : "block" }}
         {...other}
       />

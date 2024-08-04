@@ -6,33 +6,34 @@ import { StoreError } from "src/util/StoreError";
 import { isUndefinedOrNull } from "src/common/common";
 
 export enum enumPropertyType {
-    Hotel = "Hotel",
-
-    Resort = "Resort",
-
-    Apartment = "Apartment",
-
-    Bungalow = "Bungalow",
+    Hotel = 'Hotel',
+    Resort = 'Resort',
+    Apartment = 'Apartment',
+    Bungalow = 'Bungalow',
+    Villa = 'Villa',
+    Cottage = 'Cottage'
 }
 
 export class PropertyClass {
-    _id: string = "";
-    adminID: any = "";
-    name: string = "";
+    _id: string = '';
+    adminID: string = '';
+    name: string = '';
     propertyType: enumPropertyType = enumPropertyType.Hotel;
-    address: string = "";
-    city: string = "";
-    state: string = "";
-    country: string = "";
-    zipCode: string = "";
-    phone: string = "";
-    email: string = "";
-    website: string = "";
-    description: string = "";
+    address: string = '';
+    city: string = '';
+    state: string = '';
+    country: string = '';
+    zipCode: string = '';
+    phone: string = '';
+    email: string = '';
+    website: string = '';
+    description: string = '';
     amenities: string[] = [];
     images: string[] = [];
     rooms: RoomClass[] = [];
-    jobHiring: boolean = false;
+    // reviews: ReviewClass = new ReviewClass();
+    // subscribers: SubscriberClass = new SubscriberClass();
+    jobHiring: boolean = false
     createdAt: Date = new Date();
     updatedAt: Date = new Date();
 

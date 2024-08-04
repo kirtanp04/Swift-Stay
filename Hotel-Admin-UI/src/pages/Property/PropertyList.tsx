@@ -331,6 +331,12 @@ export const getChipColor = (
   if (_PropertyType === enumPropertyType.Resort) {
     color = theme.palette.color.pink.main;
   }
+  if (_PropertyType === enumPropertyType.Cottage) {
+    color = theme.palette.color.primary.main;
+  }
+  if (_PropertyType === enumPropertyType.Villa) {
+    color = theme.palette.color.purple.main;
+  }
 
   return color;
 };

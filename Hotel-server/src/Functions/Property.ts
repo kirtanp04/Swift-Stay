@@ -6,6 +6,7 @@ import { Property as PropertyModel, PropertyClass, enumPropertyType } from '../m
 // import { User, UserClass, enumUserRole } from '';
 import { checkAdminVerification } from '../middleware/AdiminVerification';
 import { Room } from '../models/RoomModel';
+import { FilterQuery } from 'mongoose';
 
 const _AddProperty = Param.function.manager.Property.AddProperty;
 const _GetSingleProperty = Param.function.manager.Property.GetSingleProperty;
@@ -18,6 +19,7 @@ const _GetAllPropertyByState = Param.function.guest.property.GetAllPropertyBySta
 const _GetAllPropertiesByCountry = Param.function.guest.property.GetAllPropertyByCountry;
 const _GetTotalPropertByCountry = Param.function.guest.property.GetTotalPropertByCountry;
 const _GetTotalPropertyByType = Param.function.guest.property.GetTotalPropertyByType;
+const _GetPropertyListByFilterSearch = Param.function.guest.property.GetPropertyListByFilterSearch;
 
 export class PropertyFunction {
     private static objUserResponse: UserResponse = new UserResponse();
@@ -52,6 +54,10 @@ export class PropertyFunction {
             this.objUserResponse = _res;
         } else if (objParam.function === _GetTotalPropertyByType) {
             const _res = await _Function.getTotalPropertyByPropertType();
+            this.objUserResponse = _res;
+
+        } else if (objParam.function === _GetPropertyListByFilterSearch) {
+            const _res = await _Function.GetPropertyListByFilterSearch();
             this.objUserResponse = _res;
         } else {
             this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
@@ -408,6 +414,7 @@ class Functions {
         }
     };
 
+    // ---------------------- Guest ------------------------
     public getAllPropertyByCountry = async (): Promise<UserResponse> => {
         try {
             const { country } = this.objParam.data;
@@ -434,24 +441,23 @@ class Functions {
             const propertiesByState = await PropertyModel.aggregate([
                 {
                     $match: {
-                        country: country
-                    }
+                        country: country,
+                    },
                 },
                 {
                     $group: {
-                        _id: "$state",
-                        totalProperties: { $sum: 1 }
-                    }
+                        _id: '$state',
+                        totalProperties: { $sum: 1 },
+                    },
                 },
                 {
                     $project: {
                         _id: 0,
-                        state: "$_id",
-                        totalProperties: 1
-                    }
-                }
+                        state: '$_id',
+                        totalProperties: 1,
+                    },
+                },
             ]);
-
 
             this.objUserResponse = GetUserSuccessObj(propertiesByState, HttpStatusCodes.OK);
         } catch (error: any) {
@@ -468,26 +474,145 @@ class Functions {
             const propertiesByState = await PropertyModel.aggregate([
                 {
                     $match: {
-                        country: country
-                    }
+                        country: country,
+                    },
                 },
                 {
                     $group: {
-                        _id: "$propertyType",
-                        totalProperties: { $sum: 1 }
-                    }
+                        _id: '$propertyType',
+                        totalProperties: { $sum: 1 },
+                    },
                 },
                 {
                     $project: {
                         _id: 0,
-                        propertyType: "$_id",
-                        totalProperties: 1
-                    }
-                }
+                        propertyType: '$_id',
+                        totalProperties: 1,
+                    },
+                },
             ]);
 
-
             this.objUserResponse = GetUserSuccessObj(propertiesByState, HttpStatusCodes.OK);
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    public GetPropertyListByFilterSearch = async (): Promise<UserResponse> => {
+        try {
+            const { FilterData } = this.objParam.data;
+
+
+            const limit = 5;
+            const skip = (Number(FilterData.page) - 1) * limit;
+
+
+
+            const Properties = await PropertyModel.aggregate([
+                {
+                    $match: {
+                        $and: getPropertyFilterAndCondition(FilterData)
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'reviews',
+                        localField: 'reviews',
+                        foreignField: '_id',
+                        as: 'review',
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'rooms',
+                        localField: 'rooms',
+                        foreignField: '_id',
+                        as: 'roomDetails',
+                    }
+                },
+                {
+                    $unwind: {
+                        path: "$review",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $addFields: {
+                        avgRating: {
+                            $avg: {
+                                $map: {
+                                    input: "$review.reviewInfo",
+                                    as: "review",
+                                    in: "$$review.rating"
+                                }
+                            }
+                        },
+                        avpPrice: {
+                            $avg: {
+                                $map: {
+                                    input: "$roomDetails",
+                                    as: "roomDetails",
+                                    in: "$$roomDetails.price"
+                                }
+                            }
+                        },
+                        totalReviews: {
+                            $size: {
+                                $ifNull: ["$review.reviewInfo", []]
+                            }
+                        },
+                        totalRooms: {
+                            $size: {
+                                $ifNull: ["$roomDetails", []]
+                            }
+                        }
+                        // isNewToSwiftStay: {
+                        //     $cond: {
+                        //         if: {
+                        //             $lt: [
+                        //                 {
+                        //                     $dateDiff: {
+                        //                         startDate: "$createdAt",
+                        //                         endDate: "$$NOW",
+                        //                         unit: "day"
+                        //                     }
+                        //                 },
+                        //                 10
+                        //             ]
+                        //         },
+                        //         then: false,
+                        //         else: true
+                        //     }
+                        // }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        images: 1,
+                        name: 1,
+                        city: 1,
+                        amenities: 1,
+                        jobHiring: 1,
+                        avgRating: 1,
+                        totalReviews: 1,
+                        totalRooms: 1,
+                        avpPrice: 1,
+                        propertyType: 1
+                    }
+                },
+                {
+                    $limit: limit
+                },
+                {
+                    $skip: skip
+                }
+            ])
+
+
+            this.objUserResponse = GetUserSuccessObj(Properties, HttpStatusCodes.OK);
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
         } finally {
@@ -700,3 +825,40 @@ const dummy = [
         updatedAt: new Date(),
     },
 ];
+
+
+
+
+const getPropertyFilterAndCondition = (FilterData: any) => {
+
+    const { Price, state, city, propertyType, page, country } = FilterData
+    console.log(FilterData)
+
+    let and: FilterQuery<any>[] = []
+
+    and.push({
+        country: country
+    })
+
+    and.push({
+        state: state
+    })
+
+    if (city !== null && city !== undefined) {
+        and.push({
+            city: {
+                $in: city.split(',')
+            }
+        })
+    }
+
+    if (propertyType !== null && propertyType !== undefined) {
+        and.push({
+            propertyType: {
+                $in: propertyType.split(',')
+            }
+        })
+    }
+
+    return and
+}

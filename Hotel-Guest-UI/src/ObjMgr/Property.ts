@@ -6,7 +6,9 @@ export enum enumPropertyType {
     Hotel = 'Hotel',
     Resort = 'Resort',
     Apartment = 'Apartment',
-    Bungalow = 'Bungalow'
+    Bungalow = 'Bungalow',
+    Villa = 'Villa',
+    Cottage = 'Cottage'
 }
 
 export class Property {
@@ -26,6 +28,8 @@ export class Property {
     amenities: string[] = [];
     images: string[] = [];
     rooms: Room[] = [];
+    // reviews: ReviewClass = new ReviewClass();
+    // subscribers: SubscriberClass = new SubscriberClass();
     jobHiring: boolean = false
     createdAt: Date = new Date();
     updatedAt: Date = new Date();
@@ -72,6 +76,26 @@ export class Property {
     static GetTotalPropertByPropertyType = async (country: string, onsuccess: (porpertyList: { propertyType: string; totalProperties: number }[]) => void, onfail: (err: any) => void) => {
         try {
             const _Param = getGETParamData(Param.broker.Property, Param.function.property.GetTotalPropertyByType, { country: country })
+            await Api.get(_Param, (res) => {
+
+                if (res.error === '') {
+                    onsuccess(res.data)
+                } else {
+                    onfail(res.error)
+                }
+
+            }, (progressValue) => {
+                console.log(progressValue)
+            })
+        } catch (error: any) {
+            onfail(error.message)
+        }
+    }
+
+
+    static GetPropertyListByFilterSearch = async (pObjFilter: any, onsuccess: (porpertyList: any) => void, onfail: (err: any) => void) => {
+        try {
+            const _Param = getGETParamData(Param.broker.Property, Param.function.property.GetPropertyListByFilterSearch, { FilterData: pObjFilter })
             await Api.get(_Param, (res) => {
 
                 if (res.error === '') {
