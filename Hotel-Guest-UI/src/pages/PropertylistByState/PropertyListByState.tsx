@@ -20,8 +20,9 @@ export interface TFilterProperty {
   avgRating: number;
   totalReviews: number;
   totalRooms: number;
-  avpPrice: number;
+  maxPrice: number;
   propertyType: enumPropertyType;
+  address: string;
 }
 
 export default function PropertyListByState() {

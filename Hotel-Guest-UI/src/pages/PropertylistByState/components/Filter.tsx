@@ -29,6 +29,20 @@ export default function Filter({ onSearchbyFilter }: Props) {
   const theme = useTheme();
   const { country, state } = useParams();
   const FilterobjRef = useRef<FilterClass>(new FilterClass());
+
+  // useEffect(() => {
+  //   let newSearchObj: any = {};
+
+  //   if (searchParam.size > 0) {
+  //     for (const [key, value] of searchParam) {
+  //       newSearchObj[key] = value;
+  //     }
+  //   }
+
+  //   FilterobjRef.current = newSearchObj;
+  //   setRefresh(new Date());
+  // }, [searchParam]);
+
   useEffect(() => {
     try {
       const _Country = Country.getCountryByCode(country!.split("-")[1]);
@@ -60,7 +74,6 @@ export default function Filter({ onSearchbyFilter }: Props) {
   }, [state, country]);
 
   const onSearch = () => {
-    // const filterInfo = FilterClass.getFilterObj(FilterobjRef.current);
     onSearchbyFilter(FilterobjRef.current);
   };
   return (
@@ -105,7 +118,11 @@ export default function Filter({ onSearchbyFilter }: Props) {
             </HeaderWrapper>
             <FilterContentWrapper>
               <ContentText>
-                0 {currency} - {FilterobjRef.current.Price} {currency}
+                0 {currency} -{" "}
+                {FilterobjRef.current.Price !== undefined
+                  ? FilterobjRef.current.Price
+                  : "1000"}{" "}
+                {currency}
               </ContentText>
 
               <MUISlider
@@ -114,7 +131,7 @@ export default function Filter({ onSearchbyFilter }: Props) {
                 aria-label="Small"
                 valueLabelDisplay="auto"
                 max={2000}
-                min={FilterobjRef.current.Price}
+                min={1000}
                 sx={{ width: "calc(100% - 20px)" }}
                 onChange={(e, num) => {
                   FilterobjRef.current.Price = num as number;

@@ -2,7 +2,7 @@ import { enumPropertyType } from "src/ObjMgr/Property"
 
 
 export class FilterClass {
-    Price: number = 1000
+    Price: number | undefined = undefined
 
     city: string[] = []
 

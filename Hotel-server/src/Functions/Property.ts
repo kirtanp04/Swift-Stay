@@ -55,7 +55,6 @@ export class PropertyFunction {
         } else if (objParam.function === _GetTotalPropertyByType) {
             const _res = await _Function.getTotalPropertyByPropertType();
             this.objUserResponse = _res;
-
         } else if (objParam.function === _GetPropertyListByFilterSearch) {
             const _res = await _Function.GetPropertyListByFilterSearch();
             this.objUserResponse = _res;
@@ -504,17 +503,14 @@ class Functions {
         try {
             const { FilterData } = this.objParam.data;
 
-
             const limit = 5;
             const skip = (Number(FilterData.page) - 1) * limit;
-
-
 
             const Properties = await PropertyModel.aggregate([
                 {
                     $match: {
-                        $and: getPropertyFilterAndCondition(FilterData)
-                    }
+                        $and: getPropertyFilterAndCondition(FilterData),
+                    },
                 },
                 {
                     $lookup: {
@@ -522,7 +518,7 @@ class Functions {
                         localField: 'reviews',
                         foreignField: '_id',
                         as: 'review',
-                    }
+                    },
                 },
                 {
                     $lookup: {
@@ -530,44 +526,47 @@ class Functions {
                         localField: 'rooms',
                         foreignField: '_id',
                         as: 'roomDetails',
-                    }
+                    },
                 },
                 {
                     $unwind: {
-                        path: "$review",
-                        preserveNullAndEmptyArrays: true
-                    }
+                        path: '$review',
+                        preserveNullAndEmptyArrays: true,
+                    },
                 },
                 {
                     $addFields: {
                         avgRating: {
                             $avg: {
                                 $map: {
-                                    input: "$review.reviewInfo",
-                                    as: "review",
-                                    in: "$$review.rating"
-                                }
-                            }
+                                    input: '$review.reviewInfo',
+                                    as: 'review',
+                                    in: '$$review.rating',
+                                },
+                            },
                         },
-                        avpPrice: {
-                            $avg: {
+                        maxPrice: {
+                            $max: {
                                 $map: {
-                                    input: "$roomDetails",
-                                    as: "roomDetails",
-                                    in: "$$roomDetails.price"
-                                }
-                            }
+                                    input: '$roomDetails',
+                                    as: 'roomDetails',
+                                    in: '$$roomDetails.price',
+                                },
+                            },
                         },
                         totalReviews: {
                             $size: {
-                                $ifNull: ["$review.reviewInfo", []]
-                            }
+                                $ifNull: ['$review.reviewInfo', []],
+                            },
                         },
                         totalRooms: {
                             $size: {
-                                $ifNull: ["$roomDetails", []]
-                            }
-                        }
+                                $ifNull: ['$roomDetails', []],
+                            },
+                        },
+
+
+
                         // isNewToSwiftStay: {
                         //     $cond: {
                         //         if: {
@@ -586,7 +585,22 @@ class Functions {
                         //         else: true
                         //     }
                         // }
-                    }
+                    },
+                },
+                {
+                    $match: {
+                        $expr: {
+                            $cond: {
+                                if: Number(FilterData.Price) !== undefined,
+                                then: {
+                                    $lte: ['$maxPrice', getMaxPrice(FilterData)],
+                                },
+                                else: {
+                                    $eq: [true, true],
+                                },
+                            },
+                        },
+                    },
                 },
                 {
                     $project: {
@@ -599,18 +613,19 @@ class Functions {
                         avgRating: 1,
                         totalReviews: 1,
                         totalRooms: 1,
-                        avpPrice: 1,
-                        propertyType: 1
-                    }
+                        maxPrice: 1,
+                        propertyType: 1,
+                        address: 1,
+                        // isNewToSwiftStay: 1
+                    },
                 },
                 {
-                    $limit: limit
+                    $limit: limit,
                 },
                 {
-                    $skip: skip
-                }
-            ])
-
+                    $skip: skip,
+                },
+            ]);
 
             this.objUserResponse = GetUserSuccessObj(Properties, HttpStatusCodes.OK);
         } catch (error: any) {
@@ -826,39 +841,53 @@ const dummy = [
     },
 ];
 
-
-
-
 const getPropertyFilterAndCondition = (FilterData: any) => {
+    const { Price, state, city, propertyType, page, country } = FilterData;
+    console.log(FilterData);
 
-    const { Price, state, city, propertyType, page, country } = FilterData
-    console.log(FilterData)
-
-    let and: FilterQuery<any>[] = []
-
-    and.push({
-        country: country
-    })
+    let and: FilterQuery<any>[] = [];
 
     and.push({
-        state: state
-    })
+        country: country,
+    });
+
+    and.push({
+        state: state,
+    });
 
     if (city !== null && city !== undefined) {
         and.push({
             city: {
-                $in: city.split(',')
-            }
-        })
+                $in: city.split(','),
+            },
+        });
     }
 
     if (propertyType !== null && propertyType !== undefined) {
         and.push({
             propertyType: {
-                $in: propertyType.split(',')
-            }
-        })
+                $in: propertyType.split(','),
+            },
+        });
     }
 
-    return and
-}
+    return and;
+};
+
+const getMaxPrice = (FilterData: any): number => {
+    const { Price } = FilterData;
+    let maxPrice: number = 1000000000000;
+    if (Price !== null && Price !== undefined) {
+        if (typeof Price === 'string') {
+            const numPrice = Number(Price);
+
+            if (numPrice >= 1000) {
+                maxPrice = numPrice;
+            }
+        }
+    }
+
+    return maxPrice;
+};
+
+const PropertFilterPipeLine = [];

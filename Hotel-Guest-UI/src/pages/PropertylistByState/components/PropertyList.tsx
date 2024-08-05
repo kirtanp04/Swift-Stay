@@ -1,6 +1,6 @@
 import { Box, Divider, styled, Typography, useTheme } from "@mui/material";
-import { memo, useCallback } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { memo } from "react";
+import { useParams } from "react-router-dom";
 import Img from "src/assets/img/GujaratIMG.jpeg";
 import LazyImage from "src/components/LazyImage";
 import "swiper/css";
@@ -13,25 +13,12 @@ interface TProps {
 
 function PropertyList({ FilteredPropertyList }: TProps) {
   const { state } = useParams();
-  const [searchParam, setSearchParams] = useSearchParams();
 
   const theme = useTheme();
 
-  // Callback to handle the update
-  const handleClick = useCallback(() => {
-    // Create a new URLSearchParams object to ensure immutability
-    const newParams = new URLSearchParams(searchParam.toString());
-    newParams.set("page", "2");
-    newParams.set("number", "56");
-    setSearchParams(newParams.toString()); // Update the search params in URL
-  }, [searchParam, setSearchParams]);
-
   return (
     <Rootstyle>
-      <Header
-        onClick={handleClick}
-        sx={{ color: theme.palette.text.secondary }}
-      >
+      <Header sx={{ color: theme.palette.text.secondary }}>
         <span style={{ color: theme.themeColor }}>{state?.split("-")[0]}:</span>{" "}
         1000 Properties found
       </Header>
@@ -69,6 +56,13 @@ function PropertyList({ FilteredPropertyList }: TProps) {
             >
               <InfoWrapper>
                 <Text sx={{ color: theme.palette.text.primary, width: 100 }}>
+                  Address
+                </Text>
+                <Text>{objProperty.address}</Text>
+              </InfoWrapper>
+
+              <InfoWrapper>
+                <Text sx={{ color: theme.palette.text.primary, width: 100 }}>
                   Amenities
                 </Text>
                 <Amenities>
@@ -91,16 +85,31 @@ function PropertyList({ FilteredPropertyList }: TProps) {
                 <Text sx={{ color: theme.palette.text.primary, width: 100 }}>
                   Jobs availability
                 </Text>
-                <Text sx={{ color: theme.palette.color.rose.main }}>
-                  {objProperty.jobHiring ? "Available" : "Not available"}
+                <Text
+                  sx={{
+                    color: objProperty.jobHiring
+                      ? theme.palette.color.success.main
+                      : theme.palette.color.rose.main,
+                  }}
+                >
+                  {objProperty.jobHiring ? "A" : "N"}
                 </Text>
               </InfoWrapper>
 
-              <Text
-                sx={{ color: theme.palette.color.rose.main, marginTop: "auto" }}
-              >
-                Only 1 room left at this price on our site
-              </Text>
+              {objProperty.totalRooms > 0 && (
+                <Text
+                  sx={{
+                    color: theme.palette.color.rose.main,
+                    marginTop: "auto",
+                  }}
+                >
+                  Only 1 room left at this price on our site
+                </Text>
+              )}
+
+              {objProperty.totalRooms < 1 && (
+                <NoRoomMessage>No rooms have been publish.</NoRoomMessage>
+              )}
             </Box>
           </MiddledContentWrapper>
 
@@ -114,7 +123,9 @@ function PropertyList({ FilteredPropertyList }: TProps) {
               </Box>
               {objProperty.avgRating !== null && (
                 <ReviewScore>
-                  <SubTitle>{objProperty.avgRating}</SubTitle>
+                  <SubTitle>
+                    {Math.round(objProperty.avgRating * 10) / 10}
+                  </SubTitle>
                 </ReviewScore>
               )}
             </ReviewScoreWrapper>
@@ -122,8 +133,10 @@ function PropertyList({ FilteredPropertyList }: TProps) {
               <SubTitle>New to Stay Swift</SubTitle>
             </NewToBooking>
             <PriceWrapper>
-              <Text sx={{ textAlign: "right" }}>Starting Price 1.5 day</Text>
-              <Header sx={{ textAlign: "right" }}>$1000</Header>
+              <Text sx={{ textAlign: "right" }}>Max price for 1 night</Text>
+              <Header sx={{ textAlign: "right" }}>
+                {objProperty.maxPrice}
+              </Header>
               <Text sx={{ textAlign: "right" }}>Incluging all Tax.</Text>
             </PriceWrapper>
 
@@ -283,4 +296,10 @@ const Ribbon = styled(Box)(({ theme }) => ({
     display: "block",
     textAlign: "center",
   },
+}));
+
+const NoRoomMessage = styled(Typography)(({ theme }) => ({
+  fontSize: "1rem",
+  color: theme.palette.color.error.main,
+  marginTop: "auto",
 }));
