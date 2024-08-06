@@ -335,7 +335,7 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
                 iconposition="start"
                 starticon={<PlusIcon />}
                 variant="outlined"
-                onClick={() => append("")}
+                // onClick={() => append("")}
               >
                 Add Amenities
               </RESIconButton>

@@ -23,6 +23,7 @@ export interface TFilterProperty {
   maxPrice: number;
   propertyType: enumPropertyType;
   address: string;
+  availableRooms: number;
 }
 
 export default function PropertyListByState() {
@@ -95,17 +96,23 @@ const Rootstyle = styled(Box)(() => ({
 
 const getParamObject = (objFilter: FilterClass) => {
   let ParamObj = {};
-  ParamObj["Price"] = objFilter.Price;
+  if (objFilter.Price !== undefined) {
+    ParamObj["Price"] = objFilter.Price;
+  }
   if (objFilter.propertyType.length > 0) {
     ParamObj["propertyType"] = objFilter.propertyType.join(",");
   }
   if (objFilter.city.length > 0) {
     ParamObj["city"] = objFilter.city.join(",");
   }
+
+  if (objFilter.reviewScore !== null) {
+    ParamObj["reviewScore"] = objFilter.reviewScore;
+  }
   return ParamObj;
 };
 
-const createQueryString = (params) => {
+const createQueryString = (params: any) => {
   let queryString = "";
   for (const key in params) {
     if (params[key]) {

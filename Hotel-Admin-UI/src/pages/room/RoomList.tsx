@@ -174,6 +174,19 @@ export default function RoomList({}: Props) {
               field: "isAvailable",
               headerName: "Available",
               width: 80,
+              renderCell: (param: any) => (
+                <TextWrapper>
+                  <Text
+                    sx={{
+                      color: param.row.isAvailable
+                        ? theme.palette.color.success.main
+                        : theme.palette.color.error.main,
+                    }}
+                  >
+                    {param.row.isAvailable ? "A" : "N"}
+                  </Text>
+                </TextWrapper>
+              ),
             },
             {
               field: "price",

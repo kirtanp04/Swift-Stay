@@ -4,6 +4,7 @@ import LoadingPage from "src/components/LoadingPage";
 import { UserSearchContextProvider } from "src/context/UserSearchContext";
 import LoginGaurd from "src/guard/LoginGaurd";
 import Layout from "src/layout/NavBar";
+// import Errorage404 from "src/pages/Error/404";
 // import Login from "src/pages/Authentication/Login";
 
 // import LoadingPage from "../components/LoadingPage";
@@ -18,6 +19,7 @@ const Loadable = (Component: ElementType) => (props: any) => {
 
 // const Login = Loadable(lazy(() => import("src/pages/Authentication/Login")));
 const HomePage = Loadable(lazy(() => import("src/pages/Home/HomePage")));
+const Errorage404 = Loadable(lazy(() => import("src/pages/Error/404")));
 
 const SignUp = Loadable(
   lazy(() => import("src/pages/Authentication/Register"))
@@ -32,11 +34,9 @@ export default function Router() {
     {
       path: "/",
       element: (
-        // <AuthGaurd>
         <UserSearchContextProvider>
           <Layout />
         </UserSearchContextProvider>
-        // </AuthGaurd>
       ),
       children: [
         { path: "", element: <HomePage />, index: true },
@@ -56,6 +56,11 @@ export default function Router() {
           <Login />
         </LoginGaurd>
       ),
+    },
+
+    {
+      path: "*",
+      element: <Errorage404 />,
     },
   ]);
 }

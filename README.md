@@ -1,69 +1,76 @@
 # Concepts that are followed in this Project
 
 <div style="display: flex; justify-content: space-between;">
+<img src="img/Pic 2.png" alt="Description of Image" width="300" />
+<img src="img/Pic one.png" alt="Description of Image" width="300" />
+<img src="img/Admin pic 1.png" alt="Description of Image" width="300" />
+<img src="img/admin pic 2.png" alt="Description of Image" width="300" />
+</div>
 
-<div style="flex: 1; padding: 10px;">
+<div style="display: flex; justify-content: space-between;">
 
-## Server
+  <div style="flex: 1; padding: 10px;">
 
-- Express JS
-- Mongoose
-- Typescript
+    ## Server
 
-- **Real_Time_Chat**
+    - Express JS
+    - Mongoose
+    - Typescript
 
-  - Socket.io
- 
-- **Authentication**
+    - Real_Time_Chat
 
-  - Email Authentication (for email verification)
+        - Socket.io
 
-- **Protection**
+    - Authentication
 
-  - cors
-  - crypto ts -> for encrypt & decrypt
-  - dotenv
-  - helmet -> for header protection
-  - jsonwebtoken
-  - express-rate-limit -> for api call rate
+        - Email Authentication (for email verification)
 
-- **Scaling / optimization**
+    - Protection
 
-  - Cluster -> for heavy traffic
-  - compression
-  - node-cache
+        - cors
+        - crypto ts -> for encrypt & decrypt
+        - dotenv
+        - helmet -> for header protection
+        - jsonwebtoken
+        - express-rate-limit -> for api call rate
+
+    - **Scaling / optimization**
+
+        - Cluster -> for heavy traffic
+        - compression
+        - node-cache
 
   </div>
 
   <div style="flex: 1; padding: 10px;">
 
-## Frontend
+    ## Frontend
 
-- ReactJS
-- Typescript
-- React-router-dom
-- Material UI
-- axios
-- react-hook-form
-- react-dropzone
+    - ReactJS
+    - Typescript
+    - React-router-dom
+    - Material UI
+    - axios
+    - react-hook-form
+    - react-dropzone
 
-- **Real_Time_Chat**
+    - Real_Time_Chat
 
-  - Socket.io
+        - Socket.io
 
-- **Validation**
+    - Validation
 
-  - Yup
+        - Yup
 
-- **Protection**
+    - Protection
 
-  - crypto ts -> for encrypt & decrypt
+        - crypto ts -> for encrypt & decrypt
 
-- **Scaling / optimization**
-  - Lazy Load
-  - Lazy image load
-  - Image Compression
+    - Scaling / optimization
+        - Lazy Load
+        - Lazy image load
+        - Image Compression
 
-</div>
+  </div>
 
 </div>

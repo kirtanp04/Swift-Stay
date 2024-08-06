@@ -8,6 +8,8 @@ export class FilterClass {
 
     propertyType: enumPropertyType[] = []
 
+    reviewScore: number | null = null
+
 
     static getFilterObj = (objFilter: FilterClass) => {
         try {

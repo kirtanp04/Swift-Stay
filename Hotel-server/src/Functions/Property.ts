@@ -211,7 +211,7 @@ class Functions {
                     this.objUserResponse = GetUserSuccessObj(ManagerPropertyCache.data, HttpStatusCodes.OK);
                 } else {
                     // const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id })
-                    const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: checkUser.data._id }).populate({
+                    const allProperties: PropertyClass[] = await PropertyModel.find({ adminID: id }).populate({
                         path: 'rooms',
                         populate: {
                             path: 'property',
@@ -564,44 +564,75 @@ class Functions {
                                 $ifNull: ['$roomDetails', []],
                             },
                         },
-
-
-
-                        // isNewToSwiftStay: {
-                        //     $cond: {
-                        //         if: {
-                        //             $lt: [
-                        //                 {
-                        //                     $dateDiff: {
-                        //                         startDate: "$createdAt",
-                        //                         endDate: "$$NOW",
-                        //                         unit: "day"
-                        //                     }
-                        //                 },
-                        //                 10
-                        //             ]
-                        //         },
-                        //         then: false,
-                        //         else: true
-                        //     }
-                        // }
+                    },
+                },
+                {
+                    $unwind: {
+                        path: '$roomDetails',
+                        preserveNullAndEmptyArrays: true,
                     },
                 },
                 {
                     $match: {
-                        $expr: {
-                            $cond: {
-                                if: Number(FilterData.Price) !== undefined,
-                                then: {
-                                    $lte: ['$maxPrice', getMaxPrice(FilterData)],
-                                },
-                                else: {
-                                    $eq: [true, true],
-                                },
+                        totalRooms: { $gte: 1 }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$_id',
+                        images: { $first: '$images' },
+                        name: { $first: '$name' },
+                        city: { $first: '$city' },
+                        amenities: { $first: '$amenities' },
+                        jobHiring: { $first: '$jobHiring' },
+                        avgRating: { $first: '$avgRating' },
+                        totalReviews: { $first: '$totalReviews' },
+                        totalRooms: { $first: '$totalRooms' },
+                        maxPrice: { $first: '$maxPrice' },
+                        propertyType: { $first: '$propertyType' },
+                        address: { $first: '$address' },
+                        availableRooms: {
+                            $sum: {
+                                $cond: [{ $eq: ['$roomDetails.isAvailable', true] }, 1, 0],
                             },
                         },
+                        roomDetails: { $push: '$roomDetails' },
                     },
                 },
+                {
+                    $match: {
+                        $and: [
+                            {
+                                $expr: {
+                                    $cond: {
+                                        if: { $ne: [FilterData.Price, undefined] },
+                                        then: { $lte: ['$maxPrice', getMaxPrice(FilterData)] },
+                                        else: true,
+                                    },
+                                },
+                            },
+                            {
+                                $expr: {
+                                    $cond: {
+                                        if: { $ne: [FilterData.reviewScore, null] },
+                                        then: { $gte: ['$avgRating', Number(FilterData.reviewScore)] },
+                                        else: true,
+                                    },
+                                },
+                            },
+                            {
+                                $expr: {
+                                    $cond: {
+                                        if: { $ne: [FilterData.availableRooms, undefined] },
+                                        then: { $gte: ['$availableRooms', Number(FilterData.availableRooms)] },
+                                        else: true,
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                },
+
                 {
                     $project: {
                         _id: 1,
@@ -616,7 +647,8 @@ class Functions {
                         maxPrice: 1,
                         propertyType: 1,
                         address: 1,
-                        // isNewToSwiftStay: 1
+                        availableRooms: 1,
+                        // roomDetails: 1,
                     },
                 },
                 {
@@ -634,6 +666,7 @@ class Functions {
             return this.objUserResponse;
         }
     };
+
 }
 
 //const ids= ['hgihgiy','ojgorg','hrgrhguh'] her i want to delete all the room whose _id is indide this using mongoose operators not bu any js loop
@@ -859,7 +892,9 @@ const getPropertyFilterAndCondition = (FilterData: any) => {
         and.push({
             city: {
                 $in: city.split(','),
+
             },
+
         });
     }
 

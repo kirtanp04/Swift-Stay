@@ -1,14 +1,15 @@
 import express, { NextFunction, Request, Response, Router } from 'express';
+import { GetUserErrorObj, HttpStatusCodes } from '../common';
 import { Crypt } from '../common/Crypt';
+import { Param } from '../Constant';
+import { MongoDB } from '../DB/MongoDB';
+import * as Functions from '../Functions/index';
 import { SendResponseToUser } from '../middleware/UserResponse';
 import { TParam } from '../types/Type';
-import * as Functions from '../Functions/index';
-import { GetUserErrorObj, HttpStatusCodes } from '../common';
-import { Param } from '../Constant'
-import { MongoDB } from '../DB/MongoDB';
 import { Room, RoomClass } from '../models/RoomModel';
-import { Property } from '../models/PropertyModel';
-import { Review, ReviewClass } from '../models/Review';
+import { Property, PropertyClass } from '../models/PropertyModel';
+
+
 
 const ManagerBrokerRouter: Router = express.Router();
 
@@ -24,46 +25,6 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
     if (isDBConnected.isError === false) {
 
 
-      // const getAllRooms = async () => {
-      //   const _Rooms: RoomClass[] = await Room.find()
-
-      //   _Rooms.forEach(async (objRoom) => {
-      //     const isUp = await Property.findOneAndUpdate({ _id: objRoom.property }, {
-      //       $push: {
-      //         rooms: objRoom._id
-      //       }
-      //     })
-      //     console.log(isUp)
-
-      //     // const property = await Property.findOne({ _id: objRoom.property })
-
-      //     // const isUp = await Room.findOneAndUpdate({ _id: objRoom._id }, {
-      //     //   $set: {
-      //     //     property: property?._id
-      //     //   }
-      //     // })
-      //     console.log(isUp)
-      //   })
-      //   // console.log(_Rooms)
-      // }
-
-      // getAllRooms()
-
-      // const updateProperty = async () => {
-      //   const _reviews: ReviewClass[] = await Review.find()
-
-      //   _reviews.forEach(async (objReview) => {
-      //     const isUpdated = await Property.findOneAndUpdate({ _id: objReview.property }, {
-      //       $set: {
-      //         reviews: objReview._id
-      //       }
-      //     })
-
-      //     console.log(isUpdated)
-      //   })
-      // }
-
-      // updateProperty()
 
       const { param } = req.params;
       const objDecrypt = Crypt.Decryption(param);
@@ -73,6 +34,7 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
 
         if (paramObj.Broker === _ManagerAuthBroker) {
           const _res = await Functions.UserFunction.findFunction(paramObj, req, res, next);
+          return SendResponseToUser(_res, next);
         }
 
         if (paramObj.Broker === _ManagerPropertyBroker) {
@@ -116,6 +78,8 @@ ManagerBrokerRouter.post('/:param', async (req: Request, res: Response, next: Ne
           let paramObj: TParam = objDecrypt.data;
 
           paramObj.data = decryptResBody.data;
+
+          console.log(paramObj)
 
           if (paramObj.Broker === _ManagerAuthBroker) {
             const _res = await Functions.UserFunction.findFunction(paramObj, req, res, next);

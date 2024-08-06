@@ -14,7 +14,7 @@ import { getChipColor } from "./PropertyList";
 import { TimeFormatter } from "src/common/TimeFormater";
 import RoomCard from "./RoomCard";
 import { RESIconButton } from "src/components/RESIconButton";
-import { DeleteIcon, PlusIcon, UpdateIcon } from "src/assets/iconify";
+import { DeleteIcon, EditIcon, PlusIcon, UpdateIcon } from "src/assets/iconify";
 import AddPropertyDialog from "./AddPropertyDialog";
 import { Path } from "src/Router/path";
 import { RoomClass } from "../room/DataObject";
@@ -116,7 +116,7 @@ export default function PropertyViewer({}: Props) {
       <RootStyle>
         <HeaderWrapper>
           <LoadingSkeleton
-            isLoading={Property.images.length > 0 ? false : true}
+            isLoading={Property._id !== "" ? false : true}
             sx={{
               width: "100%",
               height: "100%",
@@ -130,11 +130,11 @@ export default function PropertyViewer({}: Props) {
             <HeaderHotelAction>
               <RESIconButton
                 iconposition="start"
-                starticon={<UpdateIcon />}
+                starticon={<EditIcon />}
                 variant="outlined"
                 onClick={openUpdatePropertyDialog}
               >
-                Update
+                Edit
               </RESIconButton>
               <RESIconButton
                 iconposition="start"
@@ -178,12 +178,15 @@ export default function PropertyViewer({}: Props) {
                       <Label>Type :</Label>
                       <Chip
                         label={Property.propertyType}
-                        color={
-                          getChipColor(Property.propertyType, theme) as any
-                        }
                         variant="filled"
                         size="small"
-                        sx={{ width: 120 }}
+                        sx={{
+                          width: 120,
+                          backgroundColor: getChipColor(
+                            Property.propertyType,
+                            theme
+                          ) as any,
+                        }}
                       />
                     </TextSkeleton>
                   </TextWrapper>
@@ -255,6 +258,23 @@ export default function PropertyViewer({}: Props) {
                     <TextSkeleton
                       isLoading={Property._id !== "" ? false : true}
                     >
+                      <Label>Job Availability :</Label>
+                      <Text
+                        sx={{
+                          color: Property.jobHiring
+                            ? (theme.palette.color.success as any)
+                            : (theme.palette.color.error.main as any),
+                        }}
+                      >
+                        {Property.jobHiring ? "A" : "N"}
+                      </Text>
+                    </TextSkeleton>
+                  </TextWrapper>
+
+                  <TextWrapper>
+                    <TextSkeleton
+                      isLoading={Property._id !== "" ? false : true}
+                    >
                       <Label>Website :</Label>
                       <Text>{Property.website}</Text>
                     </TextSkeleton>
@@ -290,22 +310,20 @@ export default function PropertyViewer({}: Props) {
                       </Text>
                     </TextSkeleton>
                   </TextWrapper>
-
-                  <TextWrapper>
-                    <TextSkeleton
-                      isLoading={Property._id !== "" ? false : true}
-                    >
-                      <Label>Ameties :</Label>
-                      <AmenitiesWrapper>
-                        {Property.amenities.map((amenities, index) => (
-                          <AmenitiesCard key={index}>
-                            <Text>{amenities}</Text>
-                          </AmenitiesCard>
-                        ))}
-                      </AmenitiesWrapper>
-                    </TextSkeleton>
-                  </TextWrapper>
                 </TopRightContentWrapper>
+
+                <TextWrapper>
+                  <TextSkeleton isLoading={Property._id !== "" ? false : true}>
+                    <Label>Ameties :</Label>
+                    <AmenitiesWrapper>
+                      {Property.amenities.map((amenities, index) => (
+                        <AmenitiesCard key={index}>
+                          <Text>{amenities}</Text>
+                        </AmenitiesCard>
+                      ))}
+                    </AmenitiesWrapper>
+                  </TextSkeleton>
+                </TextWrapper>
               </Scrollbar>
             </TopContentWrapper>
 
@@ -438,8 +456,8 @@ const BottomWrapper = styled(Box)(() => ({
 }));
 
 const ImageWrapper = styled(Box)(({ theme }) => ({
-  height: 400,
-  width: 550,
+  height: 300,
+  width: 450,
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -476,9 +494,9 @@ const TopRightContentWrapper = styled(Box)(({ theme }) => ({
   height: "100%",
   width: "100%",
   display: "grid",
-  padding: "0.7rem 0rem",
-  gridTemplateColumns: "repeat(3,1fr)",
-  gap: "10px",
+  // padding: "0.7rem 0rem",
+  gridTemplateColumns: "repeat(2,1fr)",
+  // gap: "2px",
   [theme.breakpoints.down("xl")]: {
     gridTemplateColumns: "repeat(2,1fr)",
   },
@@ -504,15 +522,17 @@ const TextSkeleton = styled(LoadingSkeleton)(() => ({
 }));
 
 const Label = styled(Typography)(({ theme }) => ({
-  fontSize: "1rem",
+  fontSize: "0.85rem",
   color: theme.palette.text.secondary,
   [theme.breakpoints.down("xl")]: {
     fontSize: "0.85rem",
   },
+  width: "7rem",
+  textAlign: "end",
 }));
 
 const Text = styled(Typography)(({ theme }) => ({
-  fontSize: "1rem",
+  fontSize: "0.85rem",
   color: theme.palette.text.primary,
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -534,11 +554,11 @@ const AmenitiesCard = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  padding: "0.5rem",
-  backgroundColor: theme.palette.background.default,
+  padding: "0.1rem",
+  backgroundColor: theme.palette.background.neutral,
   minWidth: 100,
   borderRadius: "10px",
-  border: `1px solid ${theme.palette.divider}`,
+  border: `1px solid ${theme.palette.text.disabled}`,
 }));
 
 const BottomHeader = styled(Box)(({ theme }) => ({

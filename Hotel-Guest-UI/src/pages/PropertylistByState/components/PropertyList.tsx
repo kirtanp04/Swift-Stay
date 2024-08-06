@@ -96,19 +96,38 @@ function PropertyList({ FilteredPropertyList }: TProps) {
                 </Text>
               </InfoWrapper>
 
-              {objProperty.totalRooms > 0 && (
+              {objProperty.totalRooms > 0 &&
+                objProperty.availableRooms < objProperty.totalRooms &&
+                (objProperty.availableRooms !== 0 ? (
+                  <Text
+                    sx={{
+                      color: theme.palette.color.rose.main,
+                      marginTop: "auto",
+                    }}
+                  >
+                    Only {objProperty.availableRooms} room left at this price on
+                    our site
+                  </Text>
+                ) : (
+                  <Text
+                    sx={{
+                      color: theme.palette.color.rose.main,
+                      marginTop: "auto",
+                    }}
+                  >
+                    No Rooms left
+                  </Text>
+                ))}
+
+              {objProperty.totalRooms < 1 && (
                 <Text
                   sx={{
                     color: theme.palette.color.rose.main,
                     marginTop: "auto",
                   }}
                 >
-                  Only 1 room left at this price on our site
+                  No rooms have been publish.
                 </Text>
-              )}
-
-              {objProperty.totalRooms < 1 && (
-                <NoRoomMessage>No rooms have been publish.</NoRoomMessage>
               )}
             </Box>
           </MiddledContentWrapper>
@@ -133,7 +152,9 @@ function PropertyList({ FilteredPropertyList }: TProps) {
               <SubTitle>New to Stay Swift</SubTitle>
             </NewToBooking>
             <PriceWrapper>
-              <Text sx={{ textAlign: "right" }}>Max price for 1 night</Text>
+              <Text sx={{ textWrap: "wrap" }}>
+                Max price of room for 1 night
+              </Text>
               <Header sx={{ textAlign: "right" }}>
                 {objProperty.maxPrice}
               </Header>
@@ -184,7 +205,7 @@ const Text = styled(Typography)(({ theme }) => ({
 }));
 
 const PropertyDetailWrapper = styled(Box)(({ theme }) => ({
-  border: `1px solid ${theme.palette.border}`,
+  border: `1px solid ${theme.palette.text.disabled}`,
   padding: "1rem",
   display: "flex",
   alignItems: "center",
@@ -296,10 +317,4 @@ const Ribbon = styled(Box)(({ theme }) => ({
     display: "block",
     textAlign: "center",
   },
-}));
-
-const NoRoomMessage = styled(Typography)(({ theme }) => ({
-  fontSize: "1rem",
-  color: theme.palette.color.error.main,
-  marginTop: "auto",
 }));

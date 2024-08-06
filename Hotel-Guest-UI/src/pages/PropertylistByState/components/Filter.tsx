@@ -1,4 +1,11 @@
-import { Box, Checkbox, styled, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  Rating,
+  styled,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { Country, ICity } from "country-state-city";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -80,13 +87,13 @@ export default function Filter({ onSearchbyFilter }: Props) {
     <Box
       sx={{
         width: 300,
-        border: `1px solid ${theme.palette.border}`,
+        border: `1px solid ${theme.palette.text.disabled}`,
         maxHeight: "85vh",
         borderRadius: "10px",
         overflow: "hidden",
-        position: "relative",
+        position: "static",
         top: 10,
-        // backgroundColor: theme.palette.grey[500_32],
+        backgroundColor: theme.palette.background.neutral,
       }}
     >
       <RootStyle>
@@ -192,6 +199,22 @@ export default function Filter({ onSearchbyFilter }: Props) {
               ))}
             </FilterContentWrapper>
           </FilterContent>
+
+          <FilterContent>
+            <HeaderWrapper>
+              <HeaderText>Review Score</HeaderText>
+            </HeaderWrapper>
+            <FilterContentWrapper>
+              <Rating
+                name="size-medium"
+                value={FilterobjRef.current.reviewScore}
+                precision={0.5}
+                onChange={(_, value) =>
+                  (FilterobjRef.current.reviewScore = value)
+                }
+              />
+            </FilterContentWrapper>
+          </FilterContent>
         </Scrollbar>
         <SearchButtonWrapper onClick={onSearch}>
           <HeaderText sx={{ color: theme.palette.text.primary }}>
@@ -208,6 +231,9 @@ const RootStyle = styled(Box)(() => ({
   height: "100%",
   width: "100%",
   top: 0,
+  display: "flex",
+
+  flexDirection: "column",
 }));
 
 const HeaderWrapper = styled(Box)(() => ({
@@ -226,7 +252,7 @@ const HeaderText = styled(Typography)(({ theme }) => ({
 const FilterContent = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  borderBottom: `1px solid ${theme.palette.border}`,
+  borderBottom: `1px solid ${theme.palette.text.disabled}`,
   padding: CommonPadding,
 }));
 
@@ -253,8 +279,8 @@ const SearchButtonWrapper = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "center",
   backgroundColor: theme.themeColor,
-  position: "absolute",
-  bottom: 0,
+  // position: "absolute",
+  // bottom: 0,
   cursor: "pointer",
 }));
 
