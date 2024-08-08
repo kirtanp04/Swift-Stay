@@ -64,7 +64,7 @@ export default function HomePage() {
 
   const OnSearch = () => {
     navigate(
-      Path.PropertyListByState.root(
+      Path.proprty.PropertyListByState(
         UserSearch.selectedCountry,
         UserSearch.selectedState
       ) + "?page=1"

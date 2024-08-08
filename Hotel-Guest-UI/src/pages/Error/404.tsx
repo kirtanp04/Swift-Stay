@@ -32,7 +32,7 @@ export default function Errorage404() {
         <TextContentWrapper>
           <SomethingWrong>Something is wrong</SomethingWrong>
           <Text>
-            The page you are lookin was moved, removed, renamed, or might never
+            The page you are looking was moved, removed, renamed, or might never
             exist!
           </Text>
           <HomeButton onClick={onClickHome}>Home</HomeButton>

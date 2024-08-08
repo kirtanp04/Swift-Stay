@@ -4,10 +4,6 @@ import LoadingPage from "src/components/LoadingPage";
 import { UserSearchContextProvider } from "src/context/UserSearchContext";
 import LoginGaurd from "src/guard/LoginGaurd";
 import Layout from "src/layout/NavBar";
-// import Errorage404 from "src/pages/Error/404";
-// import Login from "src/pages/Authentication/Login";
-
-// import LoadingPage from "../components/LoadingPage";
 
 const Loadable = (Component: ElementType) => (props: any) => {
   return (
@@ -25,6 +21,9 @@ const SignUp = Loadable(
   lazy(() => import("src/pages/Authentication/Register"))
 );
 const Login = Loadable(lazy(() => import("src/pages/Authentication/Login")));
+const PropertyDetails = Loadable(
+  lazy(() => import("src/pages/property/PropertyDetails"))
+);
 const PropertyListByState = Loadable(
   lazy(() => import("src/pages/PropertylistByState/PropertyListByState"))
 );
@@ -43,6 +42,10 @@ export default function Router() {
         {
           path: ":country/:state",
           element: <PropertyListByState />,
+        },
+        {
+          path: ":country/:state/:propertyName/:propertyID",
+          element: <PropertyDetails />,
         },
         { path: "about", element: <>About</> },
         { path: "contact", element: <>Contact</> },

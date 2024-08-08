@@ -39,6 +39,7 @@ export default function SearchStateDialog({
     } else {
       showMessage(
         "Invalid Country Input or not such states. Change your country selection.",
+        "error",
         theme,
         () => {}
       );
@@ -66,13 +67,24 @@ export default function SearchStateDialog({
       <TextField
         placeholder="Search by state name.."
         fullWidth
-        sx={{ backgroundColor: "hsl(0deg 0% 0.78%)" }}
+        sx={{
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? "hsl(0deg 0% 0.78%)"
+              : theme.palette.background.neutral,
+        }}
         value={searchState}
         onChange={(e) => setSearchState(e.target.value)}
       />
       <List
         dense={dense}
-        sx={{ backgroundColor: "hsl(0deg 0% 0.78%)", height: 350 }}
+        sx={{
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? "hsl(0deg 0% 0.78%)"
+              : theme.palette.background.neutral,
+          height: 350,
+        }}
       >
         <Scrollbar sx={{ height: "100%" }}>
           {states
@@ -97,6 +109,7 @@ export default function SearchStateDialog({
                 </ListItemIcon>
                 <ListItemText
                   primary={objState.name}
+                  sx={{ color: theme.palette.text.primary }}
                   // secondary={secondary ? 'Secondary text' : null}
                 />
               </EListItem>

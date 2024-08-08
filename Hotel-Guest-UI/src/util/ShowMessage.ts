@@ -1,11 +1,11 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import MessageDialog from "src/components/MessageDialog";
+import MessageDialog, { AlertServerity } from "src/components/MessageDialog";
 import { ThemeProviderProps } from "@mui/material/styles/ThemeProvider";
 import { Theme } from "@mui/material";
 import { ThemeProvider } from "@mui/material";
 
-const showMessage = (message: string, theme: Theme, onOK: () => void) => {
+const showMessage = (message: string, severity: AlertServerity, theme: Theme, onOK: () => void) => {
   const div = document.createElement("div");
   document.body.appendChild(div);
 
@@ -29,6 +29,7 @@ const showMessage = (message: string, theme: Theme, onOK: () => void) => {
     onClose: () => {
       handleOkClick();
     },
+    severity
   });
 
   let themeProps: ThemeProviderProps = { theme: theme };

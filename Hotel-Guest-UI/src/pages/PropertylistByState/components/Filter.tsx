@@ -55,7 +55,7 @@ export default function Filter({ onSearchbyFilter }: Props) {
       const _Country = Country.getCountryByCode(country!.split("-")[1]);
       setCurrency(_Country?.currency!);
     } catch (error: any) {
-      showMessage(error.message, theme, () => {});
+      showMessage(error.message, "error", theme, () => {});
     }
   }, [country]);
 
@@ -68,15 +68,15 @@ export default function Filter({ onSearchbyFilter }: Props) {
         const getAllCities = async () => {
           await GetAllCityByCountryAndState(countryCode, stateCode)
             .then((res) => setCities(res))
-            .catch((err) => showMessage(err, theme, () => {}));
+            .catch((err) => showMessage(err, "error", theme, () => {}));
         };
 
         getAllCities();
       } else {
-        showMessage("Invalid country or state", theme, () => {});
+        showMessage("Invalid country or state", "error", theme, () => {});
       }
     } catch (error: any) {
-      showMessage(error.message, theme, () => {});
+      showMessage(error.message, "error", theme, () => {});
     }
   }, [state, country]);
 
@@ -137,7 +137,7 @@ export default function Filter({ onSearchbyFilter }: Props) {
                 defaultValue={70}
                 aria-label="Small"
                 valueLabelDisplay="auto"
-                max={2000}
+                max={200000}
                 min={1000}
                 sx={{ width: "calc(100% - 20px)" }}
                 onChange={(e, num) => {

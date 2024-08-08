@@ -1,7 +1,16 @@
-import { Box, Divider, styled, Typography, useTheme } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Divider,
+  styled,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { memo } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { Path } from "src/Router/path";
 import Img from "src/assets/img/GujaratIMG.jpeg";
+import { Crypt } from "src/common/Crypt";
 import LazyImage from "src/components/LazyImage";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -12,17 +21,40 @@ interface TProps {
 }
 
 function PropertyList({ FilteredPropertyList }: TProps) {
-  const { state } = useParams();
+  const { state, country } = useParams();
+
+  const navigate = useNavigate();
 
   const theme = useTheme();
+
+  const onClickSeeAvailability = (propertyId: string, propertyName: string) => {
+    const encryptedID = Crypt.Encryption(propertyId);
+    if (encryptedID.error === "") {
+      navigate(
+        Path.proprty.PropertyDetail(
+          country!,
+          state!,
+          propertyName,
+          encryptedID.data
+        )
+      );
+    }
+  };
 
   return (
     <Rootstyle>
       <Header sx={{ color: theme.palette.text.secondary }}>
         <span style={{ color: theme.themeColor }}>{state?.split("-")[0]}:</span>{" "}
-        1000 Properties found
+        {FilteredPropertyList.length} Properties found
       </Header>
       <Divider />
+
+      {FilteredPropertyList.length === 0 && (
+        <Alert severity="info" color="info">
+          No such properties are found, try for another Country, state, city or
+          change filter.
+        </Alert>
+      )}
 
       {FilteredPropertyList.map((objProperty, i) => (
         <PropertyDetailWrapper key={i}>
@@ -142,7 +174,11 @@ function PropertyList({ FilteredPropertyList }: TProps) {
               </Box>
               {objProperty.avgRating !== null && (
                 <ReviewScore>
-                  <SubTitle>
+                  <SubTitle
+                    sx={{
+                      color: `${theme.palette.background.default} !important`,
+                    }}
+                  >
                     {Math.round(objProperty.avgRating * 10) / 10}
                   </SubTitle>
                 </ReviewScore>
@@ -161,7 +197,14 @@ function PropertyList({ FilteredPropertyList }: TProps) {
               <Text sx={{ textAlign: "right" }}>Incluging all Tax.</Text>
             </PriceWrapper>
 
-            <SeeAvailability>See availability</SeeAvailability>
+            <SeeAvailability
+              onClick={() =>
+                onClickSeeAvailability(objProperty._id, objProperty.name)
+              }
+            >
+              {" "}
+              See availability
+            </SeeAvailability>
           </RightContentWrapper>
         </PropertyDetailWrapper>
       ))}

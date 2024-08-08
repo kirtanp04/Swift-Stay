@@ -4,7 +4,7 @@ interface TProps {
   children: ReactNode;
 }
 
-const InitialValue: string = "dark";
+const InitialValue: string = "light";
 
 const ThemeContext = createContext<{
   mode: string;

@@ -1,4 +1,4 @@
-import { alpha, Theme } from '@mui/material/styles';
+import { Theme } from '@mui/material/styles';
 
 export default function Dialog(theme: Theme) {
   return {
@@ -55,7 +55,7 @@ export default function Dialog(theme: Theme) {
         root: {
           '&.MuiDialog-container': {
 
-            backgroundColor: alpha(theme.palette.color.rose.main, 0.5), // Adjust the alpha value to control opacity
+            backgroundColor: 'red', // Adjust the alpha value to control opacity
           }
         },
       },

@@ -130,7 +130,7 @@ function AuthContexProvider({ children }: Props) {
       },
       (err) => {
         showLoading(theme, false);
-        showMessage(err, theme, () => {});
+        showMessage(err, "error", theme, () => {});
       }
     );
   };

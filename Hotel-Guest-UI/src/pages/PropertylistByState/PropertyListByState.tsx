@@ -64,7 +64,7 @@ export default function PropertyListByState() {
         showLoading(theme, false);
       },
       (err) => {
-        showMessage(err, theme, () => {});
+        showMessage(err, "error", theme, () => {});
         showLoading(theme, false);
       }
     );

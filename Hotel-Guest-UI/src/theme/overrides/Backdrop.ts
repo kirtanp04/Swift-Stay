@@ -9,7 +9,7 @@ export default function Backdrop(theme: Theme) {
     MuiBackdrop: {
       styleOverrides: {
         root: {
-          background: 'rgba(0, 0, 0, .8)',
+          background: 'rgba(0, 0, 0, .45)',
           '&.MuiBackdrop-invisible': {
             background: 'transparent'
           }

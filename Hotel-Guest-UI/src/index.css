@@ -23,16 +23,5 @@ body{
   display: none;
 } */
 
-::-webkit-scrollbar {
-  width: 7px;
-  height: 7px
-}
-::-webkit-scrollbar-track {
-  /* backgroundColor: theme.palette.background.neutral */
-  background-color: hsl(240, 3.7%, 15.9%);
-}
-::-webkit-scrollbar-thumb {
-  /* backgroundColor: theme.palette.grey[500], */
-  background-color: hsl(240, 5.9%, 90%);
-}
+
 
