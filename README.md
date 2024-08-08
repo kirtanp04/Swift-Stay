@@ -1,10 +1,10 @@
 # Concepts that are followed in this Project
 
 <div style="display: flex; justify-content: space-between;">
-<img src="img/Pic 2.png" alt="Description of Image" width="300" />
-<img src="img/Pic one.png" alt="Description of Image" width="300" />
-<img src="img/Admin pic 1.png" alt="Description of Image" width="300" />
-<img src="img/admin pic 2.png" alt="Description of Image" width="300" />
+<img src="https://i.postimg.cc/jSVSCPSM/Pic-2.png" alt="Description of Image" width="300" />
+<img src="https://i.postimg.cc/GpXRPybw/Pic-one.png" alt="Description of Image" width="300" />
+<img src="https://i.postimg.cc/hvftQ0m5/Admin-pic-1.png"  width="300" />
+<img src="https://i.postimg.cc/v8NBFpFF/admin-pic-2.png"  width="300" />
 </div>
 
 <div style="display: flex; justify-content: space-between;">
