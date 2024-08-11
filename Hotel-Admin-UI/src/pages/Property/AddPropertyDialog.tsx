@@ -31,6 +31,7 @@ import FormProvider from "src/components/Form/FormProvider";
 import FormSelectField from "src/components/Form/FormSelectField";
 import FormTextArea from "src/components/Form/FormTextArea";
 import FormTextFiels from "src/components/Form/FormTextField";
+
 import { RESIconButton } from "src/components/RESIconButton";
 import Scrollbar from "src/components/Scrollbar";
 import UploadImage from "src/components/UploadImage";
@@ -43,7 +44,7 @@ type Props = {
   objProperty: PropertyClass;
   afterSave?: (objPropertyData?: PropertyClass) => void;
 };
-
+const timeRegex = /^([01]\d|2[0-3]):([0-5]\d) (AM|PM)$/;
 const AddHotelSchema = yup.object().shape({
   name: yup.string().required("Hotel name is required"),
   address: yup.string().required("Address is required"),
@@ -58,6 +59,14 @@ const AddHotelSchema = yup.object().shape({
     .string()
     .email("Email must be a valid email")
     .required("Public Email is required"),
+  checkInTime: yup
+    .string()
+    .matches(timeRegex, "Time must be in the format hh:mm AM/PM")
+    .required("Check-in time is required"),
+  checkOutTime: yup
+    .string()
+    .matches(timeRegex, "Time must be in the format hh:mm AM/PM")
+    .required("Check-in time is required"),
 });
 
 export default function AddPropertyDialog({
@@ -85,7 +94,7 @@ export default function AddPropertyDialog({
   const { handleSubmit, control, watch } = _Method;
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "amenities",
+    name: "amenities" as any,
   });
 
   //---------------------------------------------
@@ -126,18 +135,22 @@ export default function AddPropertyDialog({
   };
 
   const onAddHotel = (objPropertyData: PropertyClass) => {
+    let newObjProperty: PropertyClass = JSON.parse(
+      JSON.stringify(objPropertyData)
+    );
+
     if (_objProperty.images.length >= 1 || objPropertyData.images.length >= 1) {
-      objPropertyData.images = [];
-      _objProperty.images.forEach((img) => objPropertyData.images.push(img));
+      newObjProperty.images = [];
+      _objProperty.images.forEach((img) => newObjProperty.images.push(img));
       if (objPropertyData._id === "") {
         setLoading(true);
         PropertyApi.addNewProperty(
-          objPropertyData,
+          newObjProperty,
           (res) => {
             setLoading(false);
             showMessage(res, theme, () => onClose());
             if (afterSave !== undefined) {
-              afterSave(objPropertyData);
+              afterSave(newObjProperty);
             }
           },
           (err) => {
@@ -150,12 +163,12 @@ export default function AddPropertyDialog({
 
         setLoading(true);
         PropertyApi.updateProperty(
-          objPropertyData,
+          newObjProperty,
           (res) => {
             setLoading(false);
             showMessage(res, theme, () => onClose());
             if (afterSave !== undefined) {
-              afterSave(objPropertyData);
+              afterSave(newObjProperty);
             }
           },
           (err) => {
@@ -302,6 +315,30 @@ export default function AddPropertyDialog({
                   variant="outlined"
                   type="number"
                 />
+              </InputWrapper>
+            </FieldWrapper>
+
+            <FieldWrapper>
+              <InputWrapper>
+                <FormTextFiels
+                  name="checkInTime"
+                  label="CheckIn Time"
+                  fullWidth
+                  variant="outlined"
+                  type="text"
+                />
+              </InputWrapper>
+
+              <InputWrapper>
+                <InputWrapper>
+                  <FormTextFiels
+                    name="checkOutTime"
+                    label="CheckOut Time"
+                    fullWidth
+                    variant="outlined"
+                    type="text"
+                  />
+                </InputWrapper>
               </InputWrapper>
             </FieldWrapper>
 

@@ -643,3 +643,60 @@ export function PreviousIcon({ IconColor, ...other }: Props) {
     </svg>
   );
 }
+
+export function HeartIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 512 512"
+      {...other}
+    >
+      <path
+        fill="none"
+        stroke={IconColor ? IconColor : "currentColor"}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={32}
+        d="M352.92 80C288 80 256 144 256 144s-32-64-96.92-64c-52.76 0-94.54 44.14-95.08 96.81c-1.1 109.33 86.73 187.08 183 252.42a16 16 0 0 0 18 0c96.26-65.34 184.09-143.09 183-252.42c-.54-52.67-42.32-96.81-95.08-96.81"
+      ></path>
+    </svg>
+  );
+}
+
+export function ShareIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 16 16"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        fillRule="evenodd"
+        d="M12.5 4.5a1 1 0 1 0 0-2a1 1 0 0 0 0 2m0 1.5a2.5 2.5 0 1 0-2.469-2.104L5.298 6.263a2.5 2.5 0 1 0 0 3.475l4.733 2.366a2.5 2.5 0 1 0 .671-1.341L5.97 8.396a2.5 2.5 0 0 0 0-.792l4.733-2.367c.455.47 1.092.763 1.798.763Zm1 6.5a1 1 0 1 1-2 0a1 1 0 0 1 2 0M4.5 8a1 1 0 1 1-2 0a1 1 0 0 1 2 0"
+        clipRule="evenodd"
+      ></path>
+    </svg>
+  );
+}
+
+// export function PersonIcon({ IconColor, ...other }: Props) {
+//   return (
+//     <svg
+//       xmlns="http://www.w3.org/2000/svg"
+//       width="1em"
+//       height="1em"
+//       viewBox="0 0 24 24"
+//       {...other}
+//     >
+//       <path
+//         fill={IconColor ? IconColor : "currentColor"}
+//         d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4s-4 1.79-4 4s1.79 4 4 4m0 2c-2.67 0-8 1.34-8 4v1c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-1c0-2.66-5.33-4-8-4"
+//       ></path>
+//     </svg>
+//   );
+// }

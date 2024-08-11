@@ -32,6 +32,8 @@ export class PropertyClass {
     reviews: ReviewClass = new ReviewClass();
     subscribers: SubscriberClass = new SubscriberClass();
     jobHiring: boolean = false
+    checkInTime: string = '';
+    checkOutTime: string = ''
     createdAt: Date = new Date();
     updatedAt: Date = new Date();
 }
@@ -49,6 +51,8 @@ const PropertySchema = new Schema<PropertyClass>({
     email: { type: String, required: [true, 'Email is required.'] },
     website: { type: String },
     description: { type: String },
+    checkInTime: { type: String },
+    checkOutTime: { type: String },
     rooms: [{ type: Schema.Types.ObjectId, ref: 'Room' }],
     reviews: { type: Schema.Types.ObjectId, ref: 'Review' },
     subscribers: { type: Schema.Types.ObjectId, ref: 'Subscriber' },

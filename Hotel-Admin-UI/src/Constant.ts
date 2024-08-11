@@ -17,7 +17,8 @@ export const Param = {
             Auth: 'ManagerAuthBroker',
             Property: 'ManagerPropertyBroker',
             Room: 'ManagerRoomBroker',
-            chat: 'ManagerChatBroker'
+            chat: 'ManagerChatBroker',
+            review: 'ManagerReviewBroker'
         },
 
         guest: {
@@ -37,21 +38,35 @@ export const Param = {
                 GetSingleProperty: 'ManagerGetSingleProperty',
                 GetAllProperty: 'ManagerGetAllProperty',
                 DeleteProperty: 'ManagerDeleteProperty',
-                UpdateProperty: 'ManagerUpdateProperty'
+                UpdateProperty: 'ManagerUpdateProperty',
             },
             Room: {
                 AddRoom: 'ManagerAddRoom',
                 UpdateRoom: 'ManagerUpdateRoom',
                 DeleteRoom: 'ManagerDeleteRoom',
-                GetAllRoom: 'ManagerGetAllRoom'
+                GetAllRoom: 'ManagerGetAllRoom',
             },
             chat: {
-                Init: 'ManagetChatInit'
+                Init: 'ManagetChatInit',
+            },
+            review: {
+                GetAllReviewsByAdmin: 'ManagerGetAllReviewsByAdmin'
+            }
+        },
+        guest: {
+            register: 'CreateGuestAccount',
+            login: 'GuestLogin',
+            property: {
+                GetAllPropertyByState: 'GuestGetAllPropertyByState',
+                GetAllPropertyByCountry: 'GuestGetAllPropertyByCountry',
+                GetTotalPropertByCountry: 'GuestGetTotalPropertByCountry',
+                GetTotalPropertyByType: 'GuestGetTotalPropertyByType',
+                GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
+                GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
             }
         },
     },
 };
-
 
 
 

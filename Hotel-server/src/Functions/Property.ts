@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
-import { Cache, GetUserErrorObj, GetUserSuccessObj, HttpStatusCodes, UserResponse } from '../common';
+import { Cache, Crypt, GetUserErrorObj, GetUserSuccessObj, HttpStatusCodes, UserResponse } from '../common';
 import { TParam } from '../types/Type';
 import { Param, CacheKey } from '../Constant';
 import { Property as PropertyModel, PropertyClass, enumPropertyType } from '../models/PropertyModel';
 // import { User, UserClass, enumUserRole } from '';
 import { checkAdminVerification } from '../middleware/AdiminVerification';
 import { Room } from '../models/RoomModel';
-import { FilterQuery } from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 
 const _AddProperty = Param.function.manager.Property.AddProperty;
 const _GetSingleProperty = Param.function.manager.Property.GetSingleProperty;
@@ -20,6 +20,7 @@ const _GetAllPropertiesByCountry = Param.function.guest.property.GetAllPropertyB
 const _GetTotalPropertByCountry = Param.function.guest.property.GetTotalPropertByCountry;
 const _GetTotalPropertyByType = Param.function.guest.property.GetTotalPropertyByType;
 const _GetPropertyListByFilterSearch = Param.function.guest.property.GetPropertyListByFilterSearch;
+const _GetGuestSinglePropertDetail = Param.function.guest.property.GetSinglePropertyDetail;
 
 export class PropertyFunction {
     private static objUserResponse: UserResponse = new UserResponse();
@@ -57,6 +58,9 @@ export class PropertyFunction {
             this.objUserResponse = _res;
         } else if (objParam.function === _GetPropertyListByFilterSearch) {
             const _res = await _Function.GetPropertyListByFilterSearch();
+            this.objUserResponse = _res;
+        } else if (objParam.function === _GetGuestSinglePropertDetail) {
+            const _res = await _Function.GetSinglePropertyDetail();
             this.objUserResponse = _res;
         } else {
             this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
@@ -98,6 +102,8 @@ class Functions {
                 zipCode,
                 updatedAt,
                 jobHiring,
+                checkInTime,
+                checkOutTime
             } = this.objParam!.data as PropertyClass;
 
             const checkUser = await checkAdminVerification(adminID);
@@ -130,6 +136,8 @@ class Functions {
                         zipCode: zipCode,
                         updatedAt: updatedAt,
                         jobHiring: jobHiring,
+                        checkInTime: checkInTime,
+                        checkOutTime: checkOutTime
                     });
 
                     // const insert = await PropertyModel.insertMany(dummy)
@@ -254,6 +262,8 @@ class Functions {
                 zipCode,
                 updatedAt,
                 jobHiring,
+                checkInTime,
+                checkOutTime
             } = this.objParam!.data as PropertyClass;
 
             const checkUser = await checkAdminVerification(adminID);
@@ -291,6 +301,8 @@ class Functions {
                                 zipCode: zipCode,
                                 updatedAt: updatedAt,
                                 jobHiring: jobHiring,
+                                checkInTime: checkInTime,
+                                checkOutTime: checkOutTime
                             },
                         },
                         { new: true }
@@ -667,12 +679,106 @@ class Functions {
         }
     };
 
+    public GetSinglePropertyDetail = async (): Promise<UserResponse> => {
+        try {
+            const { country, state, propertyName, propertyID } = this.objParam.data
+
+            const property = await PropertyModel.aggregate([
+                {
+                    $match: {
+                        $and: [
+                            {
+                                _id: new mongoose.Types.ObjectId(propertyID)
+                            },
+                            {
+                                country: country
+                            },
+                            {
+                                state: state
+                            },
+                            {
+                                name: propertyName.split('-').join(' ')
+                            }
+                        ]
+                    },
+
+                },
+                {
+                    $lookup: {
+                        from: 'rooms',
+                        localField: 'rooms',
+                        foreignField: '_id',
+                        as: 'rooms',
+                    },
+                },
+                {
+                    $lookup: {
+                        from: 'reviews',
+                        localField: 'reviews',
+                        foreignField: '_id',
+                        as: 'review',
+                    },
+                },
+                {
+                    $addFields: {
+                        avgReview: {
+                            $avg: {
+                                $map: {
+                                    input: {
+                                        $ifNull: [{ $arrayElemAt: ['$review.reviewInfo', 0] }, []]
+                                    },
+                                    as: 'review',
+                                    in: '$$review.rating',
+                                },
+                            },
+                        },
+                        review: {
+                            $arrayElemAt: ['$review', 0]
+                        }
+                    },
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        avgReview: 1,
+                        name: 1,
+                        propertyType: 1,
+                        images: 1,
+                        address: 1,
+                        city: 1,
+                        state: 1,
+                        country: 1,
+                        zipCode: 1,
+                        phone: 1,
+                        email: 1,
+                        website: 1,
+                        description: 1,
+                        amenities: 1,
+                        rooms: 1,
+                        review: 1
+                    }
+                }
+            ])
+
+
+            if (property.length > 0) {
+
+                this.objUserResponse = GetUserSuccessObj(property[0], HttpStatusCodes.OK);
+            } else {
+                this.objUserResponse = GetUserErrorObj('The property you are looking for is not available might wron url. Please try for another property', HttpStatusCodes.NOT_FOUND);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
 }
 
 
 const getPropertyFilterAndCondition = (FilterData: any) => {
     const { Price, state, city, propertyType, page, country } = FilterData;
-    console.log(FilterData);
 
     let and: FilterQuery<any>[] = [];
 

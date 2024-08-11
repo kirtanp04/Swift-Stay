@@ -1,4 +1,6 @@
+import { Theme } from "@mui/material";
 import { City } from "country-state-city";
+import { enumPropertyType } from "src/ObjMgr/Property";
 import { countryNames } from "src/Types";
 
 export function getFirstLetter(fullName: string) {
@@ -74,4 +76,33 @@ export const GetAllCityByCountryAndState = (
         }
     });
     return Cities;
+};
+
+
+export const getChipColor = (
+    _PropertyType: enumPropertyType,
+    theme: Theme
+): string => {
+    let color: string = "";
+
+    if (_PropertyType === enumPropertyType.Apartment) {
+        color = theme.palette.color.info.main;
+    }
+    if (_PropertyType === enumPropertyType.Bungalow) {
+        color = theme.palette.color.warning.main;
+    }
+    if (_PropertyType === enumPropertyType.Hotel) {
+        color = theme.palette.color.error.main;
+    }
+    if (_PropertyType === enumPropertyType.Resort) {
+        color = theme.palette.color.pink.main;
+    }
+    if (_PropertyType === enumPropertyType.Cottage) {
+        color = theme.palette.color.primary.main;
+    }
+    if (_PropertyType === enumPropertyType.Villa) {
+        color = theme.palette.color.purple.main;
+    }
+
+    return color;
 };

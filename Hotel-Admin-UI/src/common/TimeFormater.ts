@@ -6,24 +6,16 @@ export class TimeFormatter {
         const momentDate = moment.utc(date);
         const now = moment.utc(); // Current time in UTC
 
-        // Debug logs
-        console.log(`Current Date (UTC): ${now.format()}`);
-        console.log(`Provided Date (UTC): ${momentDate.format()}`);
 
         // Calculate differences
         const diffInMinutes = now.diff(momentDate, 'minutes');
         const diffInHours = now.diff(momentDate, 'hours');
         const diffInDays = now.diff(momentDate, 'days');
-        const diffInWeeks = now.diff(momentDate, 'weeks');
+        // const diffInWeeks = now.diff(momentDate, 'weeks');
+
         const diffInMonths = now.diff(momentDate, 'months');
         const diffInYears = now.diff(momentDate, 'years');
 
-        console.log(`Difference in minutes: ${diffInMinutes}`);
-        console.log(`Difference in hours: ${diffInHours}`);
-        console.log(`Difference in days: ${diffInDays}`);
-        console.log(`Difference in weeks: ${diffInWeeks}`);
-        console.log(`Difference in months: ${diffInMonths}`);
-        console.log(`Difference in years: ${diffInYears}`);
 
         if (diffInMinutes < 1) {
             return 'Just now';
@@ -41,8 +33,13 @@ export class TimeFormatter {
             return `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago`;
         }
     }
+
+    static formatTo12Hour = (value: string): string => {
+        if (!value) return '';
+        return moment(value, 'HH:mm').format('hh:mm a');
+    };
+
 }
 
-// Example test
-const testDate = '2024-08-06T10:42:21Z'; // Replace with your test date
-console.log(TimeFormatter.formatTimeDifference(testDate));
+
+

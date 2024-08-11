@@ -92,7 +92,7 @@ export default function Register() {
                 textTransform={"uppercase"}
                 fontSize={"1.5rem"}
               >
-                Stay Swift
+                Swift Stay
               </Typography>
             </Row>
 

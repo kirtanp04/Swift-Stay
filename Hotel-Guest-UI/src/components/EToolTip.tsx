@@ -1,7 +1,7 @@
 import { Tooltip, Zoom } from "@mui/material";
 
 type Props = {
-  title: string;
+  title: any;
   children: any;
 };
 

@@ -17,6 +17,7 @@ const _ManagerAuthBroker: string = Param.broker.manager.Auth;
 const _ManagerPropertyBroker: string = Param.broker.manager.Property;
 const _ManagerRoomBroker: string = Param.broker.manager.Room;
 const _ManagerChatBroker: string = Param.broker.manager.chat;
+const _ManagerReviewBroker: string = Param.broker.manager.review;
 
 ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -50,7 +51,13 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
           return SendResponseToUser(_res, next);
         }
 
+        if (paramObj.Broker === _ManagerReviewBroker) {
+          const _res = await Functions.ReviewFunction.findFunction(paramObj, req, res, next)
+          return SendResponseToUser(_res, next);
+        }
 
+        const ErrorResponst = GetUserErrorObj('Invalid Broker', HttpStatusCodes.NOT_FOUND)
+        return SendResponseToUser(ErrorResponst, next);
       } else {
         return SendResponseToUser(GetUserErrorObj(`Server Error: ${objDecrypt.error}`, 404), next);
       }
@@ -79,7 +86,7 @@ ManagerBrokerRouter.post('/:param', async (req: Request, res: Response, next: Ne
 
           paramObj.data = decryptResBody.data;
 
-          console.log(paramObj)
+
 
           if (paramObj.Broker === _ManagerAuthBroker) {
             const _res = await Functions.UserFunction.findFunction(paramObj, req, res, next);

@@ -95,7 +95,7 @@ class Functions {
                     const Token = Jwt.SignJwt({ _id: newUser._id, email: newUser.email }, '5m');
                     if (Token.error === '') {
                         let Mail = new Email({ next: this.next! });
-                        Mail.from = 'kirtanpatel6189@gmail.com';
+                        Mail.from = 'Quick Stay';
                         Mail.to = email;
                         Mail.subject = 'Email Verification';
                         Mail.html = EmailTemplate.EmailVerification(name, Token.data);
@@ -155,7 +155,7 @@ class Functions {
                                 if (setCookie.error === '') {
                                     let _Email = new Email({ next: this.next! });
 
-                                    _Email.from = 'kirtanpatel6189@gmail.com';
+                                    _Email.from = 'Quick Stay';
                                     _Email.to = email;
                                     _Email.subject = 'login Activity';
                                     _Email.html = EmailTemplate.LogedIn(isUser.name);

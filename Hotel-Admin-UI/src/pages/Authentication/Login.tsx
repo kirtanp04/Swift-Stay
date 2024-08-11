@@ -62,7 +62,7 @@ export default function Login() {
                 textTransform={"uppercase"}
                 fontSize={"1.5rem"}
               >
-                Stay Swift
+                Swift Stay
               </Typography>
             </Row>
 

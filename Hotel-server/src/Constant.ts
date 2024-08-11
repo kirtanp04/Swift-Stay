@@ -7,6 +7,7 @@ export const Param = {
             Property: 'ManagerPropertyBroker',
             Room: 'ManagerRoomBroker',
             chat: 'ManagerChatBroker',
+            review: 'ManagerReviewBroker'
         },
 
         guest: {
@@ -37,16 +38,20 @@ export const Param = {
             chat: {
                 Init: 'ManagetChatInit',
             },
+            review: {
+                GetAllReviewsByAdmin: 'ManagerGetAllReviewsByAdmin'
+            }
         },
         guest: {
             register: 'CreateGuestAccount',
             login: 'GuestLogin',
             property: {
                 GetAllPropertyByState: 'GuestGetAllPropertyByState',
-                GetAllPropertyByCountry: 'GetAllPropertyByCountry',
-                GetTotalPropertByCountry: 'GetTotalPropertByCountry',
-                GetTotalPropertyByType: 'GetTotalPropertyByType',
-                GetPropertyListByFilterSearch: 'GetPropertyListByFilterSearch'
+                GetAllPropertyByCountry: 'GuestGetAllPropertyByCountry',
+                GetTotalPropertByCountry: 'GuestGetTotalPropertByCountry',
+                GetTotalPropertyByType: 'GuestGetTotalPropertyByType',
+                GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
+                GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
             }
         },
     },
@@ -60,6 +65,7 @@ export const CacheKey = {
     manager: {
         property: (emailID: string) => `#@Manager#@${emailID}#@Property#@`,
         room: (emailID: string) => `#@Manager#@${emailID}#@Room#@`,
+        review: (emailID: string) => `#@Manager#@${emailID}#@Review#@`,
     },
 };
 

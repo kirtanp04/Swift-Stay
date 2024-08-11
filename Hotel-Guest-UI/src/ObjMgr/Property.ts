@@ -1,6 +1,7 @@
 import { Api, getGETParamData } from 'src/common/ApiCall';
 import { Room } from './Room'
 import { Param } from 'src/Constant';
+import { Review } from './Review';
 
 export enum enumPropertyType {
     Hotel = 'Hotel',
@@ -11,7 +12,29 @@ export enum enumPropertyType {
     Cottage = 'Cottage'
 }
 
+export class TPropertydetail {
+    _id: string = ''
+    avgReview: number = 0
+    name: string = ''
+    propertyType: enumPropertyType = enumPropertyType.Hotel
+    images: string[] = []
+    amenities: string[] = []
+    rooms: Room[] = []
+    review: Review = new Review()
+    address: string = ''
+    city: string = ''
+    state: string = ''
+    country: string = ''
+    zipCode: string = ''
+    phone: string = ''
+    email: string = ''
+    website: string = ''
+    description: string = ''
+}
+
 export class Property {
+
+
     _id: string = '';
     adminID: string = '';
     name: string = '';
@@ -31,6 +54,8 @@ export class Property {
     // reviews: ReviewClass = new ReviewClass();
     // subscribers: SubscriberClass = new SubscriberClass();
     jobHiring: boolean = false
+    checkInTime: string = '';
+    checkOutTime: string = ''
     createdAt: Date = new Date();
     updatedAt: Date = new Date();
 
@@ -105,7 +130,26 @@ export class Property {
                 }
 
             }, (progressValue) => {
-                console.log(progressValue)
+                if (progressValue) { }
+            })
+        } catch (error: any) {
+            onfail(error.message)
+        }
+    }
+
+    static GetSinglePropertyDetail = async (country: string, state: string, propertyName: string, propertyID: string, onsuccess: (porpertyList: TPropertydetail) => void, onfail: (err: any) => void) => {
+        try {
+            const _Param = getGETParamData(Param.broker.Property, Param.function.property.GetSinglePropertyDetail, { country: country, state: state, propertyName: propertyName, propertyID: propertyID }) //country, state, propertyName, propertyID
+            await Api.get(_Param, (res) => {
+
+                if (res.error === '') {
+                    onsuccess(res.data)
+                } else {
+                    onfail(res.error)
+                }
+
+            }, (progressValue) => {
+                if (progressValue) { }
             })
         } catch (error: any) {
             onfail(error.message)

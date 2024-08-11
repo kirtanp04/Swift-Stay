@@ -15,6 +15,15 @@ export enum enumPropertyType {
 }
 
 export class PropertyClass {
+
+
+    // reviews: ReviewClass = new ReviewClass();
+    // subscribers: SubscriberClass = new SubscriberClass();
+
+
+
+
+
     _id: string = '';
     adminID: string = '';
     name: string = '';
@@ -34,6 +43,8 @@ export class PropertyClass {
     // reviews: ReviewClass = new ReviewClass();
     // subscribers: SubscriberClass = new SubscriberClass();
     jobHiring: boolean = false
+    checkInTime: string = '';
+    checkOutTime: string = ''
     createdAt: Date = new Date();
     updatedAt: Date = new Date();
 
@@ -106,7 +117,7 @@ export class PropertyApi {
                 }
             );
         } catch (error: any) {
-            StoreError("Adding Property", error.message);
+            StoreError("Getting All Property", error.message);
             onFail(error.message);
         }
     };
@@ -156,7 +167,7 @@ export class PropertyApi {
                 }
             });
         } catch (error: any) {
-            StoreError("Adding Property", error.message);
+            StoreError("Deleting Property", error.message);
             onfail(error.message);
         }
     };
@@ -183,7 +194,7 @@ export class PropertyApi {
                 }
             });
         } catch (error: any) {
-            StoreError("Adding Property", error.message);
+            StoreError("Getting Single Property", error.message);
             onFail(error.message);
         }
     };

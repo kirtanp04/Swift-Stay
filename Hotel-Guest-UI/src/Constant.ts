@@ -20,10 +20,11 @@ export const Param = {
         login: "GuestLogin",
         property: {
             GetAllPropertyByState: 'GuestGetAllPropertyByState',
-            GetAllPropertyByCountry: 'GetAllPropertyByCountry',
-            GetTotalPropertByCountry: 'GetTotalPropertByCountry',
-            GetTotalPropertyByType: 'GetTotalPropertyByType',
-            GetPropertyListByFilterSearch: 'GetPropertyListByFilterSearch'
+            GetAllPropertyByCountry: 'GuestGetAllPropertyByCountry',
+            GetTotalPropertByCountry: 'GuestGetTotalPropertByCountry',
+            GetTotalPropertyByType: 'GuestGetTotalPropertyByType',
+            GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
+            GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
         },
     },
 };
@@ -37,3 +38,5 @@ export const SocketKeyName = {
     TypingMessage: "TypingMessage",
     UserIsTyping: "UserIsTyping",
 };
+
+

@@ -33,23 +33,14 @@ export default function Page({ title, description, children }: Props) {
   );
 }
 
-const RootStyle = styled(Box)(() => ({
+const RootStyle = styled(Box)(({ theme }) => ({
   width: "100%",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  // height: "100%",
-  // padding: "1rem",
-  "&::-webkit-scrollbar": {
-    width: "7px",
-    height: "7px",
-  },
-  "&::-webkit-scrllbar-track ": {
-    /* backgroundColor: theme.palette.background.neutral */
-    backgroundColorr: "hsl(240, 3.7%, 15.9%)",
-  },
-  "&::-webkit-scrollbar-thumb": {
-    /* backgroundColor: theme.palette.grey[500], */
-    backgroundColorr: "hsl(240, 5.9%, 90%)",
+
+  "&::selection": {
+    backgroungColor: theme.palette.text.primary,
+    color: theme.palette.background.default,
   },
 }));

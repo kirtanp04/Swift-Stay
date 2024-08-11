@@ -10,7 +10,6 @@ import { memo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Path } from "src/Router/path";
 import Img from "src/assets/img/GujaratIMG.jpeg";
-import { Crypt } from "src/common/Crypt";
 import LazyImage from "src/components/LazyImage";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -28,17 +27,12 @@ function PropertyList({ FilteredPropertyList }: TProps) {
   const theme = useTheme();
 
   const onClickSeeAvailability = (propertyId: string, propertyName: string) => {
-    const encryptedID = Crypt.Encryption(propertyId);
-    if (encryptedID.error === "") {
-      navigate(
-        Path.proprty.PropertyDetail(
-          country!,
-          state!,
-          propertyName,
-          encryptedID.data
-        )
-      );
-    }
+    // const encryptedID = Crypt.Encryption(propertyId);
+    // if (encryptedID.error === "") {
+    navigate(
+      Path.proprty.PropertyDetail(country!, state!, propertyName, propertyId)
+    );
+    // }
   };
 
   return (

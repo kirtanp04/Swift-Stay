@@ -8,18 +8,23 @@ export const Path = {
     login: rootPath + 'signin',
     signup: rootPath + 'signup',
     proprty: {
-        PropertyListByState: (countryName: string, stateName: string) => {
-            const encodedCountryName = encodeURI(countryName);
-            const encodedStateName = encodeURI(stateName);
-            return `${rootPath}${encodedCountryName}/${encodedStateName}`;
+        formatName: (name: string) => {
+            return name.replace(/[^a-zA-Z0-9]/g, '-');
         },
+
+        PropertyListByState: (countryName: string, stateName: string) => {
+            const formattedCountryName = Path.proprty.formatName(countryName);
+            const formattedStateName = Path.proprty.formatName(stateName);
+            return `${rootPath}${formattedCountryName}/${formattedStateName}`;
+        },
+
         PropertyDetail: (countryName: string, stateName: string, propertyName: string, propertyID: string) => {
-            const encodedCountryName = encodeURI(countryName);
-            const encodedStateName = encodeURI(stateName);
-            const encodedPropertyName = encodeURI(propertyName);
-            const encodedPropertyID = encodeURI(propertyID);
-            return `${rootPath}${encodedCountryName}/${encodedStateName}/${encodedPropertyName}/${encodedPropertyID}`;
+            const formattedCountryName = Path.proprty.formatName(countryName);
+            const formattedStateName = Path.proprty.formatName(stateName);
+            const formattedPropertyName = Path.proprty.formatName(propertyName);
+            const formattedPropertyID = propertyID;
+            return `${rootPath}${formattedCountryName}/${formattedStateName}/${formattedPropertyName}/${formattedPropertyID}`;
         }
     }
+};
 
-}
