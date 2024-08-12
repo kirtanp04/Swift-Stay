@@ -6,14 +6,15 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { memo } from "react";
+import getSymbolFromCurrency from "currency-symbol-map";
+import { memo, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Path } from "src/Router/path";
 import Img from "src/assets/img/GujaratIMG.jpeg";
 import LazyImage from "src/components/LazyImage";
-import "swiper/css";
-import "swiper/css/navigation";
 import { TFilterProperty } from "../PropertyListByState";
+import { GetCountryByCode } from "src/common/common";
+import showMessage from "src/util/ShowMessage";
 
 interface TProps {
   FilteredPropertyList: TFilterProperty[];
@@ -21,18 +22,31 @@ interface TProps {
 
 function PropertyList({ FilteredPropertyList }: TProps) {
   const { state, country } = useParams();
+  const [CountryCurrency, setCountryCurrency] = useState<string>("");
 
   const navigate = useNavigate();
 
   const theme = useTheme();
 
+  useEffect(() => {
+    getCountryCurrency(country as any);
+  }, []);
+
   const onClickSeeAvailability = (propertyId: string, propertyName: string) => {
-    // const encryptedID = Crypt.Encryption(propertyId);
-    // if (encryptedID.error === "") {
     navigate(
       Path.proprty.PropertyDetail(country!, state!, propertyName, propertyId)
     );
-    // }
+  };
+
+  const getCountryCurrency = async (pCountry: string) => {
+    try {
+      const countryObj = await GetCountryByCode(
+        pCountry.split("-")[1] as string
+      );
+      setCountryCurrency(countryObj.currency);
+    } catch (error: any) {
+      showMessage(error, "error", theme, () => {});
+    }
   };
 
   return (
@@ -186,7 +200,7 @@ function PropertyList({ FilteredPropertyList }: TProps) {
                 Max price of room for 1 night
               </Text>
               <Header sx={{ textAlign: "right" }}>
-                {objProperty.maxPrice}
+                {getSymbolFromCurrency(CountryCurrency)} {objProperty.maxPrice}
               </Header>
               <Text sx={{ textAlign: "right" }}>Incluging all Tax.</Text>
             </PriceWrapper>

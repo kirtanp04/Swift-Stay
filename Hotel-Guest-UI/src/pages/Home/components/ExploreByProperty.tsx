@@ -38,7 +38,7 @@ export default function ExploreByProperty({}: Props) {
         setTotalPropertByCountryState(res);
       },
       (err) => {
-        showMessage(err, theme, () => {});
+        showMessage(err, "error", theme, () => {});
       }
     );
   };

@@ -595,6 +595,8 @@ class Functions {
                         images: { $first: '$images' },
                         name: { $first: '$name' },
                         city: { $first: '$city' },
+                        country: { $first: '$country' },
+                        state: { $first: '$state' },
                         amenities: { $first: '$amenities' },
                         jobHiring: { $first: '$jobHiring' },
                         avgRating: { $first: '$avgRating' },
@@ -651,6 +653,8 @@ class Functions {
                         images: 1,
                         name: 1,
                         city: 1,
+                        country: 1,
+                        state: 1,
                         amenities: 1,
                         jobHiring: 1,
                         avgRating: 1,
@@ -708,54 +712,84 @@ class Functions {
                         from: 'rooms',
                         localField: 'rooms',
                         foreignField: '_id',
-                        as: 'rooms',
-                    },
+                        as: 'rooms'
+                    }
                 },
                 {
                     $lookup: {
                         from: 'reviews',
                         localField: 'reviews',
                         foreignField: '_id',
-                        as: 'review',
-                    },
+                        as: 'review'
+                    }
                 },
                 {
                     $addFields: {
                         avgReview: {
                             $avg: {
                                 $map: {
-                                    input: {
-                                        $ifNull: [{ $arrayElemAt: ['$review.reviewInfo', 0] }, []]
-                                    },
+                                    input: { $ifNull: [{ $arrayElemAt: ['$review.reviewInfo', 0] }, []] },
                                     as: 'review',
-                                    in: '$$review.rating',
-                                },
-                            },
+                                    in: '$$review.rating'
+                                }
+                            }
                         },
-                        review: {
-                            $arrayElemAt: ['$review', 0]
+                        review: { $arrayElemAt: ['$review', 0] }
+                    }
+                },
+                {
+                    $unwind: '$rooms'
+                },
+                {
+                    $group: {
+                        _id: {
+                            propertyID: '$_id',
+                            roomType: '$rooms.type'
+                        },
+                        rooms: { $push: '$rooms' },
+                        avgReview: { $first: '$avgReview' },
+                        review: { $first: '$review' },
+                        propertyDetails: {
+                            $first: {
+                                name: '$name',
+                                propertyType: '$propertyType',
+                                images: '$images',
+                                address: '$address',
+                                city: '$city',
+                                state: '$state',
+                                country: '$country',
+                                zipCode: '$zipCode',
+                                phone: '$phone',
+                                email: '$email',
+                                website: '$website',
+                                description: '$description',
+                                amenities: '$amenities'
+                            }
                         }
-                    },
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$_id.propertyID',
+                        Rooms: {
+                            $push: {
+                                type: '$_id.roomType',
+                                roomInfo: '$rooms'
+                            }
+                        },
+                        avgReview: { $first: '$avgReview' },
+                        review: { $first: '$review' },
+                        propertyDetails: { $first: '$propertyDetails' }
+                    }
                 },
                 {
                     $project: {
-                        _id: 1,
+                        _id: 0,
+                        propertyID: '$_id',
                         avgReview: 1,
-                        name: 1,
-                        propertyType: 1,
-                        images: 1,
-                        address: 1,
-                        city: 1,
-                        state: 1,
-                        country: 1,
-                        zipCode: 1,
-                        phone: 1,
-                        email: 1,
-                        website: 1,
-                        description: 1,
-                        amenities: 1,
-                        rooms: 1,
-                        review: 1
+                        review: 1,
+                        propertyDetails: 1,
+                        Rooms: 1
                     }
                 }
             ])

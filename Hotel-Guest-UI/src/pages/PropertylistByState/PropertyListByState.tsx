@@ -15,6 +15,8 @@ export interface TFilterProperty {
   images: string[];
   name: string;
   city: string;
+  country: string;
+  state: string;
   amenities: string[];
   jobHiring: boolean;
   avgRating: number;

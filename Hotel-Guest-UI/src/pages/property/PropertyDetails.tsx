@@ -9,26 +9,31 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { HeartIcon, LocationIcon, ShareIcon } from "src/assets/iconify";
-import { getChipColor } from "src/common/common";
+import { getChipColor, GetCountryByCode } from "src/common/common";
+import LazyImage from "src/components/LazyImage";
 import Page from "src/components/Page";
+import LoadingSkeleton from "src/components/Skeleton";
 import {
   enumPropertyType,
   Property,
   TPropertydetail,
 } from "src/ObjMgr/Property";
-import RoomDetail from "./RoomDetail";
-import { useEffect, useState } from "react";
 import showMessage from "src/util/ShowMessage";
-import LazyImage from "src/components/LazyImage";
-import LoadingSkeleton from "src/components/Skeleton";
+import RoomDetail from "./RoomDetail";
+import Reviewlist from "./Reviewlist";
+import { Storage } from "src/common/Storage";
 
 export default function PropertyDetails() {
   const { propertyName, state, country, propertyID } = useParams();
   const [PropertDetail, setPropertyDetail] = useState<TPropertydetail>(
     new TPropertydetail()
   );
+  const [CountryCurrency, setCountryCurrency] = useState<string>("");
+  const [WishlistIDS, setWishlistId] = useState<string[]>([]);
   const theme = useTheme();
 
   useEffect(() => {
@@ -37,19 +42,64 @@ export default function PropertyDetails() {
       state!,
       propertyName!,
       propertyID!,
-      (res) => {
+      (res: TPropertydetail) => {
         setPropertyDetail(res);
+        getCountrybyCode(res.propertyDetails.country);
       },
       (err) => {
         showMessage(err, "error", theme, () => {});
       }
     );
   }, []);
+
+  useEffect(() => {
+    const propertyIDs = Storage.getFromSessionStorage("Wishlist");
+
+    if (propertyIDs.error === "") {
+      const propertIDS: string[] = [...propertyIDs.data];
+
+      setWishlistId(propertIDS);
+    }
+  }, []);
+
+  const getCountrybyCode = async (pCountry: string) => {
+    try {
+      const countryObj = await GetCountryByCode(
+        pCountry.split("-")[1] as string
+      );
+      setCountryCurrency(countryObj.currency);
+    } catch (error: any) {
+      showMessage(error, "error", theme, () => {});
+    }
+  };
+
+  const SaveToWishlist = (pPropertyID: string) => {
+    const propertyIDs = Storage.getFromSessionStorage("Wishlist");
+
+    if (propertyIDs.error === "") {
+      const propertIDS: string[] = [...propertyIDs.data];
+      if (!propertIDS.includes(pPropertyID)) {
+        propertIDS.push(pPropertyID);
+        Storage.setToSessionStorage("Wishlist", propertIDS);
+        setWishlistId([...WishlistIDS, pPropertyID]);
+      } else {
+        const updated = propertIDS.filter((ids) => ids !== pPropertyID);
+        Storage.setToSessionStorage("Wishlist", updated);
+        setWishlistId(updated);
+      }
+    } else {
+      const propertIDS: string[] = [];
+      propertIDS.push(pPropertyID);
+      Storage.setToSessionStorage("Wishlist", propertIDS);
+      setWishlistId([pPropertyID]);
+    }
+  };
+
   return (
     <Page title={propertyName!}>
       <RootStyle>
         <StackSpaceBetween>
-          <FlexWrapper isLoading={PropertDetail._id === ""}>
+          <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
             <Rating
               name="size-medium"
               value={PropertDetail!.avgReview}
@@ -58,7 +108,7 @@ export default function PropertyDetails() {
             />
 
             <Chip
-              label={PropertDetail!.propertyType}
+              label={PropertDetail!.propertyDetails.propertyType}
               sx={{
                 backgroundColor: getChipColor(
                   enumPropertyType.Apartment,
@@ -70,7 +120,7 @@ export default function PropertyDetails() {
           </FlexWrapper>
 
           <FlexWrapper
-            isLoading={PropertDetail._id === ""}
+            isLoading={PropertDetail.propertyID === ""}
             justifyContent={"flex-end"}
           >
             <HeartIcon
@@ -78,6 +128,8 @@ export default function PropertyDetails() {
               width={25}
               IconColor={theme.palette.color.rose.main}
               cursor={"pointer"}
+              onClick={() => SaveToWishlist(PropertDetail.propertyID)}
+              isWishlist={WishlistIDS.includes(PropertDetail.propertyID)}
             />
 
             <ShareIcon
@@ -90,52 +142,56 @@ export default function PropertyDetails() {
         </StackSpaceBetween>
 
         <StackSpaceBetween>
-          <FlexWrapper isLoading={PropertDetail._id === ""}>
+          <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
             <HeaderText sx={{ fontWeight: 700, fontSize: "2rem" }}>
-              {PropertDetail!.name}
+              {PropertDetail!.propertyDetails.name}
             </HeaderText>
           </FlexWrapper>
         </StackSpaceBetween>
 
-        <FlexWrapper isLoading={PropertDetail._id === ""}>
+        <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
           <SubTitle>
             <LocationIcon
               style={{ marginRight: "0.7rem" }}
               height={18}
               width={18}
             />
-            {PropertDetail!.address} {" | "} {PropertDetail!.city}
+            {PropertDetail!.propertyDetails.address} {" | "}{" "}
+            {PropertDetail!.propertyDetails.city}
           </SubTitle>
         </FlexWrapper>
 
-        <FlexWrapper isLoading={PropertDetail._id === ""} sx={{ height: 450 }}>
+        <FlexWrapper
+          isLoading={PropertDetail.propertyID === ""}
+          sx={{ height: 450 }}
+        >
           <ImageList
             sx={{ width: "100%", height: 450, padding: "0rem 0.5rem" }}
             variant="quilted"
-            cols={6}
-            rowHeight={121}
+            cols={3}
+            rowHeight={250}
           >
-            {PropertDetail!.images.map((item, i) => (
+            {PropertDetail!.propertyDetails.images.map((item, i) => (
               <ImageListItem key={item}>
-                <LazyImage src={item} alt={`Image ${i}`} loading="lazy" />
+                <LazyImage src={item} alt={`Image ${i}`} />
               </ImageListItem>
             ))}
           </ImageList>
         </FlexWrapper>
 
-        <FlexWrapper isLoading={PropertDetail._id === ""}>
-          <SubTitle>{PropertDetail!.description}</SubTitle>
+        <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
+          <SubTitle>{PropertDetail!.propertyDetails.description}</SubTitle>
         </FlexWrapper>
 
         <Box marginTop={"1.2rem"}>
-          <FlexWrapper isLoading={PropertDetail._id === ""}>
+          <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
             <SubTitleHeader>Most popular facilities</SubTitleHeader>
           </FlexWrapper>
           <FlexWrapper
-            isLoading={PropertDetail._id === ""}
+            isLoading={PropertDetail.propertyID === ""}
             sx={{ flexWrap: "wrap", width: "60%", marginTop: "1.5rem" }}
           >
-            {PropertDetail!.amenities.map((amen) => (
+            {PropertDetail!.propertyDetails.amenities.map((amen) => (
               <SubTitle
                 sx={{
                   padding: "0.2rem 0.5rem",
@@ -153,16 +209,42 @@ export default function PropertyDetails() {
 
         <Divider sx={{ margin: "2rem 0rem" }} flexItem />
 
+        {/* --------------------------------------------------- Room Details--------- */}
         <Box>
-          <FlexWrapper isLoading={PropertDetail._id === ""}>
-            <HeaderText sx={{ fontSize: "2rem", fontWeight: 600 }}>
-              Availability
-            </HeaderText>
+          <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
+            <StackSpaceBetween>
+              <HeaderText sx={{ fontSize: "2rem", fontWeight: 600 }}>
+                Availability
+              </HeaderText>
+
+              <AnyQuestionBtn>Any Questions ?</AnyQuestionBtn>
+            </StackSpaceBetween>
           </FlexWrapper>
-          <FlexWrapper isLoading={PropertDetail._id === ""}>
-            <RoomDetail Rooms={PropertDetail!.rooms} />
+          <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
+            <RoomDetail
+              Rooms={PropertDetail!.Rooms}
+              currency={CountryCurrency}
+            />
           </FlexWrapper>
         </Box>
+
+        <Divider sx={{ margin: "2rem 0rem" }} flexItem />
+        {/* --------------------------------------------------- Review Details--------- */}
+        {PropertDetail.review !== null && (
+          <Box>
+            <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
+              <HeaderText sx={{ fontSize: "2rem", fontWeight: 600 }}>
+                Guest reviews
+              </HeaderText>
+            </FlexWrapper>
+            <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
+              <Reviewlist
+                avgReview={PropertDetail.avgReview}
+                review={PropertDetail.review}
+              />
+            </FlexWrapper>
+          </Box>
+        )}
       </RootStyle>
     </Page>
   );
@@ -218,6 +300,18 @@ const SubTitle = styled(Typography)(({ theme }) => ({
   textOverflow: "ellipsis",
   display: "flex",
   alignItems: "center",
+}));
+
+const AnyQuestionBtn = styled(Box)(({ theme }) => ({
+  padding: "0.3rem 0.7rem",
+  borderRadius: "10px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "1rem",
+  color: theme.palette.background.default,
+  backgroundColor: theme.palette.color.warning.main,
+  cursor: "pointer",
 }));
 
 // const Text = styled(Typography)(({ theme }) => ({

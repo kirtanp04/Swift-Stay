@@ -1,5 +1,5 @@
 import { Theme } from "@mui/material";
-import { City } from "country-state-city";
+import { City, Country } from "country-state-city";
 import { enumPropertyType } from "src/ObjMgr/Property";
 import { countryNames } from "src/Types";
 
@@ -78,6 +78,22 @@ export const GetAllCityByCountryAndState = (
     return Cities;
 };
 
+export const GetCountryByCode = (
+    countryCode: string,
+): any => {
+    const _Country: Promise<any> = new Promise((resolve, reject) => {
+        try {
+            const CountryObj = Country.getCountryByCode(countryCode);
+            if (CountryObj) {
+                resolve(CountryObj);
+            }
+        } catch (error: any) {
+            reject(error.message);
+        }
+    });
+    return _Country;
+};
+
 
 export const getChipColor = (
     _PropertyType: enumPropertyType,
@@ -106,3 +122,48 @@ export const getChipColor = (
 
     return color;
 };
+
+
+
+export const getReviewRatingInWord = (rating: number): string => {
+
+
+    if (rating <= 1.2) {
+        return 'Very Poor'
+    }
+
+    if (rating <= 1.5) {
+        return 'Poor'
+    }
+
+    if (rating <= 2.2) {
+        return 'Fair'
+    }
+
+    if (rating <= 2.5) {
+        return 'Below Average'
+    }
+
+    if (rating <= 3.2) {
+        return 'Average'
+    }
+
+    if (rating <= 3.5) {
+        return 'Above Average'
+    }
+
+    if (rating <= 4.2) {
+        return 'Good'
+    }
+
+    if (rating <= 4.7) {
+        return 'Very Good'
+    }
+
+    if (rating <= 4.8) {
+        return 'Excellent'
+    }
+
+
+    return ''
+}

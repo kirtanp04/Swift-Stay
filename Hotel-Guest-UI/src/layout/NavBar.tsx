@@ -2,6 +2,7 @@ import { Box, styled } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import NavBarContent from "./NavBarContent";
 import Scrollbar from "src/components/Scrollbar";
+import Footer from "./Footer";
 
 type Props = {};
 
@@ -16,6 +17,7 @@ export default function Layout({}: Props) {
         <OutletWrapper>
           <Outlet />
         </OutletWrapper>
+        <Footer />
       </Scrollbar>
     </RootStyle>
   );
@@ -47,4 +49,5 @@ const OutletWrapper = styled(Box)(() => ({
   // border: `1px solid ${theme.palette.border}`,
   margin: "auto",
   padding: "2rem",
+  flexDirection: "column",
 }));

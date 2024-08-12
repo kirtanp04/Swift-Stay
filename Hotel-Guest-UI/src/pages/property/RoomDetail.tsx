@@ -2,6 +2,7 @@ import {
   Box,
   Chip,
   Paper,
+  Stack,
   styled,
   Table,
   TableBody,
@@ -11,18 +12,21 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { PersonIcon } from "src/assets/iconify";
+import getSymbolFromCurrency from "currency-symbol-map";
+import { PersonIcon, PreviewIcon } from "src/assets/iconify";
 import EToolTip from "src/components/EToolTip";
 import IfLogedin from "src/components/IfLogedin";
 import LoginPopOver from "src/components/LoginPopOver";
 import { MUITableCell, MUITableRow } from "src/components/mui/MUITable";
-import { enumRoomType, Room } from "src/ObjMgr/Room";
+import { TRoom } from "src/ObjMgr/Property";
+import { enumRoomType } from "src/ObjMgr/Room";
 
 type Props = {
-  Rooms: Room[];
+  Rooms: TRoom[];
+  currency: string;
 };
 
-export default function RoomDetail({ Rooms }: Props) {
+export default function RoomDetail({ Rooms, currency }: Props) {
   const theme = useTheme();
   return (
     <RootStyle>
@@ -40,103 +44,191 @@ export default function RoomDetail({ Rooms }: Props) {
           </TableHead>
           <TableBody>
             {Rooms.map((row) => (
-              <MUITableRow key={row._id}>
+              <MUITableRow key={row.type}>
                 <MUITableCell component="th" scope="row">
-                  <Chip
-                    label={row.type}
-                    color={getChipColor(row.type) as any}
-                    variant="outlined"
-                  />
-                  <SubTitle>{row.description}</SubTitle>
-                  <AmenitiesWrapper>
-                    {row.amenities.map((amen) => (
-                      <SubTitle
-                        sx={{
-                          padding: "0.1rem 0.2rem",
-                          backgroundColor: theme.palette.background.neutral,
-                          borderRadius: "4px",
-                        }}
-                        key={amen}
-                      >
-                        {amen}
-                      </SubTitle>
-                    ))}
-                  </AmenitiesWrapper>
-                </MUITableCell>
-
-                <MUITableCell align="left">
-                  <MaxOccupancyWrapper>
-                    {createArray(row.maxOccupancy).map((_, i) => (
-                      <PersonIcon height={18} width={18} key={i} />
-                    ))}
-                  </MaxOccupancyWrapper>
-                </MUITableCell>
-
-                <MUITableCell align="left">
-                  <SubTitleHeader>{row.price}</SubTitleHeader>
-                  <SubTitle>Including all taxes</SubTitle>
-                </MUITableCell>
-
-                <MUITableCell
-                  align="left"
-                  sx={{
-                    backgroundColor: row.isAvailable
-                      ? theme.palette.color.success.lighter
-                      : theme.palette.color.error.lighter,
-                  }}
-                >
-                  <SubTitleHeader
-                    sx={{ color: theme.palette.background.default }}
+                  <Stack
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    position={"relative"}
+                    sx={{ height: "100%", width: "100%" }}
                   >
-                    {row.isAvailable ? "" : ""}
-                  </SubTitleHeader>
+                    <Chip
+                      label={row.type}
+                      color={getChipColor(row.type) as any}
+                      variant="filled"
+                      sx={{ margin: "auto" }}
+                    />
+
+                    <PreviewIcon
+                      height={20}
+                      width={20}
+                      style={{
+                        position: "absolute",
+                        top: 10,
+                        right: 10,
+                        cursor: "pointer",
+                      }}
+                    />
+                  </Stack>
                 </MUITableCell>
 
                 <MUITableCell align="left">
-                  {row.isAvailable ? (
-                    <IfLogedin
-                      Else={
-                        <>
-                          <EToolTip
-                            title={
-                              <LoginPopOver
-                                text={`You are not authorize. Please login to Swift Stay to Book ${row.type}`}
-                              />
-                            }
-                          >
-                            <BookNowButton
-                              sx={{
-                                backgroundColor: theme.themeColor,
-
-                                cursor: "pointer",
-                              }}
-                            >
-                              Book now
-                            </BookNowButton>
-                          </EToolTip>
-                        </>
-                      }
-                    >
-                      <BookNowButton
-                        sx={{
-                          backgroundColor: theme.themeColor,
-
-                          cursor: "pointer",
-                        }}
-                      >
-                        Book now
-                      </BookNowButton>
-                    </IfLogedin>
-                  ) : (
-                    <BookNowButton
+                  {row.roomInfo.map((objRoom) => (
+                    <MUITableCell
+                      align="left"
+                      key={objRoom._id}
                       sx={{
-                        backgroundColor: theme.palette.background.neutral,
-                        cursor: "not-allowed",
+                        display: "flex",
+                        flexDirection: "column",
+                        backgroundColor: !objRoom.isAvailable
+                          ? theme.palette.color.rose.lighter
+                          : null,
                       }}
                     >
-                      Book now
-                    </BookNowButton>
-                  )}
+                      <MaxOccupancyWrapper>
+                        {createArray(objRoom.maxOccupancy).map((_, i) => (
+                          <PersonIcon height={18} width={18} key={i} />
+                        ))}
+                      </MaxOccupancyWrapper>
+                      <AmenitiesWrapper>
+                        {objRoom.amenities.map((amen) => (
+                          <SubTitle
+                            key={amen}
+                            sx={{
+                              backgroundColor: theme.palette.color.info.main,
+                              color: theme.palette.background.default,
+                              padding: "0.2rem 0.5rem",
+                              borderRadius: "5px",
+                            }}
+                          >
+                            {amen}
+                          </SubTitle>
+                        ))}
+                      </AmenitiesWrapper>
+                    </MUITableCell>
+                  ))}
+                </MUITableCell>
+
+                <MUITableCell align="left">
+                  {row.roomInfo.map((objRoom) => (
+                    <MUITableCell
+                      align="left"
+                      key={objRoom._id}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        backgroundColor: !objRoom.isAvailable
+                          ? theme.palette.color.rose.lighter
+                          : null,
+                      }}
+                    >
+                      <Box padding={"0.5rem 1rem"}>
+                        <SubTitleHeader>
+                          {getSymbolFromCurrency(currency)}
+                          {objRoom.price}
+                        </SubTitleHeader>
+                        <SubTitle>Including all taxes</SubTitle>
+                      </Box>
+                    </MUITableCell>
+                  ))}
+                </MUITableCell>
+
+                <MUITableCell align="left">
+                  {row.roomInfo.map((objRoom) => (
+                    <MUITableCell
+                      align="left"
+                      key={objRoom._id}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        backgroundColor: !objRoom.isAvailable
+                          ? theme.palette.color.rose.lighter
+                          : null,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: "100%",
+                          padding: "0.2rem",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          height: "100%",
+                        }}
+                      >
+                        <SubTitle
+                          sx={{
+                            color: objRoom.isAvailable
+                              ? theme.palette.color.success.main
+                              : theme.palette.color.error.main,
+                          }}
+                        >
+                          {objRoom.isAvailable ? "A" : "N"}
+                        </SubTitle>
+                      </Box>
+                    </MUITableCell>
+                  ))}
+                </MUITableCell>
+
+                <MUITableCell align="left">
+                  {row.roomInfo.map((objRoom) => (
+                    <MUITableCell
+                      align="left"
+                      key={objRoom._id}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        backgroundColor: !objRoom.isAvailable
+                          ? theme.palette.color.rose.lighter
+                          : null,
+                      }}
+                    >
+                      {objRoom.isAvailable ? (
+                        <IfLogedin
+                          Else={
+                            <>
+                              <EToolTip
+                                title={
+                                  <LoginPopOver
+                                    text={`You are not authorize. Please login to Swift Stay to Book ${row.type}`}
+                                  />
+                                }
+                              >
+                                <BookNowButton
+                                  sx={{
+                                    backgroundColor: theme.themeColor,
+
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Book now
+                                </BookNowButton>
+                              </EToolTip>
+                            </>
+                          }
+                        >
+                          <BookNowButton
+                            sx={{
+                              backgroundColor: theme.themeColor,
+
+                              cursor: "pointer",
+                            }}
+                          >
+                            Book now
+                          </BookNowButton>
+                        </IfLogedin>
+                      ) : (
+                        <BookNowButton
+                          sx={{
+                            backgroundColor: theme.palette.background.neutral,
+                            cursor: "not-allowed",
+                          }}
+                        >
+                          Book now
+                        </BookNowButton>
+                      )}
+                    </MUITableCell>
+                  ))}
                 </MUITableCell>
               </MUITableRow>
             ))}
@@ -191,6 +283,7 @@ const MaxOccupancyWrapper = styled(Box)(() => ({
   display: "flex",
   flexDirection: "row",
   flexWrap: "wrap",
+  padding: "0.5rem 1rem",
 }));
 
 const SubTitleHeader = styled(Typography)(({ theme }) => ({
@@ -218,16 +311,18 @@ const AmenitiesWrapper = styled(Box)(() => ({
   display: "flex",
   alignItems: "center",
   width: "100%",
-  marginTop: "0.5rem",
   flexWrap: "wrap",
   gap: "5px",
+  padding: "0.5rem 1rem",
 }));
 
 const BookNowButton = styled(Box)(({ theme }) => ({
-  padding: " 0.5rem",
+  padding: "0.5rem 1rem",
   borderRadius: "10px",
   color: theme.palette.text.primary,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  width: "60%",
+  margin: "auto",
 }));

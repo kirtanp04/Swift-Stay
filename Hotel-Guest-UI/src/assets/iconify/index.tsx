@@ -644,7 +644,11 @@ export function PreviousIcon({ IconColor, ...other }: Props) {
   );
 }
 
-export function HeartIcon({ IconColor, ...other }: Props) {
+interface Heartprops extends Props {
+  isWishlist: boolean;
+}
+
+export function HeartIcon({ IconColor, isWishlist, ...other }: Heartprops) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -654,7 +658,7 @@ export function HeartIcon({ IconColor, ...other }: Props) {
       {...other}
     >
       <path
-        fill="none"
+        fill={isWishlist ? (IconColor ? IconColor : "currentCollor") : "none"}
         stroke={IconColor ? IconColor : "currentColor"}
         strokeLinecap="round"
         strokeLinejoin="round"

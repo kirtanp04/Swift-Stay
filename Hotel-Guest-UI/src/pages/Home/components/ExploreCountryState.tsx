@@ -1,11 +1,13 @@
 import { Box, Stack, styled, Typography, useTheme } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { NextIcon, PreviousIcon } from "src/assets/iconify";
 import Img from "src/assets/img/GujaratIMG.jpeg";
 import LazyImage from "src/components/LazyImage";
 import LoadingSkeleton from "src/components/Skeleton";
 import useUserSearch from "src/hooks/useUserSearch";
 import { Property } from "src/ObjMgr/Property";
+import { Path } from "src/Router/path";
 import showMessage from "src/util/ShowMessage";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -15,7 +17,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 type Props = {};
 
 export default function ExploreCountryState({}: Props) {
-  const { UserSearchObj } = useUserSearch();
+  const { UserSearchObj, UpdateSearchObj } = useUserSearch();
   // Explore Country------------------------------------------------------------
   const ExploreCountrySwiperPrevButton = useRef<HTMLButtonElement>(null);
   const ExploreCountrySwiperNextButton = useRef<HTMLButtonElement>(null);
@@ -24,6 +26,7 @@ export default function ExploreCountryState({}: Props) {
     { state: string; totalProperties: number }[]
   >([]);
   const theme = useTheme();
+  const navigate = useNavigate();
 
   useEffect(() => {
     debugger;
@@ -43,8 +46,15 @@ export default function ExploreCountryState({}: Props) {
         setShowLoading(false);
       },
       (err) => {
-        showMessage(err, theme, () => {});
+        showMessage(err, "error", theme, () => {});
       }
+    );
+  };
+
+  const OnClickProperty = (StateName: string) => {
+    UpdateSearchObj("selectedState", StateName);
+    navigate(
+      Path.proprty.PropertyListByState(UserSearchObj.selectedCountry, StateName)
     );
   };
 
@@ -99,6 +109,7 @@ export default function ExploreCountryState({}: Props) {
                   flexDirection: "column",
                   gap: "1rem",
                 }}
+                onClick={() => OnClickProperty(objProperty.state)}
               >
                 <LazyImage
                   alt=""
@@ -108,7 +119,6 @@ export default function ExploreCountryState({}: Props) {
                 <Box>
                   <StateName>{objProperty.state.split("-")[0]}</StateName>
                   <TotalProperties>
-                    {" "}
                     {objProperty.totalProperties} Properties
                   </TotalProperties>
                 </Box>

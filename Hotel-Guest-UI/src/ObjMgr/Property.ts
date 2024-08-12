@@ -1,5 +1,5 @@
 import { Api, getGETParamData } from 'src/common/ApiCall';
-import { Room } from './Room'
+import { enumRoomType, Room } from './Room'
 import { Param } from 'src/Constant';
 import { Review } from './Review';
 
@@ -12,24 +12,18 @@ export enum enumPropertyType {
     Cottage = 'Cottage'
 }
 
+
+export interface TRoom {
+    type: enumRoomType
+    roomInfo: Room[]
+}
+
 export class TPropertydetail {
-    _id: string = ''
+    propertyID: string = ''
+    Rooms: TRoom[] = []
     avgReview: number = 0
-    name: string = ''
-    propertyType: enumPropertyType = enumPropertyType.Hotel
-    images: string[] = []
-    amenities: string[] = []
-    rooms: Room[] = []
-    review: Review = new Review()
-    address: string = ''
-    city: string = ''
-    state: string = ''
-    country: string = ''
-    zipCode: string = ''
-    phone: string = ''
-    email: string = ''
-    website: string = ''
-    description: string = ''
+    review: Review | null = null
+    propertyDetails: Property = new Property()
 }
 
 export class Property {
