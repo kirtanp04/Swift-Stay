@@ -7,7 +7,10 @@ export const SecrtKey = {
 
     MNOGO_URL: process.env.MNOGO_URL || 'mongodb+srv://kirtanp04:OyBd0kVg6JZxkvpy@hotelcluster.exs9nof.mongodb.net/Stay_Swift',
 
-    FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
+    FRONTEND_URL: {
+        ADMIN: process.env.FRONTEND_URL || 'http://localhost:5173',
+        GUEST: process.env.FRONTEND_URL || 'http://localhost:8000'
+    },
 
 
     NODEMAILER: {

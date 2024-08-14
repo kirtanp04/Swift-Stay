@@ -44,34 +44,34 @@ function AuthContexProvider({ children }: Props) {
   const [user, setUser] = useState<TAuth>(new TAuth());
   const theme = useTheme();
 
-  const checkUserToken = () => {
-    const Authdata = Storage.getFromSessionStorage("Auth");
-    if (Authdata.error !== "") {
-      setUser({
-        isProcessing: false,
-        isAuthenticated: false,
-        userInfo: new TUser(),
-      });
-      return;
-    }
+  // const checkUserToken = () => {
+  //   const Authdata = Storage.getFromSessionStorage("Auth");
+  //   if (Authdata.error !== "") {
+  //     setUser({
+  //       isProcessing: false,
+  //       isAuthenticated: false,
+  //       userInfo: new TUser(),
+  //     });
+  //     return;
+  //   }
 
-    if (Authdata.data !== "") {
-      // let _userInfo: TUser = Authdata.data;
-      // const _loginPeriod = TimeFormatter.formatTimeDifference(
-      //   _userInfo.loginPeriod
-      // );
-      // if (_loginPeriod === "1 day ago") {
-      //   showMessage("Your Session get's expire. Login again", theme, () => {
-      //     setUser({
-      //       isProcessing: false,
-      //       isAuthenticated: false,
-      //       userInfo: new TUser(),
-      //     });
-      //   });
-      //   return;
-      // }
-    }
-  };
+  //   if (Authdata.data !== "") {
+  //     // let _userInfo: TUser = Authdata.data;
+  //     // const _loginPeriod = TimeFormatter.formatTimeDifference(
+  //     //   _userInfo.loginPeriod
+  //     // );
+  //     // if (_loginPeriod === "1 day ago") {
+  //     //   showMessage("Your Session get's expire. Login again", theme, () => {
+  //     //     setUser({
+  //     //       isProcessing: false,
+  //     //       isAuthenticated: false,
+  //     //       userInfo: new TUser(),
+  //     //     });
+  //     //   });
+  //     //   return;
+  //     // }
+  //   }
+  // };
 
   useEffect(() => {
     let _TimeInterval: any;
@@ -114,7 +114,6 @@ function AuthContexProvider({ children }: Props) {
     await Auth.Login(
       objLogindetail,
       (res) => {
-        debugger;
         showLoading(theme, false);
         let _user = new TUser();
         _user.email = res.email;

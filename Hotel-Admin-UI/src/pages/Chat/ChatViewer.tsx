@@ -157,61 +157,40 @@ export default function ChatViewer() {
             </MessageContentHeader>
             <Scrollbar>
               <div style={{ padding: "0px 10px 10px 10px" }}>
-                {chatMessages.map((objChat, index) => (
-                  <Box
-                    key={index}
+                {chatMessages.map((objChat, i) => (
+                  <MessageTextWrapper
                     sx={{
-                      width: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent:
+                      backgroundColor:
                         objChat.senderDetail.email === email
-                          ? "flex-end"
-                          : "flex-start",
+                          ? theme.palette.text.primary
+                          : theme.palette.grey[50012],
                     }}
+                    key={i}
                   >
-                    <MessageTextWrapper
-                      sx={{
-                        backgroundColor:
-                          objChat.senderDetail.email === email
-                            ? theme.palette.text.primary
-                            : theme.palette.grey[50012],
-                      }}
-                    >
-                      <MUIAvatar
-                        name={objChat.senderDetail.name}
-                        src={
-                          objChat.senderDetail.profileImg !== ""
-                            ? objChat.senderDetail.profileImg
-                            : undefined
-                        }
-                      />
-                      <MessageText>{objChat.message}</MessageText>
-                      <MessageDate>{objChat.date as any}</MessageDate>
-                    </MessageTextWrapper>
-                  </Box>
+                    <MUIAvatar
+                      name={objChat.senderDetail.name}
+                      src={
+                        objChat.senderDetail.profileImg !== ""
+                          ? objChat.senderDetail.profileImg
+                          : undefined
+                      }
+                    />
+                    <MessageText>{objChat.message}</MessageText>
+                    <MessageDate>{objChat.date as any}</MessageDate>
+                  </MessageTextWrapper>
                 ))}
                 {ShowTypingLoading && (
-                  <Box
+                  <MessageTextWrapper
                     sx={{
-                      width: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "flex-start",
+                      backgroundColor: theme.palette.grey[50012],
                     }}
                   >
-                    <MessageTextWrapper
-                      sx={{
-                        backgroundColor: theme.palette.grey[50012],
-                      }}
-                    >
-                      <MUIAvatar
-                        name={SelectedSubscriber.name}
-                        src={SelectedSubscriber.profileImg}
-                      />
-                      <MessageText>Typing....</MessageText>
-                    </MessageTextWrapper>
-                  </Box>
+                    <MUIAvatar
+                      name={SelectedSubscriber.name}
+                      src={SelectedSubscriber.profileImg}
+                    />
+                    <MessageText>Typing....</MessageText>
+                  </MessageTextWrapper>
                 )}
               </div>
             </Scrollbar>

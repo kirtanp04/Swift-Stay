@@ -26,14 +26,26 @@ import showMessage from "src/util/ShowMessage";
 import RoomDetail from "./RoomDetail";
 import Reviewlist from "./Reviewlist";
 import { Storage } from "src/common/Storage";
+import useAuth from "src/hooks/useAuth";
+import IfLogedin from "src/components/IfLogedin";
+import EToolTip from "src/components/EToolTip";
+import LoginPopOver from "src/components/LoginPopOver";
+import Chat from "../Chat/Chat";
 
 export default function PropertyDetails() {
   const { propertyName, state, country, propertyID } = useParams();
+  const {
+    user: {
+      userInfo: { email },
+    },
+  } = useAuth();
   const [PropertDetail, setPropertyDetail] = useState<TPropertydetail>(
     new TPropertydetail()
   );
   const [CountryCurrency, setCountryCurrency] = useState<string>("");
   const [WishlistIDS, setWishlistId] = useState<string[]>([]);
+  const [AmISubscriber, setAmISubscriber] = useState<boolean>(false);
+  const [openChat, setOpenChat] = useState<boolean>(false);
   const theme = useTheme();
 
   useEffect(() => {
@@ -44,6 +56,9 @@ export default function PropertyDetails() {
       propertyID!,
       (res: TPropertydetail) => {
         setPropertyDetail(res);
+        if (res.subscribers.map((obj) => obj.email === email)) {
+          setAmISubscriber(true);
+        }
         getCountrybyCode(res.propertyDetails.country);
       },
       (err) => {
@@ -179,9 +194,41 @@ export default function PropertyDetails() {
           </ImageList>
         </FlexWrapper>
 
-        <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
-          <SubTitle>{PropertDetail!.propertyDetails.description}</SubTitle>
-        </FlexWrapper>
+        <StackSpaceBetween>
+          <FlexWrapper
+            isLoading={PropertDetail.propertyID === ""}
+            flex={1}
+            sx={{ alignItems: "flex-start" }}
+          >
+            <SubTitle>{PropertDetail!.propertyDetails.description}</SubTitle>
+          </FlexWrapper>
+          <FlexWrapper
+            isLoading={PropertDetail.propertyID === ""}
+            sx={{ width: 200, padding: "0rem 1rem", alignItems: "flex-start" }}
+          >
+            <IfLogedin
+              Else={
+                <>
+                  <EToolTip
+                    title={
+                      <LoginPopOver
+                        text={`You are not authorize. Please login to Swift Stay to Subscribe this Property`}
+                      />
+                    }
+                  >
+                    <SubscribeButton>Subscribe</SubscribeButton>
+                  </EToolTip>
+                </>
+              }
+            >
+              {AmISubscriber ? (
+                <SubscribeButton>Un Subscribe</SubscribeButton>
+              ) : (
+                <SubscribeButton>Subscribe</SubscribeButton>
+              )}
+            </IfLogedin>
+          </FlexWrapper>
+        </StackSpaceBetween>
 
         <Box marginTop={"1.2rem"}>
           <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
@@ -217,7 +264,25 @@ export default function PropertyDetails() {
                 Availability
               </HeaderText>
 
-              <AnyQuestionBtn>Any Questions ?</AnyQuestionBtn>
+              <IfLogedin
+                Else={
+                  <>
+                    <EToolTip
+                      title={
+                        <LoginPopOver
+                          text={`You are not authorize. Please login to Swift Stay to have a chat with the admin`}
+                        />
+                      }
+                    >
+                      <AnyQuestionBtn>Any Questions ?</AnyQuestionBtn>
+                    </EToolTip>
+                  </>
+                }
+              >
+                <AnyQuestionBtn onClick={() => setOpenChat(true)}>
+                  Any Questions ?
+                </AnyQuestionBtn>
+              </IfLogedin>
             </StackSpaceBetween>
           </FlexWrapper>
           <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
@@ -244,6 +309,15 @@ export default function PropertyDetails() {
               />
             </FlexWrapper>
           </Box>
+        )}
+
+        {/* --------------------------------------- Chat--------------------------------- */}
+        {openChat && (
+          <Chat
+            onClose={() => setOpenChat(false)}
+            open={openChat}
+            property={PropertDetail.propertyDetails}
+          />
         )}
       </RootStyle>
     </Page>
@@ -312,6 +386,18 @@ const AnyQuestionBtn = styled(Box)(({ theme }) => ({
   color: theme.palette.background.default,
   backgroundColor: theme.palette.color.warning.main,
   cursor: "pointer",
+}));
+
+const SubscribeButton = styled(Box)(({ theme }) => ({
+  padding: "0.3rem 0.8rem",
+  borderRadius: "10px",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: theme.palette.color.rose.main,
+  color: theme.palette.background.default,
+  width: "100%",
 }));
 
 // const Text = styled(Typography)(({ theme }) => ({

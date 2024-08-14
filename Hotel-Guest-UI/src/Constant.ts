@@ -4,7 +4,7 @@ export const baseUrlName: string = "/swiftstay";
 export const descriptionContent =
     "Book the best hotels, resort, appartments and manymore all over India.";
 
-// export const SocketIoBaseUrl = 'http://localhost:5000'
+export const SocketIoBaseUrl = 'http://localhost:5001'
 
 export const BackendBaseApi = "http://localhost:8080"; // main api for manager
 

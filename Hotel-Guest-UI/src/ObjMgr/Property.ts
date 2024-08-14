@@ -24,6 +24,7 @@ export class TPropertydetail {
     avgReview: number = 0
     review: Review | null = null
     propertyDetails: Property = new Property()
+    subscribers: { email: string }[] = []
 }
 
 export class Property {

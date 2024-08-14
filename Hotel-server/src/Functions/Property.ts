@@ -715,6 +715,7 @@ class Functions {
                         as: 'rooms'
                     }
                 },
+
                 {
                     $lookup: {
                         from: 'reviews',
@@ -723,6 +724,28 @@ class Functions {
                         as: 'review'
                     }
                 },
+
+                {
+                    $lookup: {
+                        from: 'subscribers',
+                        localField: '_id',
+                        foreignField: 'property',
+                        as: 'subscribersData'
+                    }
+                },
+
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'subscribersData.subscribers',
+                        foreignField: '_id',
+                        pipeline: [
+                            { $project: { _id: 0, email: 1 } }
+                        ],
+                        as: 'subscribers'
+                    }
+                },
+
                 {
                     $addFields: {
                         avgReview: {
@@ -734,12 +757,15 @@ class Functions {
                                 }
                             }
                         },
-                        review: { $arrayElemAt: ['$review', 0] }
+                        review: { $arrayElemAt: ['$review', 0] },
+                        subscribers: '$subscribers'
                     }
                 },
+
                 {
                     $unwind: '$rooms'
                 },
+
                 {
                     $group: {
                         _id: {
@@ -749,6 +775,7 @@ class Functions {
                         rooms: { $push: '$rooms' },
                         avgReview: { $first: '$avgReview' },
                         review: { $first: '$review' },
+                        subscribers: { $first: '$subscribers' },
                         propertyDetails: {
                             $first: {
                                 name: '$name',
@@ -763,11 +790,13 @@ class Functions {
                                 email: '$email',
                                 website: '$website',
                                 description: '$description',
-                                amenities: '$amenities'
+                                amenities: '$amenities',
+                                adminID: '$adminID'
                             }
                         }
                     }
                 },
+
                 {
                     $group: {
                         _id: '$_id.propertyID',
@@ -779,9 +808,11 @@ class Functions {
                         },
                         avgReview: { $first: '$avgReview' },
                         review: { $first: '$review' },
+                        subscribers: { $first: '$subscribers' },
                         propertyDetails: { $first: '$propertyDetails' }
                     }
                 },
+
                 {
                     $project: {
                         _id: 0,
@@ -789,7 +820,8 @@ class Functions {
                         avgReview: 1,
                         review: 1,
                         propertyDetails: 1,
-                        Rooms: 1
+                        Rooms: 1,
+                        subscribers: 1
                     }
                 }
             ])

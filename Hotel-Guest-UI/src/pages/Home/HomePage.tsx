@@ -17,6 +17,9 @@ import { Path } from "src/Router/path";
 import ExploreByProperty from "./components/ExploreByProperty";
 import ExploreCountryState from "./components/ExploreCountryState";
 import TrendingDestinations from "./components/TrendingDestinations";
+import { enumUserRole } from "../Authentication/AuthMgr";
+import { TUser } from "src/context/AuthContex";
+import { Storage } from "src/common/Storage";
 
 const IconSize = {
   height: 22,
@@ -42,6 +45,19 @@ export default function HomePage() {
   useEffect(() => {
     setUserSearch(UserSearchObj);
   }, [UserSearchObj]);
+
+  useEffect(() => {
+    // const user = new TUser();
+    // user.id = "66ad0893b6890afb34b72d9a";
+    // user.country = "India-IN";
+    // user.email = "kirtanfake1@gmail.com";
+    // user.isEmailVerified = true;
+    // user.loginPeriod = new Date();
+    // user.name = "Kirtan Patel";
+    // user.profileImg = "";
+    // user.role = enumUserRole.guest;
+    // Storage.setToSessionStorage("Auth", user);
+  }, []);
 
   const UpdateUserSearch = <K extends keyof TUserSearchObj>(
     PropertyName: K,

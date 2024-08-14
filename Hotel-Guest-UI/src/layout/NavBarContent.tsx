@@ -175,7 +175,7 @@ const Logoutbutton = styled("button")(({ theme }) => ({
   padding: "0.5rem",
   borderRadius: "5px",
   border: `0px solid transparent`,
-  color: theme.palette.text.primary,
+  color: theme.palette.background.default,
   backgroundColor: theme.palette.color.error.main,
   cursor: "pointer",
   fontSize: "1rem",
