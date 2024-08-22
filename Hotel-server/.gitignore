@@ -5,4 +5,4 @@ env
 
 ./dist
 
-env.ts
+./src/env.ts
