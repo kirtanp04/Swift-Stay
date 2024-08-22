@@ -1,6 +1,7 @@
-import cors from "cors";
 import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
+import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import { SocketKeyName, WebSocket } from "./Socket";
@@ -9,18 +10,20 @@ import { SecrtKey } from "./env";
 
 
 
-dotenv.config();
-const port = process.env.PORT || 5001;
+
+const port = process.env.PORT || 5000;
+
+
 
 const app = express();
-
-
-app.use(cors({
-    credentials: true,
-    methods: "GET,POST",
-    origin: SecrtKey.FRONTEND_URL,
-}));
-
+app.use(
+    cors({
+        credentials: true,
+        methods: "GET,POST",
+        optionsSuccessStatus: 201,
+        origin: SecrtKey.FRONTEND_URL,
+    })
+);
 
 const server = http.createServer(app);
 
@@ -28,10 +31,10 @@ const io = new Server(server, {
     cors: {
         credentials: true,
         methods: "GET,POST",
+        optionsSuccessStatus: 201,
         origin: SecrtKey.FRONTEND_URL,
     },
 });
-
 
 const Socket = new WebSocket(io);
 const _Redis = new Redis()
@@ -45,9 +48,8 @@ ConnectRedis()
 export const runChat = () => {
     Socket.getChatMessage(
         SocketKeyName.SendMessage,
-        async (res: any) => {
+        async (res) => {
             Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, res);
-
             await _Redis.publish(res, (err) => {
                 console.log(err)
                 Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
@@ -55,19 +57,23 @@ export const runChat = () => {
 
 
         },
-        (err: any) => {
+        (err) => {
             Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
         }
     );
 };
 
+
 _Redis.subscribe((mess) => {
+    console.log(mess)
     Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, mess)
 }, (err) => {
     Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
 })
 
 
+
+// Start the HTTP server
 server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });

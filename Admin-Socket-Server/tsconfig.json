@@ -14,7 +14,7 @@
     },
     "include": [
       "src/**/*.ts"
-    ],
+, "src/Socket.ts", "src/env.ts"    ],
     "exclude": [
       "node_modules"
     ]

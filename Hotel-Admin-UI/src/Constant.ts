@@ -46,11 +46,11 @@ export const Param = {
                 DeleteRoom: 'ManagerDeleteRoom',
                 GetAllRoom: 'ManagerGetAllRoom',
             },
-            chat: {
-                Init: 'ManagetChatInit',
-            },
             review: {
                 GetAllReviewsByAdmin: 'ManagerGetAllReviewsByAdmin'
+            },
+            subscriber: {
+                GetAllSubscriber: 'ManagerGetAllSubscriber'
             }
         },
         guest: {

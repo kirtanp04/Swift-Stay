@@ -10,14 +10,18 @@ export const BackendBaseApi = "http://localhost:8080"; // main api for manager
 
 export const Param = {
     broker: {
-        Auth: "GuestAuthBroker",
-        Property: "GuestPropertyBroker",
-        Room: "GuestRoomBroker",
+
+        Auth: 'GuestAuthBroker',
+        Property: 'GuestPropertyBroker',
+        Room: 'GuestRoomBroker',
+        Redis: 'GuestRedisBroker',
+        chat: 'GuestChatBroker',
+
     },
 
     function: {
-        register: "CreateGuestAccount",
-        login: "GuestLogin",
+        register: 'CreateGuestAccount',
+        login: 'GuestLogin',
         property: {
             GetAllPropertyByState: 'GuestGetAllPropertyByState',
             GetAllPropertyByCountry: 'GuestGetAllPropertyByCountry',
@@ -26,6 +30,9 @@ export const Param = {
             GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
             GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
         },
+        redis: {
+            initRedis: 'GuestInitRedisService'
+        }
     },
 };
 

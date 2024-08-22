@@ -42,6 +42,7 @@ export class _Express {
         methods: 'GET,POST',
         optionsSuccessStatus: 201,
         origin: [SecrtKey.FRONTEND_URL.ADMIN, SecrtKey.FRONTEND_URL.GUEST],
+        // origin: [SecrtKey.FRONTEND_URL.ADMIN, SecrtKey.FRONTEND_URL.GUEST],
       })
     );
 

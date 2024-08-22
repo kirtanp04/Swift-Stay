@@ -7,58 +7,87 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useEffect, useState } from "react";
-import { CloseIcon } from "src/assets/iconify";
+import { useEffect, useMemo, useState } from "react";
+import { CloseIcon, LoadingAnimation } from "src/assets/iconify";
 import MUIAvatar from "src/components/mui/MUIAvatar";
 import Scrollbar from "src/components/Scrollbar";
 import useAuth from "src/hooks/useAuth";
 import { Property } from "src/ObjMgr/Property";
 import { SocketService } from "src/service/Socket";
-import { ChatObj } from "./DataObject";
 import showMessage from "src/util/ShowMessage";
-import axios from "axios";
+import { Chat as TChat } from "./DataObject";
+import { SocketKeyName } from "src/Constant";
+import { TimeFormatter } from "src/common/TimeFormater";
 
 type Props = {
   open: boolean;
   onClose: () => void;
   property: Property;
+  propertyID: string;
 };
 
-export default function Chat({ open, property, onClose }: Props) {
-  const [chatMessages, setChatMessages] = useState<ChatObj[]>([]);
+export default function Chat({ open, property, onClose, propertyID }: Props) {
+  const [chatMessages, setChatMessages] = useState<TChat[]>([]);
+  const [Message, setMessage] = useState("");
   const [ShowTypingLoading, setShowTypingLoading] = useState<boolean>(false);
+  const [ConnectionLoading, setConnectionLoading] = useState<boolean>(false);
   const theme = useTheme();
   const {
     user: {
-      userInfo: { profileImg, name, email, id, role },
+      userInfo: { name, email, id, role },
     },
   } = useAuth();
 
-  const _Socket = new SocketService(
-    {
-      _id: id,
-      email: email,
-      name: name,
-      role: role as any,
-    },
-    GetChatMessage,
-    onUserTyping,
-    GetChatError
-  );
-
+  const _Socket = useMemo(() => {
+    return new SocketService(
+      {
+        _id: id,
+        email: email,
+        name: name,
+        role: role as any,
+      },
+      GetChatMessage,
+      onUserTyping,
+      GetChatError,
+      (value) => {
+        console.log(value);
+        if (value == false) {
+          InitRedisService();
+        }
+      }
+    );
+  }, [id, email, name, role]);
   useEffect(() => {
-    const init = async () => {
-      await axios.get("http://localhost:50001/hellow");
-    };
-    const _ChatObj = new ChatObj();
-    _ChatObj.key = email + email; // first admin email then subscriber email -- change email to id
-    _Socket.joinRoom(_ChatObj);
-  }, []);
+    const _ChatObj = new TChat();
+    _ChatObj.key = propertyID + id; // first property id  then subscriber id
+    _Socket.joinRoom(_ChatObj, (err) => {
+      console.log(err);
+    });
 
-  const GetChatObj = (message: string, key?: string): ChatObj => {
-    const _ChatObj = new ChatObj();
+    // return () => {
+    //   _Socket.disconnect();
+    // };
+  }, [_Socket, propertyID, id]);
+
+  const InitRedisService = () => {
+    setConnectionLoading(true);
+    TChat.initRedisService(
+      id,
+      (res) => {
+        showMessage(res, "success", theme, () => {});
+        setConnectionLoading(false);
+      },
+      (err) => {
+        showMessage(err, "error", theme, () => {});
+        setConnectionLoading(false);
+      }
+    );
+  };
+
+  const GetChatObj = (message: string): TChat => {
+    const _ChatObj = new TChat();
     _ChatObj.date = new Date();
-    _ChatObj.key = key ? key : email + email;
+    _ChatObj.key = propertyID + id;
     _ChatObj.message = message;
     _ChatObj.senderDetail = {
       _id: id,
@@ -70,8 +99,18 @@ export default function Chat({ open, property, onClose }: Props) {
     return _ChatObj;
   };
 
-  function GetChatMessage(msg: ChatObj) {
-    let newChatObj = new ChatObj();
+  const SendMessage = () => {
+    _Socket.sendChatMessageInRoom(
+      SocketKeyName.SendMessage,
+      GetChatObj(Message),
+      (err) => {
+        console.log(err);
+      }
+    );
+  };
+
+  function GetChatMessage(msg: TChat) {
+    let newChatObj = new TChat();
     newChatObj = { ...msg, date: msg.date };
     setChatMessages((prevMessages) => [...prevMessages, newChatObj]);
     setShowTypingLoading(false);
@@ -81,7 +120,7 @@ export default function Chat({ open, property, onClose }: Props) {
     showMessage(err, "error", theme, () => {});
   }
 
-  function onUserTyping(msg: ChatObj) {
+  function onUserTyping(msg: TChat) {
     if (!ShowTypingLoading) {
       setShowTypingLoading(true);
     }
@@ -106,64 +145,70 @@ export default function Chat({ open, property, onClose }: Props) {
             </Box>
           </Stack>
 
-          <CloseDrawerBtn onClick={onClose}>
+          <CloseDrawerBtn
+            onClick={() => {
+              _Socket.disconnect();
+              onClose();
+            }}
+          >
             <CloseIcon IconColor={theme.palette.background.default} />
           </CloseDrawerBtn>
         </HeaderWrapper>
         <Divider sx={{ margin: "5px 0px" }} />
+
         <ChatWrapper>
-          <Scrollbar sx={{ height: "100%", width: "100%" }}>
-            <MessageTextWrapper
-              sx={{
-                backgroundColor: theme.palette.color.violet.lighter,
-                marginRight: "auto",
-              }}
-            >
-              <MUIAvatar name={property.name} src={property.images[0]} />
-              <Box width={"100%"}>
-                <MessageText>
-                  Hellow user how are you doing how are you doing how are you
-                  doing
-                </MessageText>
-                <Text
+          {!ConnectionLoading && (
+            <Scrollbar sx={{ height: "100%", width: "100%" }}>
+              {chatMessages.map((objChat, i) => (
+                <MessageTextWrapper
                   sx={{
-                    justifyContent: "end",
-                    color: theme.palette.background.default,
+                    backgroundColor:
+                      objChat.senderDetail.email === email
+                        ? theme.palette.background.neutral
+                        : theme.palette.color.violet.lighter,
+                    marginRight:
+                      objChat.senderDetail.email !== email ? "auto" : null,
+                    marginLeft:
+                      objChat.senderDetail.email === email ? "auto" : null,
                   }}
+                  key={i}
                 >
-                  {new Date().toDateString()}
-                </Text>
-              </Box>
-            </MessageTextWrapper>
+                  <MUIAvatar name={property.name} src={property.images[0]} />
+                  <Box width={"100%"}>
+                    <MessageText>{objChat.message}</MessageText>
+                    <Text
+                      sx={{
+                        justifyContent: "end",
+                        color: theme.palette.background.default,
+                      }}
+                    >
+                      {TimeFormatter.formatTimeDifference(objChat.date)}
+                    </Text>
+                  </Box>
+                </MessageTextWrapper>
+              ))}
+            </Scrollbar>
+          )}
 
-            <MessageTextWrapper
-              sx={{
-                backgroundColor: theme.palette.background.neutral,
-                marginLeft: "auto",
-              }}
-            >
-              {profileImg !== "" ? (
-                <MUIAvatar name={name} src={profileImg} />
-              ) : (
-                <MUIAvatar name={name} />
-              )}
-
-              <Box width={"100%"}>
-                <MessageText>
-                  Hellow user how are you doing how are you doing how are you
-                  doing
-                </MessageText>
-                <Text sx={{ justifyContent: "end" }}>
-                  {new Date().toDateString()}
-                </Text>
-              </Box>
-            </MessageTextWrapper>
-          </Scrollbar>
+          {ConnectionLoading && (
+            <LoadingWrapper>
+              <LoadingAnimation
+                IconColor={theme.themeColor}
+                height={25}
+                width={25}
+              />
+              <SubTitle>Connecting to Redis Service....</SubTitle>
+            </LoadingWrapper>
+          )}
         </ChatWrapper>
         <Divider sx={{ margin: "5px 0px" }} />
         <MessageTextFieldWrapper>
-          <MessageInputField placeholder="Type your question here." />
-          <SendButtonWrapper>Send</SendButtonWrapper>
+          <MessageInputField
+            placeholder="Type your question here."
+            value={Message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <SendButtonWrapper onClick={SendMessage}>Send</SendButtonWrapper>
         </MessageTextFieldWrapper>
       </Wrapper>
     </RootStyle>
@@ -279,4 +324,13 @@ const Text = styled(Typography)(({ theme }) => ({
   textOverflow: "ellipsis",
   display: "flex",
   alignItems: "center",
+}));
+
+const LoadingWrapper = styled(Box)(() => ({
+  height: "100%",
+  width: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "10px",
 }));

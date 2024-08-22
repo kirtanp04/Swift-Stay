@@ -8,13 +8,14 @@ import { SocketKeyName } from "src/Constant";
 import useAuth from "src/hooks/useAuth";
 import { SocketService } from "src/service/Socket";
 import showMessage from "src/util/ShowMessage";
-import { ChatObj, TSubscriber } from "./DataObject";
+import { ChatApi, ChatObj, SubscriberClass, TSubscriber } from "./DataObject";
 
 export default function ChatViewer() {
   const [Message, setMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatObj[]>([]);
   const [socketError, setSocketError] = useState<ChatObj | null>(null);
   const [ShowTypingLoading, setShowTypingLoading] = useState<boolean>(false);
+  const [Subscribers, setSubscriberList] = useState<SubscriberClass[]>([]);
   const [SelectedSubscriber, setSelectedSubscriber] = useState<TSubscriber>(
     new TSubscriber()
   );
@@ -25,6 +26,18 @@ export default function ChatViewer() {
   } = useAuth();
   const theme = useTheme();
 
+  useEffect(() => {
+    ChatApi.getAllSubscribedUsers(
+      id,
+      (res) => {
+        setSubscriberList(res);
+      },
+      (err) => {
+        showMessage(err, theme, () => {});
+      }
+    );
+  }, []);
+
   const _Socket = new SocketService(
     {
       _id: id,
@@ -34,13 +47,19 @@ export default function ChatViewer() {
     },
     GetChatMessage,
     onUserTyping,
-    GetChatError
+    GetChatError,
+    (value) => {
+      console.log(value);
+      // if (value !== ConnectionLoading) {
+      //   // setConnectionLoading(value);
+      // }
+    }
   );
 
   useEffect(() => {
     if (SelectedSubscriber.email !== "" && email !== "") {
       const _ChatObj = new ChatObj();
-      _ChatObj.key = email + SelectedSubscriber.email; // first admin email then subscriber email -- change email to id
+      _ChatObj.key = SelectedSubscriber.chatKey;
       _Socket.joinRoom(_ChatObj);
     }
   }, [SelectedSubscriber]);
@@ -51,10 +70,10 @@ export default function ChatViewer() {
     }
   }, [socketError]);
 
-  const GetChatObj = (message: string, key?: string): ChatObj => {
+  const GetChatObj = (message: string): ChatObj => {
     const _ChatObj = new ChatObj();
     _ChatObj.date = new Date();
-    _ChatObj.key = key ? key : email + SelectedSubscriber.email;
+    _ChatObj.key = SelectedSubscriber.chatKey;
     _ChatObj.message = message;
     _ChatObj.senderDetail = {
       _id: id,
@@ -118,27 +137,28 @@ export default function ChatViewer() {
           </SubscriberListHeaderWrapper>
           <SubscriberList>
             <Scrollbar sx={{ height: "100%" }}>
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((val) => (
-                <SubscriberDetailWrapper
-                  key={val}
-                  onClick={() =>
-                    OnSelectSubscriber({
-                      email: "subscriber" + val + "@example.com",
-                      name: "Subscriber " + val,
-                      profileImg: "",
-                      _id: "123456",
-                    })
-                  }
-                >
-                  <MUIAvatar name={"Subscriber " + val} />
-                  <UserContentWrapper>
-                    <UserNameText>{"Subscriber " + val}</UserNameText>
-                    <UserEmailText>
-                      {"subscriber" + val + "@example.com"}
-                    </UserEmailText>
-                  </UserContentWrapper>
-                </SubscriberDetailWrapper>
-              ))}
+              {Subscribers.map((objSub) =>
+                objSub.subscribers.map((objUser) => (
+                  <SubscriberDetailWrapper
+                    key={objUser._id}
+                    onClick={() =>
+                      OnSelectSubscriber({
+                        email: objUser.email,
+                        name: objUser.name,
+                        profileImg: objUser.profileImg,
+                        _id: objUser._id!,
+                        chatKey: objSub.property + objUser._id,
+                      })
+                    }
+                  >
+                    <MUIAvatar name={objUser.name} />
+                    <UserContentWrapper>
+                      <UserNameText>{objUser.name}</UserNameText>
+                      <UserEmailText>{objUser.email}</UserEmailText>
+                    </UserContentWrapper>
+                  </SubscriberDetailWrapper>
+                ))
+              )}
             </Scrollbar>
           </SubscriberList>
         </SubscriberListWrapper>
@@ -146,11 +166,18 @@ export default function ChatViewer() {
         <MessageContentWrapper>
           <MessageListWrapper>
             <MessageContentHeader>
-              <MUIAvatar
-                sx={{ height: 30, width: 30 }}
-                name={SelectedSubscriber.name}
-                src={SelectedSubscriber.profileImg}
-              />
+              {SelectedSubscriber.profileImg !== "" ? (
+                <MUIAvatar
+                  sx={{ height: 30, width: 30 }}
+                  name={SelectedSubscriber.name}
+                  src={SelectedSubscriber.profileImg}
+                />
+              ) : (
+                <MUIAvatar
+                  sx={{ height: 30, width: 30 }}
+                  name={SelectedSubscriber.name}
+                />
+              )}
               <SubscriberListHeader>
                 {SelectedSubscriber?.name}
               </SubscriberListHeader>
@@ -164,6 +191,10 @@ export default function ChatViewer() {
                         objChat.senderDetail.email === email
                           ? theme.palette.text.primary
                           : theme.palette.grey[50012],
+                      marginRight:
+                        objChat.senderDetail.email !== email ? "auto" : null,
+                      marginLeft:
+                        objChat.senderDetail.email === email ? "auto" : null,
                     }}
                     key={i}
                   >
@@ -175,7 +206,16 @@ export default function ChatViewer() {
                           : undefined
                       }
                     />
-                    <MessageText>{objChat.message}</MessageText>
+                    <MessageText
+                      sx={{
+                        color:
+                          objChat.senderDetail.email === email
+                            ? theme.palette.background.default
+                            : theme.palette.text.primary,
+                      }}
+                    >
+                      {objChat.message}
+                    </MessageText>
                     <MessageDate>{objChat.date as any}</MessageDate>
                   </MessageTextWrapper>
                 ))}
@@ -284,9 +324,8 @@ const MessageTextWrapper = styled(Box)(() => ({
   overflow: "hidden",
 }));
 
-const MessageText = styled(Typography)(({ theme }) => ({
+const MessageText = styled(Typography)(() => ({
   fontSize: "0.85rem",
-  color: theme.palette.mode === "dark" ? "black" : "white",
   width: "100%",
   textWrap: "wrap",
 }));
@@ -302,7 +341,7 @@ const MessageListWrapper = styled(Box)(() => ({
 
 const MessageDate = styled(Typography)(({ theme }) => ({
   fontSize: "0.75rem",
-  color: theme.palette.color.rose.main,
+  color: theme.themeColor,
   marginLeft: "auto",
   position: "absolute",
   bottom: 5,

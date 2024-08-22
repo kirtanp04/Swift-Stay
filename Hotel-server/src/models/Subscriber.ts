@@ -6,7 +6,7 @@ import { UserClass } from './UserModel';
 export class SubscriberClass {
     _id: string = '';
     property: PropertyClass = new PropertyClass();
-    adminID: UserClass = new UserClass()
+    adminID: string = ""
     subscribers: UserClass[] = []
 
 }

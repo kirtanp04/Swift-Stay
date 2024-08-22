@@ -2,20 +2,22 @@
   "name": "admin-socket-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/index.ts",
-    "dev": "nodemon ./src/index.ts"
+    "start": "ts-node src/app.ts",
+    "dev": "nodemon ./src/app.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bullmq": "^5.12.6",
     "cors": "^2.8.5",
     "crypto-ts": "^1.0.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "redis": "^4.7.0",
     "socket.io": "^4.7.5"
   },
   "devDependencies": {

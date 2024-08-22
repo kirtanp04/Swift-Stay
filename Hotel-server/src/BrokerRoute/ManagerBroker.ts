@@ -47,7 +47,7 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
           return SendResponseToUser(_res, next);
         }
         if (paramObj.Broker === _ManagerChatBroker) {
-          const _res = await Functions.ChatFunction.findFunction(paramObj, req, res, next)
+          const _res = await Functions.SubscriberFunction.findFunction(paramObj, req, res, next)
           return SendResponseToUser(_res, next);
         }
 

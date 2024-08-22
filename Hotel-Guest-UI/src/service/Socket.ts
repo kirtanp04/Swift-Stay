@@ -15,13 +15,16 @@ export class SocketService {
     private BackendURL: string = SocketIoBaseUrl;
     private _Socket: Socket | null = null;
 
+
     constructor(
         objUser: SocketUserAuth,
         onMessage: (msg: ChatObj) => void,
         onUserTyping: (data: ChatObj) => void,
-        onError: (err: any) => void
+        onError: (err: any) => void,
+        connectionloading: (value: boolean) => void
     ) {
-        this._Socket = this.ConnectToSocket(objUser, onError);
+
+        this._Socket = this.ConnectToSocket(objUser, connectionloading, onError);
         if (this._Socket) {
             this.setupEventListeners();
             this.setupMessageReception(onMessage, onUserTyping, onError);
@@ -30,7 +33,11 @@ export class SocketService {
         }
     }
 
-    private ConnectToSocket = (objUser: SocketUserAuth, onError: (err: any) => void): Socket | null => {
+    private ConnectToSocket = (
+        objUser: SocketUserAuth,
+        connectionloading: (value: boolean) => void,
+        onError: (err: any) => void,
+    ): Socket | null => {
         try {
             const encryptedObj = Crypt.Encryption(objUser);
             if (encryptedObj.error === "") {
@@ -39,10 +46,10 @@ export class SocketService {
                         auth: {
                             userInfo: encryptedObj.data,
                         },
-                        reconnectionAttempts: 5, // Limit reconnection attempts
-                        reconnectionDelay: 1000, // Delay between reconnection attempts
+                        reconnectionAttempts: 5,
+                        reconnectionDelay: 1000,
                     });
-                    this.setupConnectionHandlers(socket);
+                    this.setupConnectionHandlers(socket, connectionloading, onError);
                     return socket;
                 } catch (error) {
                     onError(error);
@@ -56,71 +63,46 @@ export class SocketService {
         return null;
     };
 
-    private setupConnectionHandlers(socket: Socket) {
+    private setupConnectionHandlers(socket: Socket, connectionloading: (value: boolean) => void, onError: (err: any) => void) {
+        connectionloading(true)
         socket.on("connect", () => {
             console.log("Connected to socket server.");
+
+            connectionloading(false)
+
         });
 
-        socket.on("disconnect", (reason) => {
+        socket.on("disconnect", (reason: Socket.DisconnectReason) => {
             console.warn("Disconnected from socket server:", reason);
+            connectionloading(false)
         });
 
         socket.on("reconnect_attempt", (attempt) => {
             console.log(`Reconnection attempt ${attempt}`);
+            connectionloading(false)
         });
 
         socket.on("reconnect_failed", () => {
-            console.error("Reconnection failed.");
+            onError("Reconnection failed");
+            this.disconnect();
+        });
+
+        socket.on("connect_error", (err: Error) => {
+            onError("Connection error:" + err.message);
+            this.disconnect();
         });
     }
 
     private setupEventListeners = () => {
-        this._Socket?.on('roomJoined', (data: any) => {
-            console.log('roomJoined event received:', data);
+        this._Socket?.on("roomJoined", (data: any) => {
+            console.log("roomJoined event received:", data);
             const decryptChat = Crypt.Decryption(data);
             if (decryptChat.error === "") {
-                console.log('Decrypted chat message:', decryptChat.data);
+                console.log("Decrypted chat message:", decryptChat.data);
             } else {
-                console.error('Failed to decrypt chat message:', decryptChat.error);
+                console.error("Failed to decrypt chat message:", decryptChat.error);
             }
         });
-    };
-
-    public joinRoom = (roomKey: ChatObj, onfail?: (err: any) => void) => {
-        if (!this._Socket) {
-            onfail?.("Socket is not connected.");
-            return;
-        }
-
-        try {
-            // this.RoomKey = roomKey.key;
-            const encryptedRoomKey = Crypt.Encryption(roomKey).data;
-            this._Socket.emit(SocketKeyName.JoinRoom, encryptedRoomKey);
-        } catch (error: any) {
-            onfail?.(error.message);
-        }
-    };
-
-    public sendChatMessageInRoom = (
-        socketKeyName: string,
-        objChat: ChatObj,
-        onfail?: (err: any) => void
-    ) => {
-        if (!this._Socket) {
-            onfail?.("Socket is not connected.");
-            return;
-        }
-
-        try {
-            const encryptedChat = Crypt.Encryption(objChat);
-            if (encryptedChat.error === "") {
-                this._Socket.emit(socketKeyName, encryptedChat.data);
-            } else {
-                onfail?.("Failed to encrypt chat message.");
-            }
-        } catch (error: any) {
-            onfail?.(error.message);
-        }
     };
 
     private GetChatMessage = (
@@ -157,12 +139,58 @@ export class SocketService {
         this.GetChatMessage(SocketKeyName.ReceiveError, onError, onError);
     };
 
-    // Optional: Method to disconnect and clean up event listeners
+
+
+    public joinRoom = (roomKey: ChatObj, onfail?: (err: any) => void) => {
+        if (!this._Socket) {
+            onfail?.("Socket is not connected.");
+            return;
+        }
+
+        try {
+            const encryptedRoomKey = Crypt.Encryption(roomKey).data;
+            this._Socket.emit(SocketKeyName.JoinRoom, encryptedRoomKey);
+        } catch (error: any) {
+            onfail?.(error.message);
+        }
+    };
+
+    public sendChatMessageInRoom = (
+        socketKeyName: string,
+        objChat: ChatObj,
+        onfail?: (err: any) => void
+    ) => {
+        if (!this._Socket) {
+            onfail?.("Socket is not connected.");
+            return;
+        }
+
+        try {
+            const encryptedChat = Crypt.Encryption(objChat);
+            if (encryptedChat.error === "") {
+                this._Socket.emit(socketKeyName, encryptedChat.data);
+            } else {
+                onfail?.("Failed to encrypt chat message.");
+            }
+        } catch (error: any) {
+            onfail?.(error.message);
+        }
+    };
+
+
+    public reconnect = () => {
+        if (this._Socket && this._Socket.disconnected) {
+            console.log("Attempting to reconnect...");
+            this._Socket.connect();
+        } else {
+            console.log("Socket is already connected or not initialized.");
+        }
+    };
+
     public disconnect() {
         if (this._Socket) {
             this._Socket.disconnect();
             this._Socket = null;
-            console.log("Socket disconnected.");
         }
     }
 }

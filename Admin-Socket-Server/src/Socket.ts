@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { runChat } from ".";
+import { runChat } from "./app";
 import { Crypt } from "./common/index";
 
 

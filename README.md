@@ -23,7 +23,7 @@
 
     - Authentication
 
-        - Email Authentication (for email verification)
+        - Email Authentication (for email verification) by Nodemailer
 
     - Protection
 
@@ -37,6 +37,7 @@
     - **Scaling / optimization**
 
         - Cluster -> for heavy traffic
+        - Redis Pub/Sub -> for chat system
         - compression
         - node-cache
 

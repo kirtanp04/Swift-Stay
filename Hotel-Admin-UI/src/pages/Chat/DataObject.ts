@@ -1,6 +1,7 @@
 import { Api, getGETParamData } from "src/common/ApiCall"
 import { Param } from "src/Constant"
 import { StoreError } from "src/util/StoreError"
+import { _Register } from "../Authentication/AuthMgr"
 
 export class ChatObj {
     message: string = ''
@@ -26,25 +27,37 @@ class Sender {
 
 
 
-export class TSubscriber extends Sender { }
+export class SubscriberClass {
+    _id: string = '';
+    property: string = '';
+    adminID: string = ""
+    subscribers: _Register[] = []
+
+}
+
+
+
+
+export class TSubscriber extends Sender {
+    chatKey: string = ''
+}
 
 
 
 
 export class ChatApi {
 
-    static InitChatService = async (
+    static getAllSubscribedUsers = async (
         adminID: string,
         onsuccess: (res: any) => void,
         onFail: (err: any) => void
     ) => {
         try {
-            const _Param = getGETParamData(Param.broker.manager.chat, Param.function.manager.chat.Init, {
-                adminID: adminID
-            })
+            const _Param = getGETParamData(Param.broker.manager.chat, Param.function.manager.subscriber.GetAllSubscriber,
+                adminID)
 
             await Api.protectedGet(_Param, (res) => {
-                if (res.error !== '') {
+                if (res.error === '') {
                     onsuccess(res.data)
                 } else {
                     onFail(res.error)

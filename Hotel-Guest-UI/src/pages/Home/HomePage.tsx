@@ -47,16 +47,16 @@ export default function HomePage() {
   }, [UserSearchObj]);
 
   useEffect(() => {
-    // const user = new TUser();
-    // user.id = "66ad0893b6890afb34b72d9a";
-    // user.country = "India-IN";
-    // user.email = "kirtanfake1@gmail.com";
-    // user.isEmailVerified = true;
-    // user.loginPeriod = new Date();
-    // user.name = "Kirtan Patel";
-    // user.profileImg = "";
-    // user.role = enumUserRole.guest;
-    // Storage.setToSessionStorage("Auth", user);
+    const user = new TUser();
+    user.id = "66ad0893b6890afb34b72d9a";
+    user.country = "India-IN";
+    user.email = "kirtanfake1@gmail.com";
+    user.isEmailVerified = true;
+    user.loginPeriod = new Date();
+    user.name = "Kirtan Patel";
+    user.profileImg = "";
+    user.role = enumUserRole.guest;
+    Storage.setToSessionStorage("Auth", user);
   }, []);
 
   const UpdateUserSearch = <K extends keyof TUserSearchObj>(

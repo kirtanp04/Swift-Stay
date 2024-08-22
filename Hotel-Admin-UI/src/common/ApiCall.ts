@@ -125,6 +125,7 @@ export class Api {
     try {
       const objRes = Storage.getFromSessionStorage("Auth");
       if (objRes.error === "") {
+
         if (objRes.data.role === enumUserRole.admin) {
           const encryptParamData = Crypt.Encryption(_Param);
           if (encryptParamData.error === "") {

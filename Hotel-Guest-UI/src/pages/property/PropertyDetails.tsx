@@ -317,6 +317,7 @@ export default function PropertyDetails() {
             onClose={() => setOpenChat(false)}
             open={openChat}
             property={PropertDetail.propertyDetails}
+            propertyID={PropertDetail.propertyID}
           />
         )}
       </RootStyle>

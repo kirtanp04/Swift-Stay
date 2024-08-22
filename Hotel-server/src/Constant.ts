@@ -7,13 +7,16 @@ export const Param = {
             Property: 'ManagerPropertyBroker',
             Room: 'ManagerRoomBroker',
             chat: 'ManagerChatBroker',
-            review: 'ManagerReviewBroker'
+            review: 'ManagerReviewBroker',
+            Redis: 'ManagerRedisBroker',
         },
 
         guest: {
             Auth: 'GuestAuthBroker',
             Property: 'GuestPropertyBroker',
             Room: 'GuestRoomBroker',
+            Redis: 'GuestRedisBroker',
+            chat: 'GuestChatBroker',
         },
     },
 
@@ -35,11 +38,14 @@ export const Param = {
                 DeleteRoom: 'ManagerDeleteRoom',
                 GetAllRoom: 'ManagerGetAllRoom',
             },
-            chat: {
-                Init: 'ManagetChatInit',
-            },
             review: {
                 GetAllReviewsByAdmin: 'ManagerGetAllReviewsByAdmin'
+            },
+            subscriber: {
+                GetAllSubscriber: 'ManagerGetAllSubscriber'
+            },
+            redis: {
+                initRedis: 'ManagerInitRedisService'
             }
         },
         guest: {
@@ -52,6 +58,9 @@ export const Param = {
                 GetTotalPropertyByType: 'GuestGetTotalPropertyByType',
                 GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
                 GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
+            },
+            redis: {
+                initRedis: 'GuestInitRedisService'
             }
         },
     },
@@ -66,6 +75,7 @@ export const CacheKey = {
         property: (emailID: string) => `#@Manager#@${emailID}#@Property#@`,
         room: (emailID: string) => `#@Manager#@${emailID}#@Room#@`,
         review: (emailID: string) => `#@Manager#@${emailID}#@Review#@`,
+        subscriber: (emailID: string) => `#@Manager#@${emailID}#@Subscriber#@`,
     },
 };
 

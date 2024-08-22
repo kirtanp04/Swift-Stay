@@ -13,6 +13,8 @@ const GuestBrokerRouter: Router = express.Router();
 const _GuestAuthBroker: string = Param.broker.guest.Auth;
 const _GuestPropertyBroker: string = Param.broker.guest.Property;
 const _GuestRoomBroker: string = Param.broker.guest.Room;
+const _GuestChatBroker: string = Param.broker.guest.chat;
+const _GuestRedisBroker: string = Param.broker.guest.Redis;
 
 GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -28,6 +30,11 @@ GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextF
 
                 if (paramObj.Broker === _GuestPropertyBroker) {
                     const _res = await Functions.PropertyFunction.findFunction(paramObj, req, res, next)
+                    return SendResponseToUser(_res, next);
+                }
+
+                if (paramObj.Broker === _GuestRedisBroker) {
+                    const _res = await Functions.RedisFunction.findFunction(paramObj, req, res, next)
                     return SendResponseToUser(_res, next);
                 }
 
@@ -62,6 +69,11 @@ GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: Next
                         return SendResponseToUser(_res, next);
                     }
 
+
+                    if (paramObj.Broker === _GuestRedisBroker) {
+                        const _res = await Functions.RedisFunction.findFunction(paramObj, req, res, next)
+                        return SendResponseToUser(_res, next);
+                    }
 
 
                     const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
