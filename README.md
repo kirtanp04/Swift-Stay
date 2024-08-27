@@ -17,6 +17,12 @@
     - Mongoose
     - Typescript
 
+    - Payment integration
+
+        - Stripe Checkout
+
+        - Stripe Webhook
+
     - Real_Time_Chat
 
         - Socket.io
