@@ -1,7 +1,6 @@
-import { createClient, RedisClientType } from 'redis'
-import { Queue, Worker, Job, QueueEvents } from 'bullmq';
-import { SecrtKey } from '../env';
+import { createClient, RedisClientType } from 'redis';
 import { Crypt } from '../common';
+import { SecrtKey } from '../env';
 import { ChatObj } from '../types/Type';
 
 export class Redis {
@@ -9,11 +8,14 @@ export class Redis {
     private publisher: RedisClientType;
     private subscriber: RedisClientType;
     private isConnected: boolean = false;
-    private SubscribeUserChannelName: string = 'GetUserChatMess'; // channel for user to get user messages
-    private SubscribeAdminChannelName: string = 'PublishAdminChatMess'; // channel for user to get admin messages
-    private queueScheduler: QueueEvents | undefined = undefined;
 
-    public queue: Queue | undefined = undefined;
+
+    private SubscribeUserChannelName: string = 'GetUserChatMess';
+    private SubscribeAdminChannelName: string = 'PublishAdminChatMess';
+    private isSubscribedAdmin: boolean = false;
+    private isSubscribedUser: boolean = false;
+
+    private processedMessages: Set<string> = new Set();
 
     constructor() {
         this.redisClient = createClient({
@@ -48,7 +50,7 @@ export class Redis {
 
         client.on('reconnecting', () => {
             console.log('Redis client reconnecting...');
-            this.isConnected = false;  // Mark as not connected during reconnection attempts
+            this.isConnected = false;
         });
 
         client.on('end', () => {
@@ -61,30 +63,6 @@ export class Redis {
         });
     }
 
-    createQueue(queueName: string) {
-        try {
-            this.queue = new Queue(queueName, {
-                connection: {
-                    host: SecrtKey.REDIS.URL,
-                    port: SecrtKey.REDIS.PORT,
-                    password: SecrtKey.REDIS.PASSWORD
-                }
-            });
-
-            this.queueScheduler = new QueueEvents(queueName, {
-                connection: {
-                    host: SecrtKey.REDIS.URL,
-                    port: SecrtKey.REDIS.PORT,
-                    password: SecrtKey.REDIS.PASSWORD
-                }
-            });
-
-
-        } catch (error) {
-
-        }
-    }
-
     async connect(): Promise<void> {
         if (!this.isConnected) {
             await Promise.all([
@@ -92,57 +70,71 @@ export class Redis {
                 this.publisher.connect(),
                 this.subscriber.connect()
             ]);
-            this.isConnected = true; // Mark as connected once all clients are connected
+            this.isConnected = true;
         } else {
             console.log('Redis client is already connected.');
         }
     }
 
+
     async subscribeAdminChat(onMessage: (message: ChatObj) => void, onError: (err: any) => void): Promise<void> {
+        if (this.isSubscribedAdmin) {
+            console.log("Already subscribed to admin channel.");
+            return;
+        }
+
         try {
             await this.subscriber.subscribe(this.SubscribeAdminChannelName, (message) => {
                 const decryptObj = Crypt.Decryption(message);
                 if (decryptObj.error === '') {
-                    onMessage(decryptObj.data);
+                    this.processAndHandleMessage(decryptObj.data, onMessage);
                 } else {
                     onError(decryptObj.error);
                 }
             });
+
+            this.isSubscribedAdmin = true;
         } catch (error) {
             onError(error);
         }
     }
 
+
     async subscribeUserChat(onMessage: (message: ChatObj) => void, onError: (err: any) => void): Promise<void> {
+        if (this.isSubscribedUser) {
+            console.log("Already subscribed to user channel.");
+            return;
+        }
+
         try {
             await this.subscriber.subscribe(this.SubscribeUserChannelName, (message) => {
                 const decryptObj = Crypt.Decryption(message);
                 if (decryptObj.error === '') {
-                    onMessage(decryptObj.data);
+                    this.processAndHandleMessage(decryptObj.data, onMessage);
                 } else {
                     onError(decryptObj.error);
                 }
             });
+
+            this.isSubscribedUser = true;
         } catch (error) {
             onError(error);
         }
     }
 
-    addWorker(name: string, processFunction: (job: Job) => Promise<void> | void, onError: (err: any) => void): Worker {
-        return new Worker(name, async (job: Job) => {
-            try {
-                await processFunction(job);
-                console.log(`Job ${job.id} processed successfully.`);
-            } catch (error) {
-                console.error(`Error processing job ${job.id}:`, error);
-                onError(`Error processing job ${job.id}:` + error);
-            }
-        }, {
-            connection: {
-                host: SecrtKey.REDIS.URL,
-                port: SecrtKey.REDIS.PORT,
-                password: SecrtKey.REDIS.PASSWORD
-            }
-        });
+    private processAndHandleMessage(message: ChatObj, onMessage: (message: ChatObj) => void): void {
+        const messageId = message.date as string;
+
+        if (!this.processedMessages.has(messageId)) {
+            this.processedMessages.add(messageId);
+            onMessage(message);
+        } else {
+            console.log(`Duplicate message with id: ${messageId} ignored.`);
+        }
+    }
+
+
+    cleanProcessedMessages(): void {
+        this.processedMessages.clear();
     }
 }

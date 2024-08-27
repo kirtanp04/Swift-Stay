@@ -18,13 +18,16 @@ export const Param = {
             Property: 'ManagerPropertyBroker',
             Room: 'ManagerRoomBroker',
             chat: 'ManagerChatBroker',
-            review: 'ManagerReviewBroker'
+            review: 'ManagerReviewBroker',
+            Redis: 'ManagerRedisBroker',
         },
 
         guest: {
             Auth: 'GuestAuthBroker',
             Property: 'GuestPropertyBroker',
             Room: 'GuestRoomBroker',
+            Redis: 'GuestRedisBroker',
+            chat: 'GuestChatBroker',
         },
     },
 
@@ -51,6 +54,12 @@ export const Param = {
             },
             subscriber: {
                 GetAllSubscriber: 'ManagerGetAllSubscriber'
+            },
+            redis: {
+                initRedis: 'ManagerInitRedisService'
+            },
+            chat: {
+                saveChat: 'ManagerSaveChatService'
             }
         },
         guest: {
@@ -63,6 +72,12 @@ export const Param = {
                 GetTotalPropertyByType: 'GuestGetTotalPropertyByType',
                 GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
                 GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
+            },
+            redis: {
+                initRedis: 'GuestInitRedisService'
+            },
+            chat: {
+                saveChat: 'GuestSaveChatService'
             }
         },
     },

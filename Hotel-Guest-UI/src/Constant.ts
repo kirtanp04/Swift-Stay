@@ -16,7 +16,7 @@ export const Param = {
         Room: 'GuestRoomBroker',
         Redis: 'GuestRedisBroker',
         chat: 'GuestChatBroker',
-
+        payment: 'GuestPaymentBroker'
     },
 
     function: {
@@ -32,6 +32,15 @@ export const Param = {
         },
         redis: {
             initRedis: 'GuestInitRedisService'
+        },
+        chat: {
+            saveChat: 'GuestSaveChatService'
+        },
+        room: {
+            GetRoomDetail: 'GuestGetRoomDetail'
+        },
+        payment: {
+            CheckOut: 'GuestCheckOut'
         }
     },
 };

@@ -39,7 +39,8 @@
             "request": "launch",
             "name": "Run Hotel Server Script",
             "command": "npm run dev",
-            "cwd": "${workspaceFolder}/Hotel-server"
+            "cwd": "${workspaceFolder}/Hotel-server",
+            
         },
         {
             "type": "node-terminal",

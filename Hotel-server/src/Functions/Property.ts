@@ -32,38 +32,44 @@ export class PropertyFunction {
         _Function.next = next;
         _Function.objParam = objParam;
 
-        if (objParam.function === _AddProperty) {
-            const _res = await _Function.addNewProperty();
-            this.objUserResponse = _res;
-        } else if (objParam.function === _GetSingleProperty) {
-            const _res = await _Function.getSingleProperty();
-            this.objUserResponse = _res;
-        } else if (objParam.function === _GetAllProperty) {
-            const _res = await _Function.getAllProperty();
-            this.objUserResponse = _res;
-        } else if (objParam.function === _UpdateProperty) {
-            const _res = await _Function.updateProperty();
-            this.objUserResponse = _res;
-        } else if (objParam.function === _DeleteProperty) {
-            const _res = await _Function.deleteProperty();
-            this.objUserResponse = _res;
-        } else if (objParam.function === _GetAllPropertiesByCountry) {
-            const _res = await _Function.getAllPropertyByCountry();
-            this.objUserResponse = _res;
-        } else if (objParam.function === _GetTotalPropertByCountry) {
-            const _res = await _Function.getTotalPropertyByCountry();
-            this.objUserResponse = _res;
-        } else if (objParam.function === _GetTotalPropertyByType) {
-            const _res = await _Function.getTotalPropertyByPropertType();
-            this.objUserResponse = _res;
-        } else if (objParam.function === _GetPropertyListByFilterSearch) {
-            const _res = await _Function.GetPropertyListByFilterSearch();
-            this.objUserResponse = _res;
-        } else if (objParam.function === _GetGuestSinglePropertDetail) {
-            const _res = await _Function.GetSinglePropertyDetail();
-            this.objUserResponse = _res;
-        } else {
-            this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
+        switch (objParam.function) {
+            case _AddProperty:
+                this.objUserResponse = await _Function.addNewProperty();
+                break;
+            case _GetSingleProperty:
+                this.objUserResponse = await _Function.getSingleProperty();
+                break;
+            case _GetAllProperty:
+                this.objUserResponse = await _Function.getAllProperty();
+                break;
+            case _UpdateProperty:
+                this.objUserResponse = await _Function.updateProperty();
+                break;
+            case _DeleteProperty:
+                this.objUserResponse = await _Function.deleteProperty();
+                break;
+            case _GetAllPropertiesByCountry:
+                this.objUserResponse = await _Function.getAllPropertyByCountry();
+                break;
+            case _GetTotalPropertByCountry:
+                this.objUserResponse = await _Function.getTotalPropertyByCountry();
+                break;
+            case _GetTotalPropertyByType:
+                this.objUserResponse = await _Function.getTotalPropertyByPropertType();
+                break;
+            case _GetPropertyListByFilterSearch:
+                this.objUserResponse = await _Function.GetPropertyListByFilterSearch();
+                break;
+            case _GetGuestSinglePropertDetail:
+                this.objUserResponse = await _Function.GetSinglePropertyDetail();
+                break;
+            // case _GetAllPropertyByState:
+            //     this.objUserResponse = await _Function.get();
+            //     break;
+
+            default:
+                this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
+                break;
         }
 
         return this.objUserResponse;
@@ -108,7 +114,6 @@ class Functions {
 
             const checkUser = await checkAdminVerification(adminID);
             const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
-            const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
 
             if (checkUser.error === '') {
                 if (email === checkUser.data.email) {
@@ -152,9 +157,7 @@ class Functions {
                         if (ManagerPropertyCache.data !== '') {
                             Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                         }
-                        if (UserPropertyCache.data !== '') {
-                            Cache.ClearCache(CacheKey.user.property);
-                        }
+
                     } else {
                         this.objUserResponse = GetUserErrorObj(
                             `Server error not able to save ` + propertyType + `. Create Manager account first.`,
@@ -276,9 +279,9 @@ class Functions {
                     );
                 } else {
                     const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
-                    const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
+                    const UserPropertyCache = Cache.getCacheData(CacheKey.user.property(_id));
                     const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(checkUser.data.email));
-                    const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
+
 
                     const isUpdated = await PropertyModel.findOneAndUpdate(
                         {
@@ -309,18 +312,17 @@ class Functions {
                     );
 
                     if (isUpdated) {
+
                         if (ManagerPropertyCache.data !== '') {
                             Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                         }
                         if (UserPropertyCache.data !== '') {
-                            Cache.ClearCache(CacheKey.user.property);
+                            Cache.ClearCache(CacheKey.user.property(_id));
                         }
                         if (ManagerRoomCache.data !== '') {
                             Cache.ClearCache(CacheKey.manager.room(checkUser.data.email));
                         }
-                        if (UserRoomCache.data !== '') {
-                            Cache.ClearCache(CacheKey.user.room);
-                        }
+
                         this.objUserResponse = GetUserSuccessObj(
                             `Success: Your ` + propertyType + ` has been Updated.`,
                             HttpStatusCodes.CREATED
@@ -349,9 +351,9 @@ class Functions {
 
             if (checkUser.error === '') {
                 const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
-                const UserPropertyCache = Cache.getCacheData(CacheKey.user.property);
+                const UserPropertyCache = Cache.getCacheData(CacheKey.user.property(PropertyID));
                 const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(checkUser.data.email));
-                const UserRoomCache = Cache.getCacheData(CacheKey.user.room);
+
 
                 const isDeleted = await PropertyModel.findOneAndDelete({
                     $and: [
@@ -372,13 +374,15 @@ class Functions {
                             Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                         }
                         if (UserPropertyCache.data !== '') {
-                            Cache.ClearCache(CacheKey.user.property);
+                            Cache.ClearCache(CacheKey.user.property(PropertyID));
                         }
                         if (ManagerRoomCache.data !== '') {
                             Cache.ClearCache(CacheKey.manager.room(checkUser.data.email));
                         }
+
+                        const UserRoomCache = Cache.getCacheData(CacheKey.user.room(isDeleted?._id!));
                         if (UserRoomCache.data !== '') {
-                            Cache.ClearCache(CacheKey.user.room);
+                            Cache.ClearCache(CacheKey.user.room(isDeleted?._id!));
                         }
                         this.objUserResponse = GetUserSuccessObj(
                             `Success: Your ` + isDeleted!.propertyType + isDeleted!.name + ` has been Deleted.`,
@@ -399,7 +403,7 @@ class Functions {
                             Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                         }
                         if (UserPropertyCache.data !== '') {
-                            Cache.ClearCache(CacheKey.user.property);
+                            Cache.ClearCache(CacheKey.user.property(PropertyID));
                         }
                         this.objUserResponse = GetUserSuccessObj(
                             `Success: Your ` + isDeleted.propertyType + isDeleted.name + ` has been Deleted.`,
@@ -468,6 +472,11 @@ class Functions {
                         totalProperties: 1,
                     },
                 },
+                {
+                    $sort: {
+                        state: 1
+                    }
+                }
             ]);
 
             this.objUserResponse = GetUserSuccessObj(propertiesByState, HttpStatusCodes.OK);
@@ -501,6 +510,11 @@ class Functions {
                         totalProperties: 1,
                     },
                 },
+                {
+                    $sort: {
+                        propertyType: 1
+                    }
+                }
             ]);
 
             this.objUserResponse = GetUserSuccessObj(propertiesByState, HttpStatusCodes.OK);
@@ -687,152 +701,164 @@ class Functions {
         try {
             const { country, state, propertyName, propertyID } = this.objParam.data
 
-            const property = await PropertyModel.aggregate([
-                {
-                    $match: {
-                        $and: [
-                            {
-                                _id: new mongoose.Types.ObjectId(propertyID)
-                            },
-                            {
-                                country: country
-                            },
-                            {
-                                state: state
-                            },
-                            {
-                                name: propertyName.split('-').join(' ')
-                            }
-                        ]
+            const UserPropertyCache = Cache.getCacheData(CacheKey.user.property(propertyID));
+
+            if (UserPropertyCache.error === '') {
+                this.objUserResponse = GetUserSuccessObj(UserPropertyCache.data, HttpStatusCodes.OK);
+            } else {
+
+                const property = await PropertyModel.aggregate([
+                    {
+                        $match: {
+                            $and: [
+                                {
+                                    _id: new mongoose.Types.ObjectId(propertyID)
+                                },
+                                {
+                                    country: country
+                                },
+                                {
+                                    state: state
+                                },
+                                {
+                                    name: propertyName.split('-').join(' ')
+                                }
+                            ]
+                        },
+
+                    },
+                    {
+                        $lookup: {
+                            from: 'rooms',
+                            localField: 'rooms',
+                            foreignField: '_id',
+                            as: 'rooms'
+                        }
                     },
 
-                },
-                {
-                    $lookup: {
-                        from: 'rooms',
-                        localField: 'rooms',
-                        foreignField: '_id',
-                        as: 'rooms'
-                    }
-                },
+                    {
+                        $lookup: {
+                            from: 'reviews',
+                            localField: 'reviews',
+                            foreignField: '_id',
+                            as: 'review'
+                        }
+                    },
 
-                {
-                    $lookup: {
-                        from: 'reviews',
-                        localField: 'reviews',
-                        foreignField: '_id',
-                        as: 'review'
-                    }
-                },
+                    {
+                        $lookup: {
+                            from: 'subscribers',
+                            localField: '_id',
+                            foreignField: 'property',
+                            as: 'subscribersData'
+                        }
+                    },
 
-                {
-                    $lookup: {
-                        from: 'subscribers',
-                        localField: '_id',
-                        foreignField: 'property',
-                        as: 'subscribersData'
-                    }
-                },
+                    {
+                        $lookup: {
+                            from: 'users',
+                            localField: 'subscribersData.subscribers',
+                            foreignField: '_id',
+                            pipeline: [
+                                { $project: { _id: 0, email: 1 } }
+                            ],
+                            as: 'subscribers'
+                        }
+                    },
 
-                {
-                    $lookup: {
-                        from: 'users',
-                        localField: 'subscribersData.subscribers',
-                        foreignField: '_id',
-                        pipeline: [
-                            { $project: { _id: 0, email: 1 } }
-                        ],
-                        as: 'subscribers'
-                    }
-                },
+                    {
+                        $addFields: {
+                            avgReview: {
+                                $avg: {
+                                    $map: {
+                                        input: { $ifNull: [{ $arrayElemAt: ['$review.reviewInfo', 0] }, []] },
+                                        as: 'review',
+                                        in: '$$review.rating'
+                                    }
+                                }
+                            },
+                            review: { $arrayElemAt: ['$review', 0] },
+                            subscribers: '$subscribers'
+                        }
+                    },
 
-                {
-                    $addFields: {
-                        avgReview: {
-                            $avg: {
-                                $map: {
-                                    input: { $ifNull: [{ $arrayElemAt: ['$review.reviewInfo', 0] }, []] },
-                                    as: 'review',
-                                    in: '$$review.rating'
+                    {
+                        $unwind: '$rooms'
+                    },
+
+                    {
+                        $group: {
+                            _id: {
+                                propertyID: '$_id',
+                                roomType: '$rooms.type'
+                            },
+                            rooms: { $push: '$rooms' },
+                            avgReview: { $first: '$avgReview' },
+                            review: { $first: '$review' },
+                            subscribers: { $first: '$subscribers' },
+                            propertyDetails: {
+                                $first: {
+                                    name: '$name',
+                                    propertyType: '$propertyType',
+                                    images: '$images',
+                                    address: '$address',
+                                    city: '$city',
+                                    state: '$state',
+                                    country: '$country',
+                                    zipCode: '$zipCode',
+                                    phone: '$phone',
+                                    email: '$email',
+                                    website: '$website',
+                                    description: '$description',
+                                    amenities: '$amenities',
+                                    adminID: '$adminID',
+                                    checkInTime: '$checkInTime',
+                                    checkOutTime: '$checkOutTime'
                                 }
                             }
-                        },
-                        review: { $arrayElemAt: ['$review', 0] },
-                        subscribers: '$subscribers'
-                    }
-                },
+                        }
+                    },
 
-                {
-                    $unwind: '$rooms'
-                },
+                    {
+                        $group: {
+                            _id: '$_id.propertyID',
+                            Rooms: {
+                                $push: {
+                                    type: '$_id.roomType',
+                                    roomInfo: '$rooms'
+                                }
+                            },
+                            avgReview: { $first: '$avgReview' },
+                            review: { $first: '$review' },
+                            subscribers: { $first: '$subscribers' },
+                            propertyDetails: { $first: '$propertyDetails' }
+                        }
+                    },
 
-                {
-                    $group: {
-                        _id: {
+                    {
+                        $project: {
+                            _id: 0,
                             propertyID: '$_id',
-                            roomType: '$rooms.type'
-                        },
-                        rooms: { $push: '$rooms' },
-                        avgReview: { $first: '$avgReview' },
-                        review: { $first: '$review' },
-                        subscribers: { $first: '$subscribers' },
-                        propertyDetails: {
-                            $first: {
-                                name: '$name',
-                                propertyType: '$propertyType',
-                                images: '$images',
-                                address: '$address',
-                                city: '$city',
-                                state: '$state',
-                                country: '$country',
-                                zipCode: '$zipCode',
-                                phone: '$phone',
-                                email: '$email',
-                                website: '$website',
-                                description: '$description',
-                                amenities: '$amenities',
-                                adminID: '$adminID'
-                            }
+                            avgReview: 1,
+                            review: 1,
+                            propertyDetails: 1,
+                            Rooms: 1,
+                            subscribers: 1
                         }
                     }
-                },
+                ])
 
-                {
-                    $group: {
-                        _id: '$_id.propertyID',
-                        Rooms: {
-                            $push: {
-                                type: '$_id.roomType',
-                                roomInfo: '$rooms'
-                            }
-                        },
-                        avgReview: { $first: '$avgReview' },
-                        review: { $first: '$review' },
-                        subscribers: { $first: '$subscribers' },
-                        propertyDetails: { $first: '$propertyDetails' }
-                    }
-                },
 
-                {
-                    $project: {
-                        _id: 0,
-                        propertyID: '$_id',
-                        avgReview: 1,
-                        review: 1,
-                        propertyDetails: 1,
-                        Rooms: 1,
-                        subscribers: 1
-                    }
+                if (property !== undefined) {
+                    Cache.SetCache(CacheKey.user.property(propertyID), property[0])
+                    this.objUserResponse = GetUserSuccessObj(property[0], HttpStatusCodes.OK);
+                } else {
+                    this.objUserResponse = GetUserErrorObj('The property you are looking for is not available might wron url. Please try for another property', HttpStatusCodes.NOT_FOUND);
                 }
-            ])
 
-
-            if (property.length > 0) {
-
-                this.objUserResponse = GetUserSuccessObj(property[0], HttpStatusCodes.OK);
-            } else {
-                this.objUserResponse = GetUserErrorObj('The property you are looking for is not available might wron url. Please try for another property', HttpStatusCodes.NOT_FOUND);
             }
+
+
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
         } finally {
@@ -893,4 +919,4 @@ const getMaxPrice = (FilterData: any): number => {
     return maxPrice;
 };
 
-const PropertFilterPipeLine = [];
+

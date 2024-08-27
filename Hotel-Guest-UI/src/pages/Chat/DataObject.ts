@@ -1,5 +1,6 @@
 import { Api, getGETParamData } from "src/common/ApiCall"
 import { Param } from "src/Constant"
+import { enumUserRole } from "../Authentication/AuthMgr"
 
 class Sender {
     _id: string = ''
@@ -9,6 +10,8 @@ class Sender {
     name: string = ''
 
     profileImg: string = ''
+
+    role: enumUserRole = enumUserRole.guest
 }
 
 export class Chat {
@@ -20,8 +23,8 @@ export class Chat {
 
     senderDetail: Sender = new Sender()
 
-    static initRedisService = async (guestID: string, onSuccess: (res: any) => void, onError: (err: any) => void) => {
-        const _Param = getGETParamData(Param.broker.Redis, Param.function.redis.initRedis, guestID)
+    static initRedisService = async (guestID: string, role: string, onSuccess: (res: any) => void, onError: (err: any) => void) => {
+        const _Param = getGETParamData(Param.broker.Redis, Param.function.redis.initRedis, { id: guestID, role: role })
 
         try {
             await Api.get(_Param, (res) => {

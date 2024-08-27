@@ -14,8 +14,9 @@ export class ChatObj {
 }
 
 class Sender {
-    id: string = "";
+    _id: string = "";
     email: string = "";
     name: string = "";
     profileImg: string = "";
+    role: string = ''
 }

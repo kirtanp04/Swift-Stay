@@ -1,53 +1,113 @@
-import mongoose, { Schema } from "mongoose";
-import { UserClass } from "./UserModel";
-import { RoomClass } from "./RoomModel";
-import { PropertyClass } from "./PropertyModel";
-
-
-interface TGuest {
-    adults: number
-    childrens: number
-}
+import mongoose, { Schema } from 'mongoose';
 
 export enum enumBookingStatus {
     booked = 'booked',
     checked_in = 'checked_in',
     checked_out = 'checked_out',
-    cancelled = 'cancelled'
+    cancelled = 'cancelled',
 }
 
-export class BookingDetails {
-    property: PropertyClass = new PropertyClass()
-    room: RoomClass = new RoomClass()
-    checkInDate: Date = new Date()
-    checkOutDate: Date = new Date()
-    guests: TGuest = { adults: 1, childrens: 0 }
-    totalPrice: number = 0
-    status: enumBookingStatus = enumBookingStatus.booked
-    bookedOn: Date = new Date()
+enum PaymentStatus {
+    pending = 'pending',
+    paid = 'paid',
+    fail = 'fail'
 }
 
 export class BookingClass {
-    _id: string = '';
-    user: UserClass = new UserClass();
-    bookingDetails: BookingDetails[] = []
+    propertyID: string = '';
+
+    roomID: string = '';
+
+    userID: string = '';
+
+    UserInfo: UserInfo = new UserInfo();
+
+    stayInfo: StayInfo = new StayInfo();
+
+    totalPay: string | null = null;
+
+    bookingStatus: enumBookingStatus = enumBookingStatus.booked;
+
+    PaymentStatus: PaymentStatus = PaymentStatus.pending;
+
+    WhoAreYouBookingFor: string = '';
+
+    AreYouTravellingForWork: string = '';
+
+    SpecialRequests: string = '';
+
+    YourArrivalTime: string = '';
+
+    companyName: string = '';
+
+    BookingDate: string = ''
+
+    CancleDate: string | null = null
 }
 
 const BookingSchema = new Schema<BookingClass>({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    bookingDetails: [
-        {
-            property: { type: mongoose.Schema.Types.ObjectId, ref: 'Hotel', required: true },
-            room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true },
-            checkInDate: { type: Date, required: true },
-            checkOutDate: { type: Date, required: true },
-            guests: { type: Number, required: true },
-            totalPrice: { type: Number, required: true },
-            status: { type: String, enum: [enumBookingStatus.booked, enumBookingStatus.checked_in, enumBookingStatus.checked_out, enumBookingStatus.cancelled], default: enumBookingStatus.booked },
-            bookedOn: { type: Date, default: Date.now }
-        }
-    ]
+    propertyID: { type: String, required: [true, 'Property is required.'] },
+    roomID: { type: String, required: [true, 'Room is required.'] },
+    userID: { type: String, required: [true, 'User is required.'] },
+    UserInfo: {
+        name: { type: String, required: [true, 'User name is required.'] },
+        email: { type: String, required: [true, 'User email is required.'] },
+        address: { type: String, required: [true, 'User address is required.'] },
+        city: { type: String, required: [true, 'User city is required.'] },
+        ZipCode: { type: String, required: [true, 'User ZipCode is required.'] },
+        country: { type: String, required: [true, 'User country is required.'] },
+        state: { type: String, required: [true, 'User state is required.'] },
+        phone: { type: Number, required: [true, 'User phone is required.'] },
+    },
+    stayInfo: {
+        checkIn: { type: String, required: [true, 'User checkIn is required.'] },
+        checkOut: { type: String, required: [true, 'User checkOut is required.'] },
+        adults: { type: Number, required: [true, 'User adults is required.'] },
+        childrens: { type: Number, required: [true, 'User childrens is required.'] },
+        totalStay: { type: String, required: [true, 'User totalStay is required.'] },
+    },
+    totalPay: { type: String, required: [true, 'Total payment getting empty is required.'] },
+    WhoAreYouBookingFor: { type: String },
+    bookingStatus: { type: String },
+    PaymentStatus: { type: String, enum: Object.values(PaymentStatus) },
+    AreYouTravellingForWork: { type: String },
+    SpecialRequests: { type: String },
+    YourArrivalTime: { type: String },
+    companyName: { type: String },
+    BookingDate: { type: String },
+    CancleDate: { type: String || null, default: null }
 });
 
-BookingSchema.index({ user: 1 })
+BookingSchema.index({ userID: 1 });
+
 export const Booking = mongoose.model<BookingClass>('Booking', BookingSchema);
+
+class StayInfo {
+    checkIn: string | null = null;
+
+    checkOut: string | null = null;
+
+    adults: number | null = null;
+
+    childrens: number | null = null;
+
+    totalStay: string | null = null;
+}
+
+class UserInfo {
+    name: string = '';
+
+    email: string = '';
+
+    address: string = '';
+
+    city: string = '';
+
+    ZipCode: string = '';
+
+    country: string = '';
+
+    state: string = '';
+
+    phone: number | null = null;
+}

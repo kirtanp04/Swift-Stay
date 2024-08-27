@@ -15,6 +15,11 @@ export const MUITextField = styled(TextField)(({ theme }) => ({
       fontSize: "0.6rem",
     },
   },
+
+  "& .MuiFormHelperText-root": {
+    color: theme.palette.color.info.main,
+    fontWeight: 600,
+  },
 }));
 
 export default function FormTextField<T extends FieldValues>({

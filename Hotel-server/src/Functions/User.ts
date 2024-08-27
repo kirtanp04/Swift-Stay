@@ -5,6 +5,7 @@ import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
 import { Login, User, UserClass, enumUserRole } from '../models/UserModel';
 import { EmailTemplate, Param } from '../Constant';
 import { Email } from '../service/Email';
+import { SecrtKey } from '../env';
 
 const _CreateGuestAccount: string = Param.function.guest.register;
 
@@ -420,9 +421,12 @@ class Functions {
                                 },
                                 HttpStatusCodes.ACCEPTED
                             );
+                            this.res?.redirect(SecrtKey.FRONTEND_URL.ADMIN)
+                        } else {
+                            this.objUserResponse = GetUserErrorObj('Server error: Somthing is wrong to update email', HttpStatusCodes.BAD_REQUEST);
                         }
                     } else {
-                        this.objUserResponse = GetUserErrorObj('Email is already been verifyed.', HttpStatusCodes.BAD_REQUEST);
+                        this.objUserResponse = GetUserErrorObj('Email is already been verifyed.', HttpStatusCodes.NOT_ACCEPTABLE);
                     }
                 } else {
                     this.objUserResponse = GetUserErrorObj(
@@ -431,7 +435,7 @@ class Functions {
                     );
                 }
             } else {
-                this.objUserResponse = GetUserErrorObj('Server Error: Invalid Token provided', HttpStatusCodes.BAD_REQUEST);
+                this.objUserResponse = GetUserErrorObj('Server Error: Invalid request url', HttpStatusCodes.BAD_REQUEST);
             }
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);

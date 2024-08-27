@@ -9,6 +9,7 @@ import useAuth from "src/hooks/useAuth";
 import { SocketService } from "src/service/Socket";
 import showMessage from "src/util/ShowMessage";
 import { ChatApi, ChatObj, SubscriberClass, TSubscriber } from "./DataObject";
+import { enumUserRole } from "../Authentication/AuthMgr";
 
 export default function ChatViewer() {
   const [Message, setMessage] = useState("");
@@ -29,8 +30,22 @@ export default function ChatViewer() {
   useEffect(() => {
     ChatApi.getAllSubscribedUsers(
       id,
+
       (res) => {
         setSubscriberList(res);
+
+        ChatApi.initRedisService(
+          id,
+          role,
+          (res) => {
+            //
+            if (res) {
+            }
+          },
+          (err) => {
+            showMessage(err, theme, () => {});
+          }
+        );
       },
       (err) => {
         showMessage(err, theme, () => {});
@@ -57,14 +72,6 @@ export default function ChatViewer() {
   );
 
   useEffect(() => {
-    if (SelectedSubscriber.email !== "" && email !== "") {
-      const _ChatObj = new ChatObj();
-      _ChatObj.key = SelectedSubscriber.chatKey;
-      _Socket.joinRoom(_ChatObj);
-    }
-  }, [SelectedSubscriber]);
-
-  useEffect(() => {
     if (socketError !== null) {
       showMessage(socketError.message, theme, () => {});
     }
@@ -80,6 +87,7 @@ export default function ChatViewer() {
       email: email,
       name: name,
       profileImg: "",
+      role: role as enumUserRole,
     };
 
     return _ChatObj;
@@ -126,6 +134,9 @@ export default function ChatViewer() {
 
   const OnSelectSubscriber = (subscriber: TSubscriber) => {
     setSelectedSubscriber(subscriber);
+    const _ChatObj = new ChatObj();
+    _ChatObj.key = subscriber.chatKey;
+    _Socket.joinRoom(_ChatObj);
   };
 
   return (
@@ -148,6 +159,7 @@ export default function ChatViewer() {
                         profileImg: objUser.profileImg,
                         _id: objUser._id!,
                         chatKey: objSub.property + objUser._id,
+                        role: role as enumUserRole,
                       })
                     }
                   >

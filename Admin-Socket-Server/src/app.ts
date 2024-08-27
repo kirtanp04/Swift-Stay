@@ -38,39 +38,38 @@ const io = new Server(server, {
 
 const Socket = new WebSocket(io);
 const _Redis = new Redis()
-
 const ConnectRedis = async () => {
     await _Redis.connect()
 }
+
+
 ConnectRedis()
-
-
-export const runChat = () => {
+export const runChat = async () => {
+    // await _Redis.connect(); // Ensure Redis connection here
     Socket.getChatMessage(
         SocketKeyName.SendMessage,
-        async (res) => {
-            Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, res);
+        async (res: any) => {
+            // Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, res);
+
             await _Redis.publish(res, (err) => {
-                console.log(err)
                 Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
-            })
-
-
+            });
         },
-        (err) => {
+        (err: any) => {
             Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
         }
     );
+
+
 };
 
 
+
 _Redis.subscribe((mess) => {
-    console.log(mess)
-    Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, mess)
+    Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, mess);
 }, (err) => {
     Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
-})
-
+});
 
 
 // Start the HTTP server

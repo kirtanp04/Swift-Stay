@@ -7,9 +7,12 @@ export class Redis {
     private redisClient: RedisClientType;
     private publisher: RedisClientType;
     private subscriber: RedisClientType;
+
     private PublishChannelName: string = 'PublishAdminChatMess'; // channel for admin to get user messages
     private SubscribeChannelName: string = 'GetUserChatMess'; // channel for user to get admin messages
+
     private isConnected: boolean = false;
+    private isSubscribed: boolean = false; // Prevent duplicate subscription
 
     constructor() {
         this.redisClient = createClient({
@@ -65,8 +68,11 @@ export class Redis {
                 this.subscriber.connect()
             ]);
             this.isConnected = true;
+            // console.log('Redis client  connected.');
         } else {
-            console.log('Redis client is already connected.');
+            // await this.disconnect()
+            // await this.connect()
+            console.log('Redis client already connected.');
         }
     }
 
@@ -84,6 +90,11 @@ export class Redis {
     }
 
     async subscribe(onMessage: (message: ChatObj) => void, onError: (err: any) => void): Promise<void> {
+        if (this.isSubscribed) {
+            console.log("Already subscribed to the channel.");
+            return; // Prevent duplicate subscription
+        }
+
         try {
             await this.subscriber.subscribe(this.SubscribeChannelName, (message) => {
                 const decryptObj = Crypt.Decryption(message);
@@ -93,8 +104,24 @@ export class Redis {
                     onError(decryptObj.error);
                 }
             });
+
+            this.isSubscribed = true; // Mark subscription as active
         } catch (error) {
             onError(error);
+        }
+    }
+
+    async disconnect(): Promise<void> {
+        if (this.isConnected) {
+            await Promise.all([
+                this.redisClient.disconnect(),
+                this.publisher.disconnect(),
+                this.subscriber.disconnect()
+            ]);
+            console.log('Redis client disconnected');
+            this.isConnected = false; // Reset the connection flag
+        } else {
+            console.log('Redis client is not connected.');
         }
     }
 }

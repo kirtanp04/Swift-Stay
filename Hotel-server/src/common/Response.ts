@@ -1,3 +1,4 @@
+import { HttpStatusCodes } from "./HTTPStatusCode";
 
 export class ProjectResponse {
     data: any = '';
@@ -11,7 +12,7 @@ export class UserResponse {
 
     data: any
 
-    statusCode: number = 200
+    statusCode: HttpStatusCodes = HttpStatusCodes.OK
 
     Message: string = '';
 
@@ -32,7 +33,7 @@ export const GetUserErrorObj = (errMess: string, statusCode?: number): UserRespo
     _objErr.Message = errMess
     _objErr.data = ''
     _objErr.isError = true
-    _objErr.statusCode = statusCode || 404
+    _objErr.statusCode = statusCode || HttpStatusCodes.BAD_REQUEST
 
     return _objErr
 
@@ -44,7 +45,7 @@ export const GetUserSuccessObj = (Data: any, statusCode?: number): UserResponse 
     _objSucc.Message = ''
     _objSucc.data = Data
     _objSucc.isError = false
-    _objSucc.statusCode = statusCode || 404
+    _objSucc.statusCode = statusCode || HttpStatusCodes.OK
 
     return _objSucc
 

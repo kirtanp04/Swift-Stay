@@ -132,9 +132,10 @@ export class Api {
     let _res = new ProjectResponse();
 
     try {
+      debugger
       const objRes = Storage.getFromSessionStorage("Auth");
       if (objRes.error === "") {
-        if (objRes.data.role === enumUserRole.admin) {
+        if (objRes.data.role === enumUserRole.guest) {
           const encryptParamData = Crypt.Encryption(_Param);
           if (encryptParamData.error === "") {
             const response = await axiosCall.get(encryptParamData.data, {
@@ -166,7 +167,7 @@ export class Api {
           }
         } else {
           _res.error =
-            "Your are not allowed to perform this call as you are not an admin. First login through admin account.";
+            "Your are not allowed to perform this call as you are not an guest. First login through guest account.";
         }
       } else {
         _res.error =
@@ -194,7 +195,7 @@ export class Api {
 
     try {
       if (objRes.error === "") {
-        if (objRes.data.role === enumUserRole.admin) {
+        if (objRes.data.role === enumUserRole.guest) {
           const encryptParamData = Crypt.Encryption(_Param);
 
           if (encryptParamData.error === "") {
@@ -223,7 +224,7 @@ export class Api {
           }
         } else {
           _res.error =
-            "Your are not allowed to perform this call as you are not an admin. First login through admin account.";
+            "Your are not allowed to perform this call as you are not an guest. First login through guest account.";
         }
       } else {
         _res.error =

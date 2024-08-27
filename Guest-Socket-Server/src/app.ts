@@ -39,29 +39,38 @@ const _Redis = new Redis()
 const ConnectRedis = async () => {
     await _Redis.connect()
 }
+
+
 ConnectRedis()
 
 
-export const runChat = () => {
+
+export const runChat = async () => {
+    // Ensure Redis connection here
     Socket.getChatMessage(
         SocketKeyName.SendMessage,
         async (res: any) => {
-            Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, res);
+            // Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, res);
 
             await _Redis.publish(res, (err) => {
-                console.log(err)
                 Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
-            })
-
-
+            });
         },
         (err: any) => {
             Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
         }
     );
+
+    // _Redis.subscribe((mess) => {
+    //     Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, mess);
+    // }, (err) => {
+    //     Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
+    // });
 };
 
+
 _Redis.subscribe((mess) => {
+    console.log(mess)
     Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, mess)
 }, (err) => {
     Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);

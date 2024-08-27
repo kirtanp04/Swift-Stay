@@ -6,3 +6,6 @@ env
 ./dist
 
 ./src/env.ts
+
+# Ignore the env file
+/src/env.ts

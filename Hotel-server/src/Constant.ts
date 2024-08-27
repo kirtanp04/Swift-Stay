@@ -17,6 +17,7 @@ export const Param = {
             Room: 'GuestRoomBroker',
             Redis: 'GuestRedisBroker',
             chat: 'GuestChatBroker',
+            payment: 'GuestPaymentBroker'
         },
     },
 
@@ -46,6 +47,9 @@ export const Param = {
             },
             redis: {
                 initRedis: 'ManagerInitRedisService'
+            },
+            chat: {
+                saveChat: 'ManagerSaveChatService'
             }
         },
         guest: {
@@ -61,6 +65,16 @@ export const Param = {
             },
             redis: {
                 initRedis: 'GuestInitRedisService'
+            },
+            chat: {
+                saveChat: 'GuestSaveChatService'
+            },
+            room: {
+                GetRoomDetail: 'GuestGetRoomDetail'
+            },
+            payment: {
+                CheckOut: 'GuestCheckOut',
+                WebHook: 'GuestWebhook'
             }
         },
     },
@@ -68,8 +82,8 @@ export const Param = {
 
 export const CacheKey = {
     user: {
-        property: '#@User#@Property#@',
-        room: '#@User#@Room#@',
+        property: (propertyID: string) => `#@User${propertyID}#@Property#@`,
+        room: (roomID: string) => `#@User${roomID}#@Room#@`,
     },
     manager: {
         property: (emailID: string) => `#@Manager#@${emailID}#@Property#@`,
@@ -77,6 +91,8 @@ export const CacheKey = {
         review: (emailID: string) => `#@Manager#@${emailID}#@Review#@`,
         subscriber: (emailID: string) => `#@Manager#@${emailID}#@Subscriber#@`,
     },
+
+    chat: (chatKey: string) => `#@ManagerChat#@${chatKey}#@UserChat#@`
 };
 
 export const EmailTemplate = {

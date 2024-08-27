@@ -14,23 +14,19 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { HeartIcon, LocationIcon, ShareIcon } from "src/assets/iconify";
 import { getChipColor, GetCountryByCode } from "src/common/common";
+import { Storage } from "src/common/Storage";
+import EToolTip from "src/components/EToolTip";
+import IfLogedin from "src/components/IfLogedin";
 import LazyImage from "src/components/LazyImage";
+import LoginPopOver from "src/components/LoginPopOver";
 import Page from "src/components/Page";
 import LoadingSkeleton from "src/components/Skeleton";
-import {
-  enumPropertyType,
-  Property,
-  TPropertydetail,
-} from "src/ObjMgr/Property";
-import showMessage from "src/util/ShowMessage";
-import RoomDetail from "./RoomDetail";
-import Reviewlist from "./Reviewlist";
-import { Storage } from "src/common/Storage";
 import useAuth from "src/hooks/useAuth";
-import IfLogedin from "src/components/IfLogedin";
-import EToolTip from "src/components/EToolTip";
-import LoginPopOver from "src/components/LoginPopOver";
+import { Property, TPropertydetail } from "src/ObjMgr/Property";
+import showMessage from "src/util/ShowMessage";
 import Chat from "../Chat/Chat";
+import Reviewlist from "./Reviewlist";
+import RoomDetail from "./RoomDetail";
 
 export default function PropertyDetails() {
   const { propertyName, state, country, propertyID } = useParams();
@@ -126,7 +122,7 @@ export default function PropertyDetails() {
               label={PropertDetail!.propertyDetails.propertyType}
               sx={{
                 backgroundColor: getChipColor(
-                  enumPropertyType.Apartment,
+                  PropertDetail!.propertyDetails.propertyType,
                   theme
                 ),
                 padding: "0.1rem 0.5rem",

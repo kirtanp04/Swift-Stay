@@ -1,4 +1,6 @@
+import { Api, getGETParamData } from 'src/common/ApiCall';
 import { Property } from './Property'
+import { Param } from 'src/Constant';
 export enum enumRoomType {
     Single_Room = 'Single Room',
     Double_Room = 'Double Room',
@@ -23,4 +25,23 @@ export class Room {
     isAvailable: boolean = true
     createdAt: Date = new Date()
     updatedAt: Date = new Date()
+
+
+    static getRoomDetail = async (roomID: string, PropertyID: string, UserID: string, onsuccess: (objRoom: Room) => void, onfail: (err: any) => void) => {
+        try {
+
+            const _Param = getGETParamData(Param.broker.Room, Param.function.room.GetRoomDetail, { guestID: UserID, roomID: roomID, PropertyID: PropertyID })
+
+            await Api.protectedGet(_Param, (res) => {
+                if (res.error !== '') {
+                    onfail(res.error)
+                } else {
+                    onsuccess(res.data)
+                }
+            })
+
+        } catch (error: any) {
+            onfail(error)
+        }
+    }
 }

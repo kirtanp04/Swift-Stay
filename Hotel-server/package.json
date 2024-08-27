@@ -7,7 +7,8 @@
     "start": "ts-node ./src/index.ts",
     "start:prod": "npm run build && node ./dist/src/server.js",
     "build": "npx tsc",
-    "dev": "nodemon ./src/index.ts"
+    "dev": "nodemon ./src/index.ts",
+    "debug": "node --inspect=9229 -r ts-node/register ./src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -34,7 +35,8 @@
     "node-cache": "^5.1.2",
     "nodemailer": "^6.9.14",
     "redis": "^4.7.0",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "stripe": "^16.8.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

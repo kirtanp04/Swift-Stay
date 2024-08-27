@@ -13,6 +13,7 @@ import {
   useTheme,
 } from "@mui/material";
 import getSymbolFromCurrency from "currency-symbol-map";
+import { useParams } from "react-router-dom";
 import { PersonIcon, PreviewIcon } from "src/assets/iconify";
 import EToolTip from "src/components/EToolTip";
 import IfLogedin from "src/components/IfLogedin";
@@ -20,6 +21,7 @@ import LoginPopOver from "src/components/LoginPopOver";
 import { MUITableCell, MUITableRow } from "src/components/mui/MUITable";
 import { TRoom } from "src/ObjMgr/Property";
 import { enumRoomType } from "src/ObjMgr/Room";
+import { Path } from "src/Router/path";
 
 type Props = {
   Rooms: TRoom[];
@@ -27,6 +29,8 @@ type Props = {
 };
 
 export default function RoomDetail({ Rooms, currency }: Props) {
+  const { propertyName, state, country, propertyID } = useParams();
+
   const theme = useTheme();
   return (
     <RootStyle>
@@ -213,6 +217,20 @@ export default function RoomDetail({ Rooms, currency }: Props) {
 
                               cursor: "pointer",
                             }}
+                            onClick={() =>
+                              window.open(
+                                window.location.origin +
+                                  Path.booking(
+                                    country!,
+                                    state!,
+                                    propertyName!,
+                                    propertyID!,
+                                    objRoom._id,
+                                    objRoom.type
+                                  ),
+                                "_blank"
+                              )
+                            }
                           >
                             Book now
                           </BookNowButton>
@@ -239,7 +257,7 @@ export default function RoomDetail({ Rooms, currency }: Props) {
   );
 }
 
-function createArray(length) {
+export function createArray(length) {
   return Array.from({ length }, (_, index) => index);
 }
 

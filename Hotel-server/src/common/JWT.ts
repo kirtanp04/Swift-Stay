@@ -3,8 +3,6 @@ import { SecrtKey } from '../env';
 import { Crypt } from './Crypt';
 import { ProjectResponse, errorPath } from './Response';
 
-// const privateKey = fs.readFileSync(path.join(__dirname, 'private_key.pem'), 'utf8');
-// const publicKey = fs.readFileSync(path.join(__dirname, 'public_key.pem'), 'utf8');
 
 export class Jwt {
     private static JWT_KEY = SecrtKey.JWT_KEY!;

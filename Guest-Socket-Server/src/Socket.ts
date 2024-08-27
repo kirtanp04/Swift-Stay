@@ -78,7 +78,7 @@ export class WebSocket {
 
     private HandleConnections = () => {
         this.io.on("connection", (socket: CustomSocket) => {
-            console.log("User connected:", socket.id);
+            // console.log("User connected:", socket.id);
             this.Socket = socket;
             runChat()
 
@@ -108,12 +108,12 @@ export class WebSocket {
 
         this.Socket!.on(SocketKeyName.JoinRoom, (roomKey: string) => {
             const objDecryptKey: ChatObj = Crypt.Decryption(roomKey).data;
-            console.log("Joining room:", roomKey);
+            // console.log("Joining room:", roomKey);
             this.Socket!.join(objDecryptKey.key);
 
             if (this.ActiveRoom === objDecryptKey.key) {
                 const encryptMess = Crypt.Encryption(ResPonseDate).data;
-                console.log("Emitting roomJoined event to room:", roomKey);
+                // console.log("Emitting roomJoined event to room:", roomKey);
                 this.Socket!.to(objDecryptKey.key).emit(SocketKeyName.onJoinRoom, encryptMess);
             }
 
@@ -128,6 +128,8 @@ export class WebSocket {
     ) => {
         try {
             const encryptedChat = Crypt.Encryption(data).data;
+
+            console.log(encryptedChat)
             this.Socket!.to(data.key).emit(SocketName, encryptedChat);
         } catch (error) { }
     };

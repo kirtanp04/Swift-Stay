@@ -18,6 +18,7 @@ import showMessage from "src/util/ShowMessage";
 import { Chat as TChat } from "./DataObject";
 import { SocketKeyName } from "src/Constant";
 import { TimeFormatter } from "src/common/TimeFormater";
+import { enumUserRole } from "../Authentication/AuthMgr";
 
 type Props = {
   open: boolean;
@@ -73,6 +74,7 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
     setConnectionLoading(true);
     TChat.initRedisService(
       id,
+      role,
       (res) => {
         showMessage(res, "success", theme, () => {});
         setConnectionLoading(false);
@@ -94,6 +96,7 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
       email: email,
       name: name,
       profileImg: "",
+      role: role as enumUserRole,
     };
 
     return _ChatObj;
@@ -111,6 +114,7 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
 
   function GetChatMessage(msg: TChat) {
     let newChatObj = new TChat();
+    console.log(msg);
     newChatObj = { ...msg, date: msg.date };
     setChatMessages((prevMessages) => [...prevMessages, newChatObj]);
     setShowTypingLoading(false);

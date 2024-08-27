@@ -2,6 +2,7 @@ import { ElementType, Suspense, lazy } from "react";
 import { useRoutes } from "react-router-dom";
 import LoadingPage from "src/components/LoadingPage";
 import { UserSearchContextProvider } from "src/context/UserSearchContext";
+import AuthGaurd from "src/guard/AuthGaurd";
 import LoginGaurd from "src/guard/LoginGaurd";
 import Layout from "src/layout/NavBar";
 
@@ -27,6 +28,7 @@ const PropertyDetails = Loadable(
 const PropertyListByState = Loadable(
   lazy(() => import("src/pages/PropertylistByState/PropertyListByState"))
 );
+const Bookin = Loadable(lazy(() => import("src/pages/Booking/Bookin")));
 
 export default function Router() {
   return useRoutes([
@@ -46,6 +48,14 @@ export default function Router() {
         {
           path: ":country/:state/:propertyName/:propertyID",
           element: <PropertyDetails />,
+        },
+        {
+          path: ":country/:state/:propertyName/:propertyID/booking/:roomType/:roomID",
+          element: (
+            <AuthGaurd>
+              <Bookin />
+            </AuthGaurd>
+          ),
         },
         { path: "about", element: <>About</> },
         { path: "contact", element: <>Contact</> },

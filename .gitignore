@@ -1,0 +1,14 @@
+env
+
+./dist
+
+./src/env.ts
+
+# Ignore the env file
+Hotel-server/src/env.ts
+Guest-Socket-Server/src/env.ts
+Admin-Socket-Server/src/env.ts
+Hotel-Guest-UI/src/env.ts
+Hotel-Guest-UI/src/env.ts
+
+stripe.exe
