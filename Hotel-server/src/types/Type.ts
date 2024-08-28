@@ -1,3 +1,6 @@
+import { enumPropertyType } from "../models/PropertyModel";
+import { enumRoomType } from "../models/RoomModel";
+
 export class TParam {
     Broker: string = ''
 
@@ -19,4 +22,18 @@ class Sender {
     name: string = "";
     profileImg: string = "";
     role: string = ''
+}
+
+export interface TSuccessbooking {
+    propertyName: string
+    description: string,
+    image: string[],
+    totalPrice: string,
+    propertyType: enumPropertyType,
+    checkIn: string,
+    checkOut: string,
+    totalNights: string,
+    roomType: enumRoomType,
+    roomDescription: string,
+    roomPrice: string
 }

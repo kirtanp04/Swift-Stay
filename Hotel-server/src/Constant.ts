@@ -1,4 +1,7 @@
 import { SecrtKey } from './env';
+import { enumPropertyType } from './models/PropertyModel';
+import { enumRoomType } from './models/RoomModel';
+import { TSuccessbooking } from './types/Type';
 
 export const Param = {
     broker: {
@@ -17,7 +20,8 @@ export const Param = {
             Room: 'GuestRoomBroker',
             Redis: 'GuestRedisBroker',
             chat: 'GuestChatBroker',
-            payment: 'GuestPaymentBroker'
+            payment: 'GuestPaymentBroker',
+            booking: 'GuestBookingBroker'
         },
     },
 
@@ -75,6 +79,10 @@ export const Param = {
             payment: {
                 CheckOut: 'GuestCheckOut',
                 WebHook: 'GuestWebhook'
+            },
+            booking: {
+                SaveBookingInfo: 'GuestSaveBookingInfo',
+                UpdateBookingInfo: 'GuestUpdateBookinInfo'
             }
         },
     },
@@ -150,6 +158,8 @@ export const EmailTemplate = {
         </div>
     </div>
 </body>`,
+
+
     LogedIn: (UserName: string) => `
     <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
     <div style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
@@ -172,4 +182,132 @@ export const EmailTemplate = {
     </div>
 </body>
 `,
+
+    Successbooking: ({ checkIn, checkOut, description, image, roomPrice, totalPrice, propertyName, propertyType, roomDescription, roomType, totalNights }: TSuccessbooking) => {
+
+        return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Booking Confirmation</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          color: #333;
+        }
+        .container {
+          width: 100%;
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          border: 1px solid #ddd;
+          background-color: #f9f9f9;
+        }
+        .header {
+          text-align: center;
+          padding-bottom: 20px;
+        }
+        .header svg {
+          width: 50px;
+          height: 50px;
+        }
+        .header h1 {
+          margin: 0;
+          color: #333;
+        }
+        .details {
+          margin-bottom: 20px;
+        }
+        .details h2 {
+          color: #333;
+          font-size: 20px;
+        }
+        .details p {
+          margin: 0;
+        }
+        .images {
+          margin: 20px 0;
+        }
+        .images img {
+          width: 100%;
+          height: auto;
+        }
+        .footer {
+          margin-top: 30px;
+          text-align: center;
+        }
+        .footer p {
+          color: #999;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            x="0px"
+            y="0px"
+            width="50"
+            height="50"
+            viewBox="0 0 172 172"
+            fill="#333"
+          >
+            <g
+              fill="none"
+              fill-rule="nonzero"
+              stroke="none"
+              stroke-width="1"
+              stroke-linecap="butt"
+              stroke-linejoin="miter"
+              stroke-miterlimit="10"
+              stroke-dasharray=""
+              stroke-dashoffset="0"
+              font-family="none"
+              font-weight="none"
+              font-size="none"
+              text-anchor="none"
+              style="mix-blend-mode: normal"
+            >
+              <path d="M0,172v-172h172v172z" fill="none"></path>
+              <g fill="#333">
+                <path d="M21.5,21.5v129h64.5v-32.25v-64.5v-32.25zM86,53.75c0,17.7805 14.4695,32.25 32.25,32.25c17.7805,0 32.25,-14.4695 32.25,-32.25c0,-17.7805 -14.4695,-32.25 -32.25,-32.25c-17.7805,0 -32.25,14.4695 -32.25,32.25zM118.25,86c-17.7805,0 -32.25,14.4695 -32.25,32.25c0,17.7805 14.4695,32.25 32.25,32.25c17.7805,0 32.25,-14.4695 32.25,-32.25c0,-17.7805 -14.4695,-32.25 -32.25,-32.25z"></path>
+              </g>
+            </g>
+          </svg>
+          <h1>Swift Stay</h1>
+        </div>
+  
+        <div class="details">
+          <h2>Booking Confirmation</h2>
+          <p><strong>Hotel:</strong> ${propertyName} (${propertyType})</p>
+          <p>${description}</p>
+          <div class="images">
+            ${image.map((img: any) => `<img src="${img}" alt="${propertyName} Image" />`).join('')}
+          </div>
+          <p><strong>Check-in:</strong> ${checkIn}</p>
+          <p><strong>Check-out:</strong> ${checkOut}</p>
+          <p><strong>Total Nights:</strong> ${totalNights}</p>
+          <p><strong>Total Payment:</strong> $${totalPrice}</p>
+        </div>
+  
+        <div class="details">
+          <h2>Room Details</h2>
+          <p><strong>Room Type:</strong> ${roomType}</p>
+          <p>${roomDescription}</p>
+          <p><strong>Room Price:</strong> $${roomPrice} per night</p>
+        </div>
+  
+        <div class="footer">
+          <p>Thank you for booking with Swift Stay! We look forward to your stay.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
+    }
 };
+
+

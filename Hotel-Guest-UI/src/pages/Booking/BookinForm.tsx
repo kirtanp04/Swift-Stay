@@ -193,7 +193,7 @@ export default function BookinForm({ _Method }: Props) {
       </FlexWrapper>
 
       <FormRadioGroup
-        name="WhoAreYouBookingFor"
+        name="OptionalInfo.WhoAreYouBookingFor"
         options={[
           { label: "I am the main guest", value: "I am the main guest" },
           {
@@ -208,7 +208,7 @@ export default function BookinForm({ _Method }: Props) {
       </FlexWrapper>
 
       <FormRadioGroup
-        name="AreYouTravellingForWork"
+        name="OptionalInfo.AreYouTravellingForWork"
         options={[
           { label: "Yes", value: true },
           {

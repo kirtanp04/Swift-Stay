@@ -1,16 +1,17 @@
 import mongoose, { Schema } from 'mongoose';
 
 export enum enumBookingStatus {
+    pending = 'pending',
     booked = 'booked',
     checked_in = 'checked_in',
     checked_out = 'checked_out',
     cancelled = 'cancelled',
 }
 
-enum PaymentStatus {
+export enum PaymentStatus {
     pending = 'pending',
     paid = 'paid',
-    fail = 'fail'
+    fail = 'fail',
 }
 
 export class BookingClass {
@@ -26,23 +27,20 @@ export class BookingClass {
 
     totalPay: string | null = null;
 
-    bookingStatus: enumBookingStatus = enumBookingStatus.booked;
+    bookingStatus: enumBookingStatus = enumBookingStatus.pending;
 
-    PaymentStatus: PaymentStatus = PaymentStatus.pending;
+    PaymentDetail: PaymentDetail = new PaymentDetail()
 
-    WhoAreYouBookingFor: string = '';
-
-    AreYouTravellingForWork: string = '';
-
-    SpecialRequests: string = '';
+    OptionalInfo: OptionalInfo = new OptionalInfo();
 
     YourArrivalTime: string = '';
 
-    companyName: string = '';
+    BookingDate: string = '';
 
-    BookingDate: string = ''
+    CancleDate: string | null = null;
 
-    CancleDate: string | null = null
+    ReasonForCancle: string | null = null
+
 }
 
 const BookingSchema = new Schema<BookingClass>({
@@ -67,15 +65,23 @@ const BookingSchema = new Schema<BookingClass>({
         totalStay: { type: String, required: [true, 'User totalStay is required.'] },
     },
     totalPay: { type: String, required: [true, 'Total payment getting empty is required.'] },
-    WhoAreYouBookingFor: { type: String },
     bookingStatus: { type: String },
-    PaymentStatus: { type: String, enum: Object.values(PaymentStatus) },
-    AreYouTravellingForWork: { type: String },
-    SpecialRequests: { type: String },
+    PaymentDetail: {
+        PaymentID: { type: String || null, default: null },
+        failPaymentID: { type: String || null, default: null },
+        PaymentStatus: { type: String, enum: Object.values(PaymentStatus) },
+        description: { type: String || null, default: null },
+    },
+    OptionalInfo: {
+        WhoAreYouBookingFor: { type: String },
+        AreYouTravellingForWork: { type: String },
+        SpecialRequests: { type: String },
+        companyName: { type: String },
+    },
     YourArrivalTime: { type: String },
-    companyName: { type: String },
     BookingDate: { type: String },
-    CancleDate: { type: String || null, default: null }
+    CancleDate: { type: String || null, default: null },
+    ReasonForCancle: { type: String || null, default: null },
 });
 
 BookingSchema.index({ userID: 1 });
@@ -110,4 +116,25 @@ class UserInfo {
     state: string = '';
 
     phone: number | null = null;
+}
+
+class OptionalInfo {
+    WhoAreYouBookingFor: string = '';
+
+    AreYouTravellingForWork: string = '';
+
+    SpecialRequests: string = '';
+
+    companyName: string = '';
+}
+
+
+class PaymentDetail {
+    PaymentID: string | null = null
+
+    failPaymentID: string | null = null
+
+    PaymentStatus: PaymentStatus = PaymentStatus.pending
+
+    description: string | null = null
 }
