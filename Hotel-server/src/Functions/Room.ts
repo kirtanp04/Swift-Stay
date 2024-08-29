@@ -342,7 +342,7 @@ class Functions {
                                 property: PropertyID
                             }
                         ]
-                    })
+                    }).populate('property').exec();
 
                     if (RoomDetail) {
                         Cache.SetCache(CacheKey.user.room(roomID), RoomDetail);

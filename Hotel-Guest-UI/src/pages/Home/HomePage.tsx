@@ -48,9 +48,9 @@ export default function HomePage() {
 
   useEffect(() => {
     const user = new TUser();
-    user.id = "66ad0893b6890afb34b72d9a";
+    user.id = "66a267a0dcd88e75426768d3";
     user.country = "India-IN";
-    user.email = "kirtanfake1@gmail.com";
+    user.email = "kirtanpatel6189@gmail.com";
     user.isEmailVerified = true;
     user.loginPeriod = new Date();
     user.name = "Kirtan Patel";

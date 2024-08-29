@@ -14,6 +14,7 @@ const _GuestRoomBroker: string = Param.broker.guest.Room;
 const _GuestChatBroker: string = Param.broker.guest.chat;
 const _GuestRedisBroker: string = Param.broker.guest.Redis;
 const _GuestPaymentBroker: string = Param.broker.guest.payment;
+const _GuestBookingBroker: string = Param.broker.guest.booking;
 
 GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -43,6 +44,9 @@ GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextF
 
                     case _GuestPropertyBroker:
                         return SendResponseToUser(await Functions.PropertyFunction.findFunction(paramObj, req, res, next), next);
+
+                    case _GuestBookingBroker:
+                        return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
 
                     default:
                         const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
@@ -75,6 +79,7 @@ GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: Next
 
                     paramObj.data = decryptResBody.data;
 
+
                     switch (paramObj.Broker) {
                         case _GuestAuthBroker:
                             return SendResponseToUser(await Functions.UserFunction.findFunction(paramObj, req, res, next), next);
@@ -87,6 +92,9 @@ GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: Next
 
                         case _GuestRoomBroker:
                             return SendResponseToUser(await Functions.RoomFunction.findFunction(paramObj, req, res, next), next);
+
+                        case _GuestBookingBroker:
+                            return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
 
                         default:
                             const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);

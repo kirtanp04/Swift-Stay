@@ -16,6 +16,7 @@
     - Express JS
     - Mongoose
     - Typescript
+    - pdfkit -> to create and generate pdf
 
     - Payment integration
 

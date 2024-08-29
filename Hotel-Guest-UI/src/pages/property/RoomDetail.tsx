@@ -220,7 +220,7 @@ export default function RoomDetail({ Rooms, currency }: Props) {
                             onClick={() =>
                               window.open(
                                 window.location.origin +
-                                  Path.booking(
+                                  Path.booking.bookingForm(
                                     country!,
                                     state!,
                                     propertyName!,

@@ -15,6 +15,8 @@ export enum PaymentStatus {
 }
 
 export class BookingClass {
+    _id: string = ''
+
     propertyID: string = '';
 
     roomID: string = '';
@@ -31,6 +33,8 @@ export class BookingClass {
 
     PaymentDetail: PaymentDetail = new PaymentDetail()
 
+    invoice: string | null = null
+
     OptionalInfo: OptionalInfo = new OptionalInfo();
 
     YourArrivalTime: string = '';
@@ -40,6 +44,7 @@ export class BookingClass {
     CancleDate: string | null = null;
 
     ReasonForCancle: string | null = null
+
 
 }
 
@@ -71,7 +76,9 @@ const BookingSchema = new Schema<BookingClass>({
         failPaymentID: { type: String || null, default: null },
         PaymentStatus: { type: String, enum: Object.values(PaymentStatus) },
         description: { type: String || null, default: null },
+        Session: { type: String || null, default: null },
     },
+    invoice: { type: String || null, default: null },
     OptionalInfo: {
         WhoAreYouBookingFor: { type: String },
         AreYouTravellingForWork: { type: String },
@@ -137,4 +144,6 @@ class PaymentDetail {
     PaymentStatus: PaymentStatus = PaymentStatus.pending
 
     description: string | null = null
+
+    Session: string | null = null
 }

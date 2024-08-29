@@ -1,113 +1,118 @@
 import { SecrtKey } from './env';
-import { enumPropertyType } from './models/PropertyModel';
-import { enumRoomType } from './models/RoomModel';
 import { TSuccessbooking } from './types/Type';
 
 export const Param = {
-    broker: {
-        manager: {
-            Auth: 'ManagerAuthBroker',
-            Property: 'ManagerPropertyBroker',
-            Room: 'ManagerRoomBroker',
-            chat: 'ManagerChatBroker',
-            review: 'ManagerReviewBroker',
-            Redis: 'ManagerRedisBroker',
-        },
-
-        guest: {
-            Auth: 'GuestAuthBroker',
-            Property: 'GuestPropertyBroker',
-            Room: 'GuestRoomBroker',
-            Redis: 'GuestRedisBroker',
-            chat: 'GuestChatBroker',
-            payment: 'GuestPaymentBroker',
-            booking: 'GuestBookingBroker'
-        },
+  broker: {
+    manager: {
+      Auth: 'ManagerAuthBroker',
+      Property: 'ManagerPropertyBroker',
+      Room: 'ManagerRoomBroker',
+      chat: 'ManagerChatBroker',
+      review: 'ManagerReviewBroker',
+      Redis: 'ManagerRedisBroker',
+      booking: 'ManagerBookingBroker'
     },
 
-    function: {
-        manager: {
-            register: 'CreateManagerAccount',
-            login: 'ManagerLogin',
-            EmailVerification: 'ManagerEmailVerification',
-            Property: {
-                AddProperty: 'ManagerAddProperty',
-                GetSingleProperty: 'ManagerGetSingleProperty',
-                GetAllProperty: 'ManagerGetAllProperty',
-                DeleteProperty: 'ManagerDeleteProperty',
-                UpdateProperty: 'ManagerUpdateProperty',
-            },
-            Room: {
-                AddRoom: 'ManagerAddRoom',
-                UpdateRoom: 'ManagerUpdateRoom',
-                DeleteRoom: 'ManagerDeleteRoom',
-                GetAllRoom: 'ManagerGetAllRoom',
-            },
-            review: {
-                GetAllReviewsByAdmin: 'ManagerGetAllReviewsByAdmin'
-            },
-            subscriber: {
-                GetAllSubscriber: 'ManagerGetAllSubscriber'
-            },
-            redis: {
-                initRedis: 'ManagerInitRedisService'
-            },
-            chat: {
-                saveChat: 'ManagerSaveChatService'
-            }
-        },
-        guest: {
-            register: 'CreateGuestAccount',
-            login: 'GuestLogin',
-            property: {
-                GetAllPropertyByState: 'GuestGetAllPropertyByState',
-                GetAllPropertyByCountry: 'GuestGetAllPropertyByCountry',
-                GetTotalPropertByCountry: 'GuestGetTotalPropertByCountry',
-                GetTotalPropertyByType: 'GuestGetTotalPropertyByType',
-                GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
-                GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
-            },
-            redis: {
-                initRedis: 'GuestInitRedisService'
-            },
-            chat: {
-                saveChat: 'GuestSaveChatService'
-            },
-            room: {
-                GetRoomDetail: 'GuestGetRoomDetail'
-            },
-            payment: {
-                CheckOut: 'GuestCheckOut',
-                WebHook: 'GuestWebhook'
-            },
-            booking: {
-                SaveBookingInfo: 'GuestSaveBookingInfo',
-                UpdateBookingInfo: 'GuestUpdateBookinInfo'
-            }
-        },
+    guest: {
+      Auth: 'GuestAuthBroker',
+      Property: 'GuestPropertyBroker',
+      Room: 'GuestRoomBroker',
+      Redis: 'GuestRedisBroker',
+      chat: 'GuestChatBroker',
+      payment: 'GuestPaymentBroker',
+      booking: 'GuestBookingBroker'
     },
+  },
+
+  function: {
+    manager: {
+      register: 'CreateManagerAccount',
+      login: 'ManagerLogin',
+      EmailVerification: 'ManagerEmailVerification',
+      Property: {
+        AddProperty: 'ManagerAddProperty',
+        GetSingleProperty: 'ManagerGetSingleProperty',
+        GetAllProperty: 'ManagerGetAllProperty',
+        DeleteProperty: 'ManagerDeleteProperty',
+        UpdateProperty: 'ManagerUpdateProperty',
+      },
+      Room: {
+        AddRoom: 'ManagerAddRoom',
+        UpdateRoom: 'ManagerUpdateRoom',
+        DeleteRoom: 'ManagerDeleteRoom',
+        GetAllRoom: 'ManagerGetAllRoom',
+      },
+      review: {
+        GetAllReviewsByAdmin: 'ManagerGetAllReviewsByAdmin'
+      },
+      subscriber: {
+        GetAllSubscriber: 'ManagerGetAllSubscriber'
+      },
+      redis: {
+        initRedis: 'ManagerInitRedisService'
+      },
+      chat: {
+        saveChat: 'ManagerSaveChatService'
+      },
+      booking: {
+        GetBookingListByAdmin: 'ManagerGetBookinListByAdmin',
+      }
+    },
+    guest: {
+      register: 'CreateGuestAccount',
+      login: 'GuestLogin',
+      property: {
+        GetAllPropertyByState: 'GuestGetAllPropertyByState',
+        GetAllPropertyByCountry: 'GuestGetAllPropertyByCountry',
+        GetTotalPropertByCountry: 'GuestGetTotalPropertByCountry',
+        GetTotalPropertyByType: 'GuestGetTotalPropertyByType',
+        GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
+        GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
+      },
+      redis: {
+        initRedis: 'GuestInitRedisService'
+      },
+      chat: {
+        saveChat: 'GuestSaveChatService'
+      },
+      room: {
+        GetRoomDetail: 'GuestGetRoomDetail'
+      },
+      payment: {
+        CheckOut: 'GuestCheckOut',
+        WebHook: 'GuestWebhook'
+      },
+      booking: {
+        SaveBookingInfo: 'GuestSaveBookingInfo',
+        UpdateBookingInfo: 'GuestUpdateBookinInfo',
+        generateInvoice: 'GuestGenerateInvoice',
+        getMyBookingList: 'GuestGetMyBookingList'
+      }
+    },
+  },
 };
 
 export const CacheKey = {
-    user: {
-        property: (propertyID: string) => `#@User${propertyID}#@Property#@`,
-        room: (roomID: string) => `#@User${roomID}#@Room#@`,
-    },
-    manager: {
-        property: (emailID: string) => `#@Manager#@${emailID}#@Property#@`,
-        room: (emailID: string) => `#@Manager#@${emailID}#@Room#@`,
-        review: (emailID: string) => `#@Manager#@${emailID}#@Review#@`,
-        subscriber: (emailID: string) => `#@Manager#@${emailID}#@Subscriber#@`,
-    },
+  user: {
+    property: (propertyID: string) => `#@User${propertyID}#@Property#@`,
+    room: (roomID: string) => `#@User${roomID}#@Room#@`,
+  },
+  manager: {
+    property: (emailID: string) => `#@Manager#@${emailID}#@Property#@`,
+    room: (emailID: string) => `#@Manager#@${emailID}#@Room#@`,
+    review: (emailID: string) => `#@Manager#@${emailID}#@Review#@`,
+    subscriber: (emailID: string) => `#@Manager#@${emailID}#@Subscriber#@`,
+  },
 
-    chat: (chatKey: string) => `#@ManagerChat#@${chatKey}#@UserChat#@`
+  chat: (chatKey: string) => `#@ManagerChat#@${chatKey}#@UserChat#@`,
+  bookingList: (userID: string) => `#@ManagerChat#@${userID}#@UserChat#@`
 };
 
 export const EmailTemplate = {
-    EmailVerification: (
-        UserName: string,
-        token: string
-    ) => `<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+  EmailVerification: (
+    UserName: string,
+    token: string
+  ) => `<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
     <div style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
         <div style="text-align: center; padding: 10px 0;">
         <svg
@@ -160,7 +165,7 @@ export const EmailTemplate = {
 </body>`,
 
 
-    LogedIn: (UserName: string) => `
+  LogedIn: (UserName: string) => `
     <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
     <div style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
         <div style="text-align: center; padding: 10px 0;">
@@ -183,9 +188,9 @@ export const EmailTemplate = {
 </body>
 `,
 
-    Successbooking: ({ checkIn, checkOut, description, image, roomPrice, totalPrice, propertyName, propertyType, roomDescription, roomType, totalNights }: TSuccessbooking) => {
+  Successbooking: ({ objBooking, objRoom }: TSuccessbooking) => {
 
-        return `
+    return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -229,6 +234,8 @@ export const EmailTemplate = {
         }
         .images {
           margin: 20px 0;
+          display:grid;
+          grid-template-columns: repeat(3,1fr);
         }
         .images img {
           width: 100%;
@@ -282,22 +289,26 @@ export const EmailTemplate = {
   
         <div class="details">
           <h2>Booking Confirmation</h2>
-          <p><strong>Hotel:</strong> ${propertyName} (${propertyType})</p>
-          <p>${description}</p>
+          <p><strong>Hotel:</strong> ${objRoom.property.name} (${objRoom.property.propertyType})</p>
+          <p>${objRoom.property.description}</p>
           <div class="images">
-            ${image.map((img: any) => `<img src="${img}" alt="${propertyName} Image" />`).join('')}
+            ${objRoom.property.images.map((img: any) => `<img src="${img}" alt="${objRoom.property.name} Image" />`).join('')}
           </div>
-          <p><strong>Check-in:</strong> ${checkIn}</p>
-          <p><strong>Check-out:</strong> ${checkOut}</p>
-          <p><strong>Total Nights:</strong> ${totalNights}</p>
-          <p><strong>Total Payment:</strong> $${totalPrice}</p>
+          <p><strong>Check-in:</strong> ${objBooking.stayInfo.checkIn}</p>
+          <p><strong>Check-out:</strong> ${objBooking.stayInfo.checkOut}</p>
+          <p><strong>Total Nights:</strong> ${objBooking.stayInfo.totalStay} </p>
+          <p><strong>Total Payment:</strong> ${objBooking.totalPay}</p>
         </div>
   
         <div class="details">
           <h2>Room Details</h2>
-          <p><strong>Room Type:</strong> ${roomType}</p>
-          <p>${roomDescription}</p>
-          <p><strong>Room Price:</strong> $${roomPrice} per night</p>
+          <p>${objRoom.description}</p>
+          <p><strong>Room Type:</strong> ${objRoom.type}</p>
+          <p><strong>Room Price:</strong> ${objRoom.price} per night</p>
+          <p><strong>Room Rating:</strong> ${objRoom.rating} </p>
+          <div class="images">
+            ${objRoom.images.map((img: any) => `<img src="${img}" alt="${objRoom.type} Image" />`).join('')}
+          </div>
         </div>
   
         <div class="footer">
@@ -307,7 +318,7 @@ export const EmailTemplate = {
     </body>
     </html>
     `;
-    }
+  }
 };
 
 

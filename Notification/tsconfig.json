@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "commonjs",
+      "baseUrl": ".", // Ensure the base URL is the project root
+      "paths": {
+        "src/*": ["src/*"]
+      },
+      "outDir": "./dist",
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "strict": true,
+      "skipLibCheck": true
+    },
+    "include": [
+      "src/**/*.ts"
+, "src/Socket.ts", "src/env.ts"    ],
+    "exclude": [
+      "node_modules"
+    ]
+  }
+  

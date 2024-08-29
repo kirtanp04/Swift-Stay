@@ -16,6 +16,9 @@ const Loadable = (Component: ElementType) => (props: any) => {
 
 // const Login = Loadable(lazy(() => import("src/pages/Authentication/Login")));
 const HomePage = Loadable(lazy(() => import("src/pages/Home/HomePage")));
+const BookingList = Loadable(
+  lazy(() => import("src/pages/Booking/BookingList"))
+);
 const Errorage404 = Loadable(lazy(() => import("src/pages/Error/404")));
 
 const SignUp = Loadable(
@@ -28,7 +31,7 @@ const PropertyDetails = Loadable(
 const PropertyListByState = Loadable(
   lazy(() => import("src/pages/PropertylistByState/PropertyListByState"))
 );
-const Bookin = Loadable(lazy(() => import("src/pages/Booking/Bookin")));
+const Bookin = Loadable(lazy(() => import("src/pages/Booking/Booking")));
 
 export default function Router() {
   return useRoutes([
@@ -48,6 +51,10 @@ export default function Router() {
         {
           path: ":country/:state/:propertyName/:propertyID",
           element: <PropertyDetails />,
+        },
+        {
+          path: "mybooking",
+          element: <BookingList />,
         },
         {
           path: ":country/:state/:propertyName/:propertyID/booking/:roomType/:roomID",

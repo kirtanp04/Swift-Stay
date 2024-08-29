@@ -16,7 +16,8 @@ export const Param = {
         Room: 'GuestRoomBroker',
         Redis: 'GuestRedisBroker',
         chat: 'GuestChatBroker',
-        payment: 'GuestPaymentBroker'
+        payment: 'GuestPaymentBroker',
+        booking: 'GuestBookingBroker'
     },
 
     function: {
@@ -40,7 +41,14 @@ export const Param = {
             GetRoomDetail: 'GuestGetRoomDetail'
         },
         payment: {
-            CheckOut: 'GuestCheckOut'
+            CheckOut: 'GuestCheckOut',
+            WebHook: 'GuestWebhook'
+        },
+        booking: {
+            SaveBookingInfo: 'GuestSaveBookingInfo',
+            UpdateBookingInfo: 'GuestUpdateBookinInfo',
+            generateInvoice: 'GuestGenerateInvoice',
+            getMyBookingList: 'GuestGetMyBookingList'
         }
     },
 };

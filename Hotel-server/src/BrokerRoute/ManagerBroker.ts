@@ -15,6 +15,7 @@ const _ManagerRoomBroker: string = Param.broker.manager.Room;
 const _ManagerChatBroker: string = Param.broker.manager.chat;
 const _ManagerReviewBroker: string = Param.broker.manager.review;
 const _ManagerRedisBroker: string = Param.broker.manager.Redis;
+const _ManagerBookingBroker: string = Param.broker.manager.booking;
 
 ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -45,6 +46,9 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
 
           case _ManagerRedisBroker:
             return SendResponseToUser(await Functions.RedisFunction.findFunction(paramObj, req, res, next), next);
+
+          case _ManagerBookingBroker:
+            return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
 
           default:
             const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
@@ -85,6 +89,9 @@ ManagerBrokerRouter.post('/:param', async (req: Request, res: Response, next: Ne
 
             case _ManagerRoomBroker:
               return SendResponseToUser(await Functions.RoomFunction.findFunction(paramObj, req, res, next), next);
+
+            case _ManagerBookingBroker:
+              return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
 
             default:
               const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);

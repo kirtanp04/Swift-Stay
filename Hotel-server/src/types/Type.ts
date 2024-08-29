@@ -1,5 +1,6 @@
-import { enumPropertyType } from "../models/PropertyModel";
-import { enumRoomType } from "../models/RoomModel";
+import { BookingClass, PaymentStatus } from "src/models/BookingModel";
+import { enumPropertyType, PropertyClass } from "../models/PropertyModel";
+import { enumRoomType, RoomClass } from "../models/RoomModel";
 
 export class TParam {
     Broker: string = ''
@@ -24,16 +25,106 @@ class Sender {
     role: string = ''
 }
 
+
+
+
+export class Invoice {
+
+    InvoiceId: string = ''
+
+    CustomerInfo: InvoiceCustomer = new InvoiceCustomer()
+
+    BookingDetails: InvoiceBooking = new InvoiceBooking()
+
+    PaymentInfo: InvoicePayment = new InvoicePayment()
+
+    PropertyInfo: InvoiceProperty = new InvoiceProperty()
+
+    RoomInfo: InvoiceRoom = new InvoiceRoom()
+
+    CreatedAt: Date = new Date()
+
+}
+
+class InvoiceCustomer {
+    Name: string = ''
+
+    Email: string = ''
+
+    Number: number = 0
+
+    Address: string = ''
+
+    City: string = ''
+
+    State: string = ''
+
+    Country: string = ''
+}
+
+class InvoiceBooking {
+    CheckIn: string = ''
+
+    CheckOut: string = ''
+
+    Adults: number = 0
+
+    Childrens: number = 0
+
+    TotalStay: string = ''
+
+    TotalPay: string = ''
+}
+class InvoicePayment {
+
+    PaymentID: string = ''
+
+    EmailID: string = ''
+
+    HolderName: string = ''
+
+    PaymentStatus: PaymentStatus | null = null
+
+    PaymentType: string = ''
+
+    PaymentDate: string = ''
+
+    TotalPay: number = 0
+
+    Currency: string = ''
+
+    Country: string = ''
+}
+
+class InvoiceProperty {
+    PropertyName: string = ''
+
+    PropertyType: enumPropertyType | null = null
+
+    PropertyAddress: string = ''
+
+    PropertyCity: string = ''
+
+    PropertyState: string = ''
+
+    PropertyCountry: string = ''
+}
+
+class InvoiceRoom {
+    RoomType: enumRoomType | null = null
+
+    RoomPrice: number = 0
+
+}
+
+
 export interface TSuccessbooking {
-    propertyName: string
-    description: string,
-    image: string[],
-    totalPrice: string,
-    propertyType: enumPropertyType,
-    checkIn: string,
-    checkOut: string,
-    totalNights: string,
-    roomType: enumRoomType,
-    roomDescription: string,
-    roomPrice: string
+    objBooking: BookingClass,
+    objRoom: RoomClass
+}
+
+export interface BookingListObj extends BookingClass {
+    property: PropertyClass | null
+
+    room: RoomClass | null
 }

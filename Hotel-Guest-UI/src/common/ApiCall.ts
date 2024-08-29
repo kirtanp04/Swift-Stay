@@ -152,7 +152,7 @@ export class Api {
                 }
               },
             });
-            if (response) {
+            if (response !== undefined) {
               const objDecryptRes = Crypt.Decryption(response.data);
               if (objDecryptRes.data.isError === false) {
                 _res.data = objDecryptRes.data.data;
@@ -160,7 +160,7 @@ export class Api {
                 _res.error = objDecryptRes.data.Message;
               }
             } else {
-              _res.error = "Getting response Undefine";
+              _res.error = "Api error.. Getting response Undefine";
             }
           } else {
             _res.error = encryptParamData.error;

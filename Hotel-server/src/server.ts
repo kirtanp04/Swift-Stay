@@ -7,13 +7,13 @@ import helmet from 'helmet';
 import GuestBrokerRouter from './BrokerRoute/GuestBroker';
 import ManagerBrokerRouter from './BrokerRoute/ManagerBroker';
 import { UserResponse } from './common/Response';
-import { SecrtKey } from './env';
-import { MainApiLimit } from './middleware/RateLimitApi';
-import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
-import { PaymentFunction } from './Functions';
-import { TParam } from './types/Type';
 import { Param } from './Constant';
 import { MongoDB } from './DB/MongoDB';
+import { SecrtKey } from './env';
+import { PaymentFunction } from './Functions';
+import { MainApiLimit } from './middleware/RateLimitApi';
+import { SendResponseToUser, UserResponseMiddWare } from './middleware/UserResponse';
+import { TParam } from './types/Type';
 
 export const _app = express();
 
@@ -61,6 +61,8 @@ export class _Express {
     _app.use(cookieParser());
 
     _app.use(bodyParser.raw({ type: 'application/json' }));
+
+
   }
 
   route() {
