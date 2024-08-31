@@ -22,6 +22,7 @@ export default class ImageConverter {
     }
 
     static bufferToBase64(buffer: ArrayBuffer): string {
+        debugger
         const bytes = new Uint8Array(buffer);
         let binary = '';
         for (let i = 0; i < bytes.byteLength; i++) {

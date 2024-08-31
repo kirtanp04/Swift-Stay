@@ -151,7 +151,6 @@ class Functions {
         try {
             const { bookingID, userID } = this.objParam.data;
 
-
             const isVerified = await checkGuestVerification(userID);
 
             if (isVerified.error === '') {
@@ -197,6 +196,7 @@ class Functions {
                     InvoiceData.BookingDetails.Adults = BookingData.stayInfo.adults!;
                     InvoiceData.BookingDetails.Childrens = BookingData.stayInfo.childrens!;
                     InvoiceData.BookingDetails.TotalStay = BookingData.stayInfo.totalStay!;
+                    InvoiceData.BookingDetails.TotalPay = BookingData.totalPay!.replace(Session.currency!, '');
 
                     if (RoomData !== null) {
                         InvoiceData.PropertyInfo.PropertyAddress = RoomData.property.address;
@@ -211,73 +211,162 @@ class Functions {
                     }
 
                     try {
-                        const doc = new PDFDocument();
-
+                        const doc = new PDFDocument({ size: 'A4', margin: 50 });
                         const res = new ProjectResponse();
-
                         const buffers: Buffer[] = [];
+                        const primaryColor = '#004d99';
+                        const headerColor = '#ff9900';
+                        const lineHeight = 15;
+                        let yPosLeft = 100;
+                        let yPosRight = 100;
+                        const leftColumnX = 50;
+                        const rightColumnX = 300;
 
-                        doc.fontSize(26).text('Invoice', { align: 'center' }).moveDown();
-                        doc.fontSize(12).text(`Invoice ID: ${InvoiceData.InvoiceId}`).moveDown();
-                        doc.text(`Date: ${InvoiceData.CreatedAt}`).moveDown();
+                        // Title
 
-                        doc.fontSize(18).text('Customer Details').moveDown();
-                        doc.text(`Name: ${InvoiceData.CustomerInfo.Name}`).moveDown();
-                        doc.text(`Email: ${InvoiceData.CustomerInfo.Email}`).moveDown();
-                        doc.text(`Number: ${InvoiceData.CustomerInfo.Number}`).moveDown();
-                        doc.text(`Address: ${InvoiceData.CustomerInfo.Address}`).moveDown();
-                        doc.text(`City: ${InvoiceData.CustomerInfo.City}`).moveDown();
-                        doc.text(`State: ${InvoiceData.CustomerInfo.State}`).moveDown();
-                        doc.moveDown();
+                        doc.fontSize(24).fillColor(primaryColor).text('Swift Stay | Booking Invoice', { align: 'center' }).moveDown(2);
 
-                        doc.fontSize(18).text('Payment Details').moveDown();
-                        doc.text(`ID: ${InvoiceData.PaymentInfo.PaymentID}`).moveDown();
-                        doc.text(`Status: ${InvoiceData.PaymentInfo.PaymentStatus}`).moveDown();
-                        doc.text(`Type: ${InvoiceData.PaymentInfo.PaymentType}`).moveDown();
-                        doc.text(`Paid Amount: ${InvoiceData.PaymentInfo.TotalPay}`).moveDown();
-                        doc.text(`Currency: ${InvoiceData.PaymentInfo.Currency}`).moveDown();
-                        doc.text(`Card Holder Name: ${InvoiceData.PaymentInfo.HolderName}`).moveDown();
-                        doc.text(`Used Email ID: ${InvoiceData.PaymentInfo.EmailID}`).moveDown();
-                        doc.text(`Country: ${InvoiceData.PaymentInfo.Country}`).moveDown();
-                        doc.text(`Paid On: ${InvoiceData.PaymentInfo.PaymentDate}`).moveDown();
-                        doc.moveDown();
+                        // Customer Details
+                        doc
+                            .rect(leftColumnX, yPosLeft, 200, 20)
+                            .fillAndStroke(headerColor, 'black')
+                            .fillColor('white')
+                            .fontSize(14)
+                            .text('Customer Details', leftColumnX + 10, yPosLeft + 5)
+                            .fillColor('black');
 
-                        doc.fontSize(18).text('Booking Details').moveDown();
-                        doc.text(`Check-In: ${InvoiceData.BookingDetails.CheckIn}`).moveDown();
-                        doc.text(`Check-Out: ${InvoiceData.BookingDetails.CheckOut}`).moveDown();
-                        doc.text(`Adults: ${InvoiceData.BookingDetails.Adults}`).moveDown();
-                        doc.text(`Childrens: ${InvoiceData.BookingDetails.Childrens}`).moveDown();
-                        doc.text(`Total Nights: ${InvoiceData.BookingDetails.TotalStay}`).moveDown();
-                        doc.text(`Total Pay: ${InvoiceData.BookingDetails.TotalPay}`).moveDown();
-                        doc.moveDown();
+                        yPosLeft += 40;
 
-                        doc.fontSize(18).text('Property Details').moveDown();
-                        doc.text(`Name: $${InvoiceData.PropertyInfo.PropertyName}`).moveDown();
-                        doc.text(`Type: ${InvoiceData.PropertyInfo.PropertyType}`).moveDown();
-                        doc.text(`Address: ${InvoiceData.PropertyInfo.PropertyAddress}`).moveDown();
-                        doc.text(`City: ${InvoiceData.PropertyInfo.PropertyCity}`).moveDown();
-                        doc.text(`State: ${InvoiceData.PropertyInfo.PropertyState}`).moveDown();
-                        doc.text(`Country: ${InvoiceData.PropertyInfo.PropertyCountry}`).moveDown();
-                        doc.moveDown();
+                        doc
+                            .fontSize(12)
+                            .fillColor('gray')
+                            .text(`Name: ${InvoiceData.CustomerInfo.Name}`, leftColumnX, yPosLeft)
+                            .text(`Email: ${InvoiceData.CustomerInfo.Email}`, leftColumnX, yPosLeft + lineHeight)
+                            .text(`Address: ${InvoiceData.CustomerInfo.Address}`, leftColumnX, yPosLeft + lineHeight * 2)
+                            .text(`City: ${InvoiceData.CustomerInfo.City}`, leftColumnX, yPosLeft + lineHeight * 3)
+                            .text(`Country: ${InvoiceData.CustomerInfo.Country}`, leftColumnX, yPosLeft + lineHeight * 4)
+                            .text(`Phone Number: ${InvoiceData.CustomerInfo.Number}`, leftColumnX, yPosLeft + lineHeight * 5);
 
-                        doc.fontSize(18).text('Room Details').moveDown();
-                        doc.text(`Price: $${InvoiceData.RoomInfo.RoomPrice}`).moveDown();
-                        doc.text(`Type: ${InvoiceData.RoomInfo.RoomType}`).moveDown();
-                        doc.moveDown();
+                        yPosLeft += lineHeight * 6;
 
-                        doc.text('Thank you for booking with us!', { align: 'center' });
+                        // Payment Details
+                        doc
+                            .rect(rightColumnX, yPosRight, 200, 20)
+                            .fillAndStroke(headerColor, 'black')
+                            .fillColor('white')
+                            .fontSize(14)
+                            .text('Payment Details', rightColumnX + 10, yPosRight + 5)
+                            .fillColor('black');
+
+                        yPosRight += 40;
+
+                        doc
+                            .fontSize(12)
+                            .fillColor('gray')
+                            .text(`Payment ID: ${InvoiceData.PaymentInfo.PaymentID}`, rightColumnX, yPosRight)
+                            .text(`Payment Method: ${InvoiceData.PaymentInfo.PaymentType}`, rightColumnX, yPosRight + lineHeight * 3)
+                            .text(`Payment Status: ${InvoiceData.PaymentInfo.PaymentStatus}`, rightColumnX, yPosRight + lineHeight * 4)
+                            .text(`Total Paid: ${InvoiceData.PaymentInfo.TotalPay}`, rightColumnX, yPosRight + lineHeight * 5)
+                            .text(`Currency: ${InvoiceData.PaymentInfo.Currency}`, rightColumnX, yPosRight + lineHeight * 6)
+                            .text(
+                                `Payment Date: ${new Date(InvoiceData.PaymentInfo.PaymentDate).toLocaleDateString()}`,
+                                rightColumnX,
+                                yPosRight + lineHeight * 7
+                            )
+                            .text(`Card Holder Name: ${InvoiceData.PaymentInfo.HolderName}`, rightColumnX, yPosRight + lineHeight * 8)
+                            .text(`Email: ${InvoiceData.PaymentInfo.EmailID}`, rightColumnX, yPosRight + lineHeight * 9)
+                            .text(`Country: ${InvoiceData.PaymentInfo.Country}`, rightColumnX, yPosRight + lineHeight * 10);
+
+                        yPosRight += lineHeight * 9;
+
+                        let yPos = Math.max(yPosLeft, yPosRight) + 50;
+
+                        // Booking Details
+                        doc
+                            .rect(leftColumnX, yPos, 450, 20)
+                            .fillAndStroke(headerColor, 'black')
+                            .fillColor('white')
+                            .fontSize(14)
+                            .text('Booking Details', leftColumnX + 10, yPos + 5)
+                            .fillColor('black');
+
+                        yPos += 30;
+
+                        doc
+                            .fontSize(12)
+                            .fillColor('gray')
+                            .text(`Check-In: ${InvoiceData.BookingDetails.CheckIn}`, leftColumnX, yPos)
+                            .text(`Check-Out: ${InvoiceData.BookingDetails.CheckOut}`, leftColumnX, yPos + lineHeight)
+                            .text(`Adults: ${InvoiceData.BookingDetails.Adults}`, leftColumnX, yPos + lineHeight * 2)
+                            .text(`Children: ${InvoiceData.BookingDetails.Childrens}`, leftColumnX, yPos + lineHeight * 3)
+                            .text(`Total Stay: ${InvoiceData.BookingDetails.TotalStay}`, leftColumnX, yPos + lineHeight * 4)
+                            .text(`Total Pay: ${InvoiceData.BookingDetails.TotalPay}`, leftColumnX, yPos + lineHeight * 5);
+
+                        yPos += lineHeight * 6;
+
+                        // Property Details
+                        doc
+                            .rect(leftColumnX, yPos, 450, 20)
+                            .fillAndStroke(headerColor, 'black')
+                            .fillColor('white')
+                            .fontSize(14)
+                            .text('Property Details', leftColumnX + 10, yPos + 5)
+                            .fillColor('black');
+
+                        yPos += 30;
+
+                        doc
+                            .fontSize(12)
+                            .fillColor('gray')
+                            .text(`Property Name: ${InvoiceData.PropertyInfo.PropertyName}`, leftColumnX, yPos)
+                            .text(`Property Type: ${InvoiceData.PropertyInfo.PropertyType}`, leftColumnX, yPos + lineHeight)
+                            .text(`Address: ${InvoiceData.PropertyInfo.PropertyAddress}`, leftColumnX, yPos + lineHeight * 2)
+                            .text(`City: ${InvoiceData.PropertyInfo.PropertyCity}`, leftColumnX, yPos + lineHeight * 3)
+                            .text(`State: ${InvoiceData.PropertyInfo.PropertyState}`, leftColumnX, yPos + lineHeight * 4)
+                            .text(`Country: ${InvoiceData.PropertyInfo.PropertyCountry}`, leftColumnX, yPos + lineHeight * 5);
+
+                        yPos += lineHeight * 6;
+
+                        // Room Details
+                        doc
+                            .rect(leftColumnX, yPos, 450, 20)
+                            .fillAndStroke(headerColor, 'black')
+                            .fillColor('white')
+                            .fontSize(14)
+                            .text('Room Details', leftColumnX + 10, yPos + 5)
+                            .fillColor('black');
+
+                        yPos += 30;
+
+                        doc
+                            .fontSize(12)
+                            .fillColor('gray')
+                            .text(`Room Type: ${InvoiceData.RoomInfo.RoomType}`, leftColumnX, yPos)
+                            .text(`Room Price: ${InvoiceData.RoomInfo.RoomPrice}`, leftColumnX, yPos + lineHeight);
+
+                        // Footer
+                        yPos += 50;
+                        doc.moveTo(50, yPos).lineTo(550, yPos).stroke();
+
+                        doc
+                            .fontSize(10)
+                            .fillColor('black')
+                            .text(`Invoice ID: ${InvoiceData.InvoiceId}`, leftColumnX, yPos + 10)
+                            .text(`Invoice Date: ${InvoiceData.CreatedAt.toLocaleDateString()}`, leftColumnX, yPos + 25);
 
                         doc.end();
 
-                        const pdfData = await new Promise<Buffer>((resolve, reject) => {
+                        const pdfData = await new Promise<Buffer[]>((resolve, reject) => {
                             doc.on('data', (chunk) => buffers.push(chunk));
-                            doc.on('end', () => resolve(Buffer.concat(buffers)));
+                            doc.on('end', () => resolve(buffers));
                             doc.on('error', (err) => reject(err));
                         });
 
+                        const pdfBase64 = Buffer.concat(pdfData).toString('base64');
+
                         const isUpdated = await Booking.findOneAndUpdate(
                             { $and: [{ _id: bookingID }, { userID: userID }] },
-                            { $set: { invoice: pdfData } },
+                            { $set: { invoice: 'data:application/pdf;base64,' + pdfBase64 } },
                             { new: true }
                         );
 

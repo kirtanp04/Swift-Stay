@@ -132,7 +132,7 @@ export class Api {
     let _res = new ProjectResponse();
 
     try {
-      debugger
+
       const objRes = Storage.getFromSessionStorage("Auth");
       if (objRes.error === "") {
         if (objRes.data.role === enumUserRole.guest) {

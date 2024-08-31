@@ -10,7 +10,7 @@ import { Booking } from "src/ObjMgr/Booking";
 import { Property, TPropertydetail } from "src/ObjMgr/Property";
 import { Room } from "src/ObjMgr/Room";
 import showMessage from "src/util/ShowMessage";
-import BookinForm from "./BookinForm";
+import BookinForm, { BookingFormSchema } from "./BookinForm";
 import BookinDetail from "./BookingDetail";
 import PriceSummary from "./PriceSummary";
 import PropertyDetail from "./PropertyDetail";
@@ -20,6 +20,10 @@ import DateFormatter from "src/common/DateFormate";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { SecretKey } from "src/env";
+import { SubTitle } from "./CommonStyle";
+import { VisacardIcon } from "src/assets/iconify";
+import showLoading from "src/util/ShowLoading";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type Props = {};
 
@@ -108,6 +112,7 @@ export default function Bookin({}: Props) {
   };
 
   const SaveBooking = async (objbooking: Booking) => {
+    showLoading(theme, true);
     objbooking.propertyID = PropertDetail.propertyID;
     objbooking.roomID = RoomDetail._id;
     objbooking.totalPay =
@@ -135,21 +140,23 @@ export default function Bookin({}: Props) {
               sessionId: res,
             });
 
-            // console.log(result);
-
+            showLoading(theme, false);
             if (result.error) {
               showMessage(result.error.message!, "error", theme, () => {});
             }
           },
           (err) => {
             showMessage(err, "error", theme, () => {});
+            showLoading(theme, false);
           }
         );
       } else {
         showMessage("Getting stripe null", "error", theme, () => {});
+        showLoading(theme, false);
       }
     } catch (error: any) {
       showMessage(error, "error", theme, () => {});
+      showLoading(theme, false);
     }
   };
 
@@ -197,17 +204,27 @@ export default function Bookin({}: Props) {
               <RoomDetails RoomDetail={RoomDetail} />
             </ContentWrapper>
 
-            <Button
+            <ContentWrapper
               sx={{
-                marginLeft: "auto",
-                marginTop: "1rem",
-                color: theme.palette.background.default,
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexDirection: "row",
               }}
-              variant="contained"
-              type="submit"
             >
-              Pay
-            </Button>
+              <Box>
+                <SubTitle>Pay with a Card</SubTitle>
+                <VisacardIcon height={30} width={30} />
+              </Box>
+              <Button
+                sx={{
+                  color: theme.palette.background.default,
+                }}
+                variant="contained"
+                type="submit"
+              >
+                Pay
+              </Button>
+            </ContentWrapper>
           </FormProvider>
         </RightContentWrapper>
       </Rootstyle>
