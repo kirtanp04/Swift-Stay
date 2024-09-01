@@ -24,6 +24,7 @@ export class RoomClass {
     amenities: string[] = []
     images: string[] = []
     price: number = 0
+    currency: string = ''
     maxOccupancy: number = 0
     rating: number = 0
     isAvailable: boolean = true

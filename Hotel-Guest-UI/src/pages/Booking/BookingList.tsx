@@ -16,7 +16,7 @@ import { PDFIcon } from "src/assets/iconify";
 import { MUITableCell, MUITableRow } from "src/components/mui/MUITable";
 import Page from "src/components/Page";
 import useAuth from "src/hooks/useAuth";
-import { Booking, BookingListObj } from "src/ObjMgr/Booking";
+import { Booking, BookingListObj, PaymentStatus } from "src/ObjMgr/Booking";
 import { enumRoomType } from "src/ObjMgr/Room";
 import showLoading from "src/util/ShowLoading";
 import showMessage from "src/util/ShowMessage";
@@ -66,6 +66,7 @@ export default function BookingList() {
                 <MUITableCell align="center">Room Type</MUITableCell>
                 <MUITableCell align="center">Check-In | Check-Out</MUITableCell>
                 <MUITableCell align="center">Arrival Time</MUITableCell>
+                <MUITableCell align="center">Payment Status</MUITableCell>
                 <MUITableCell align="center">Total Paid</MUITableCell>
                 <MUITableCell align="center">Booked On</MUITableCell>
                 <MUITableCell align="center">Invoice</MUITableCell>
@@ -110,6 +111,26 @@ export default function BookingList() {
                           ? "-"
                           : objBooking.YourArrivalTime}
                       </HeaderSubtitle>
+                    </MUITableCell>
+
+                    <MUITableCell component="th" scope="row" align="center">
+                      <Chip
+                        label={objBooking.PaymentDetail.PaymentStatus}
+                        color={
+                          objBooking.PaymentDetail.PaymentStatus ===
+                          PaymentStatus.fail
+                            ? "error"
+                            : objBooking.PaymentDetail.PaymentStatus ===
+                              PaymentStatus.paid
+                            ? "success"
+                            : objBooking.PaymentDetail.PaymentStatus ===
+                              PaymentStatus.pending
+                            ? "warning"
+                            : "default"
+                        }
+                        variant="filled"
+                        sx={{ width: 70 }}
+                      />
                     </MUITableCell>
 
                     <MUITableCell component="th" scope="row" align="center">

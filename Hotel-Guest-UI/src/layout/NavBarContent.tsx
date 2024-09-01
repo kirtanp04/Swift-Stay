@@ -16,6 +16,8 @@ import { Path } from "src/Router/path";
 import getFlagClassName from "src/util/getCountryFlagUrl";
 import IfLogedin from "src/components/IfLogedin";
 import { _UserSearchObj } from "src/context/UserSearchContext";
+import LoginPopOver from "src/components/LoginPopOver";
+import EToolTip from "src/components/EToolTip";
 
 type Props = {};
 
@@ -59,6 +61,25 @@ export default function NavBarContent({}: Props) {
         </CountryDetailWrapper>
 
         <ListPropertyButton>List your property</ListPropertyButton>
+        <IfLogedin
+          Else={
+            <EToolTip
+              title={
+                <LoginPopOver
+                  text={`You are not authorize. Please login to Swift Stay to See your booking list`}
+                />
+              }
+            >
+              <ListPropertyButton>My Bookings</ListPropertyButton>
+            </EToolTip>
+          }
+        >
+          <ListPropertyButton
+            onClick={() => navigate(Path.booking.bookingList)}
+          >
+            My Bookings
+          </ListPropertyButton>
+        </IfLogedin>
 
         <AuthWrapper>
           <IfLogedin

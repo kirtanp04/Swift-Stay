@@ -19,6 +19,7 @@ import {
   PlusIcon,
   UpdateIcon,
 } from "src/assets/iconify";
+import getSymbolFromCurrency from "currency-symbol-map";
 import { FormCheckbox } from "src/components/Form/FormCheckBox";
 import FormProvider from "src/components/Form/FormProvider";
 import FormSelectField from "src/components/Form/FormSelectField";
@@ -34,6 +35,7 @@ import * as yup from "yup";
 import AddPropertyDialog from "../Property/AddPropertyDialog";
 import { PropertyApi, PropertyClass } from "../Property/DataObject";
 import { RoomApi, RoomClass, enumRoomType } from "./DataObject";
+import { Country } from "country-state-city";
 
 type Props = {
   onClose: () => void;
@@ -64,8 +66,6 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
     new PropertyClass()
   );
 
-  debugger;
-
   const theme = useTheme();
   const {
     user: {
@@ -85,12 +85,34 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
     defaultValues: objRoom,
     resolver: yupResolver(AddRoomSchema) as any,
   });
-  const { handleSubmit, control } = _Method;
+  const { handleSubmit, control, watch, setValue } = _Method;
 
   const { fields, append, remove } = useFieldArray<RoomClass>({
     control,
     name: "amenities" as any,
   });
+
+  useEffect(() => {
+    const _watch = watch();
+    if (_watch.property._id !== "" && objRoom._id === "") {
+      const property = propertyList.find(
+        (objProperty) => objProperty._id === _watch.property._id
+      );
+      if (property !== undefined) {
+        const _Country = Country.getCountryByCode(
+          property.country.split("-")[1]
+        );
+        if (_Country !== undefined) {
+          const currency = getSymbolFromCurrency(_Country.currency);
+          if (currency !== undefined) {
+            if (_watch.currency !== currency) {
+              setValue("currency", currency);
+            }
+          }
+        }
+      }
+    }
+  }, [watch("property._id")]);
 
   const openAddPropertyDialog = () => {
     let _newObjProperty = new PropertyClass();
@@ -192,7 +214,7 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
         >
           <Scrollbar sx={{ height: "100%" }}>
             <FieldWrapper>
-              {objRoom._id === "" && objRoom.property._id === "" ? (
+              {objRoom._id === "" ? (
                 <LoadingSkeleton
                   isLoading={showPropertyLoading}
                   sx={{ width: "100%" }}
@@ -267,6 +289,16 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
             <FieldWrapper>
               <InputWrapper>
                 <FormTextFiels
+                  name="currency"
+                  label="Currency"
+                  variant="outlined"
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                >
+                  {watch().currency}
+                </FormTextFiels>
+                <FormTextFiels
                   name="price"
                   label="Price"
                   fullWidth
@@ -335,7 +367,7 @@ export default function AddRoomDialog({ objRoom, onClose, afterSave }: Props) {
                 iconposition="start"
                 starticon={<PlusIcon />}
                 variant="outlined"
-                // onClick={() => append("")}
+                onClick={() => append("" as any)}
               >
                 Add Amenities
               </RESIconButton>

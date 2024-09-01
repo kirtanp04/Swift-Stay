@@ -66,14 +66,29 @@ class Functions {
         try {
             const objBooking: BookingClass = this.objParam.data;
 
-            const _Booking = await Booking.create(objBooking);
+            const _Booking = await Booking.create({
+                BookingDate: objBooking.BookingDate,
+                bookingStatus: objBooking.bookingStatus,
+                CancleDate: objBooking.CancleDate,
+                invoice: objBooking.invoice,
+                OptionalInfo: objBooking.OptionalInfo,
+                PaymentDetail: objBooking.PaymentDetail,
+                propertyID: objBooking.propertyID,
+                ReasonForCancle: objBooking.ReasonForCancle,
+                roomID: objBooking.roomID,
+                stayInfo: objBooking.stayInfo,
+                totalPay: objBooking.totalPay,
+                userID: objBooking.userID,
+                UserInfo: objBooking.UserInfo,
+                YourArrivalTime: objBooking.YourArrivalTime
+            });
             await _Booking.save();
 
             if (_Booking) {
-                const BookingListCache = Cache.getCacheData(CacheKey.bookingList(objBooking.userID));
+                const BookingListCache = Cache.getCacheData(CacheKey.user.bookingList(objBooking.userID));
 
                 if (BookingListCache.error === '') {
-                    Cache.ClearCache(CacheKey.bookingList(objBooking.userID));
+                    Cache.ClearCache(CacheKey.user.bookingList(objBooking.userID));
                 }
                 this.objUserResponse = GetUserSuccessObj('Success: booking info store in DB', HttpStatusCodes.OK);
             } else {
@@ -138,6 +153,11 @@ class Functions {
             );
 
             if (_Booking) {
+                const bookingCache = Cache.getCacheData(CacheKey.user.bookingList(userID))
+
+                if (bookingCache.error === '') {
+                    Cache.ClearCache(CacheKey.user.bookingList(userID))
+                }
                 this.objUserResponse = GetUserSuccessObj('Success: booking info Updated', HttpStatusCodes.OK);
             }
         } catch (error: any) {
@@ -404,7 +424,7 @@ class Functions {
             const isUser = await checkGuestVerification(userID);
 
             if (isUser.error === '') {
-                const BookingListCache = Cache.getCacheData(CacheKey.bookingList(userID));
+                const BookingListCache = Cache.getCacheData(CacheKey.user.bookingList(userID));
 
                 if (BookingListCache.error === '') {
                     this.objUserResponse = GetUserSuccessObj(BookingListCache.data, HttpStatusCodes.OK);
@@ -451,7 +471,7 @@ class Functions {
                         },
                     ]);
 
-                    Cache.SetCache(CacheKey.bookingList(userID), BookingList);
+                    Cache.SetCache(CacheKey.user.bookingList(userID), BookingList);
                     this.objUserResponse = GetUserSuccessObj(BookingList, HttpStatusCodes.OK);
                 }
             } else {

@@ -26,10 +26,14 @@ export interface TFilterProperty {
   propertyType: enumPropertyType;
   address: string;
   availableRooms: number;
+  currency: string;
 }
 
 export default function PropertyListByState() {
   const [searchParam, setSearchParams] = useSearchParams();
+  const [totalProperty, setTotalProperty] = useState<number | undefined>(
+    undefined
+  );
   const _ParamValue_ = useParams();
   const {
     UserSearchObj: { selectedState },
@@ -62,7 +66,8 @@ export default function PropertyListByState() {
     Property.GetPropertyListByFilterSearch(
       newSearchObj,
       (res) => {
-        setFilteredPropertyList(res);
+        setFilteredPropertyList(res[0].properties);
+        setTotalProperty(res[0].totalProperties);
         showLoading(theme, false);
       },
       (err) => {
@@ -79,11 +84,23 @@ export default function PropertyListByState() {
     setSearchParams(queryString);
   };
 
+  const onChangePage = (number: number) => {
+    const objFilter = new FilterClass();
+    objFilter.page = number;
+    const ParamObj = getParamObject(objFilter);
+    const queryString = createQueryString(ParamObj);
+    setSearchParams(queryString);
+  };
+
   return (
     <Page title={selectedState}>
       <Rootstyle>
         <Filter onSearchbyFilter={onSearchbyFilter} />
-        <PropertyList FilteredPropertyList={FilteredPropertyList} />
+        <PropertyList
+          FilteredPropertyList={FilteredPropertyList}
+          onChangePage={onChangePage}
+          totalProperty={totalProperty}
+        />
       </Rootstyle>
     </Page>
   );
@@ -110,6 +127,10 @@ const getParamObject = (objFilter: FilterClass) => {
 
   if (objFilter.reviewScore !== null) {
     ParamObj["reviewScore"] = objFilter.reviewScore;
+  }
+
+  if (objFilter.page !== undefined) {
+    ParamObj["page"] = objFilter.page;
   }
   return ParamObj;
 };

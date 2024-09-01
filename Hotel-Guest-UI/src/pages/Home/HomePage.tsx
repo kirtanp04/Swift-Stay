@@ -17,9 +17,7 @@ import { Path } from "src/Router/path";
 import ExploreByProperty from "./components/ExploreByProperty";
 import ExploreCountryState from "./components/ExploreCountryState";
 import TrendingDestinations from "./components/TrendingDestinations";
-import { enumUserRole } from "../Authentication/AuthMgr";
-import { TUser } from "src/context/AuthContex";
-import { Storage } from "src/common/Storage";
+import GuestSelectionDialog from "src/components/UserSearchInput/GuestSelectionDialog";
 
 const IconSize = {
   height: 22,
@@ -30,6 +28,8 @@ export default function HomePage() {
   const { UserSearchObj, UpdateFullobj } = useUserSearch();
   const [UserSearch, setUserSearch] = useState<TUserSearchObj>(UserSearchObj);
   const [ShowDateRange, setShowDateRange] = useState<boolean>(false);
+  const [ShowGuestSelectionDialog, setShowGuestSelectionDialog] =
+    useState<boolean>(false);
   const [ShowSearchStateDialog, setShowSearchStateDialog] =
     useState<boolean>(false);
 
@@ -45,19 +45,6 @@ export default function HomePage() {
   useEffect(() => {
     setUserSearch(UserSearchObj);
   }, [UserSearchObj]);
-
-  useEffect(() => {
-    const user = new TUser();
-    user.id = "66a267a0dcd88e75426768d3";
-    user.country = "India-IN";
-    user.email = "kirtanpatel6189@gmail.com";
-    user.isEmailVerified = true;
-    user.loginPeriod = new Date();
-    user.name = "Kirtan Patel";
-    user.profileImg = "";
-    user.role = enumUserRole.guest;
-    Storage.setToSessionStorage("Auth", user);
-  }, []);
 
   const UpdateUserSearch = <K extends keyof TUserSearchObj>(
     PropertyName: K,
@@ -153,10 +140,9 @@ export default function HomePage() {
 
         <FilterBoxContainer>
           <PersonIcon {...IconSize} IconColor={theme.palette.text.secondary} />
-          <FilterBoxButton>
+          <FilterBoxButton onClick={() => setShowGuestSelectionDialog(true)}>
             <FilterBoxButtonText>
-              {UserSearch.adults} adults . {UserSearch.children} children .{" "}
-              {UserSearch.totalRoom} room
+              {UserSearch.adults} adults . {UserSearch.children} children
             </FilterBoxButtonText>
           </FilterBoxButton>
         </FilterBoxContainer>
@@ -225,6 +211,21 @@ export default function HomePage() {
           onClose={() => setShowSearchStateDialog(false)}
           countryCode={UserSearch.selectedCountry.split("-")[1]}
           onSelectState={onSelectState}
+        />
+      )}
+
+      {ShowGuestSelectionDialog && (
+        <GuestSelectionDialog
+          defaultAdults={UserSearch.adults}
+          defaultChildrens={UserSearch.children}
+          onClose={() => setShowGuestSelectionDialog(false)}
+          onSave={(adults, childrens) => {
+            setUserSearch({
+              ...UserSearch,
+              adults: adults,
+              children: childrens,
+            });
+          }}
         />
       )}
     </RootStyle>

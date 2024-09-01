@@ -1,4 +1,7 @@
 import { Box, styled } from "@mui/material";
+import DateFormatter from "src/common/DateFormate";
+import useUserSearch from "src/hooks/useUserSearch";
+import { Room } from "src/ObjMgr/Room";
 import {
   FlexWrapper,
   MUIDivider,
@@ -6,17 +9,12 @@ import {
   SubTitle,
   Text,
 } from "./CommonStyle";
-import { Room } from "src/ObjMgr/Room";
-import getSymbolFromCurrency from "currency-symbol-map";
-import useUserSearch from "src/hooks/useUserSearch";
-import DateFormatter from "src/common/DateFormate";
 
 type Props = {
   RoomDetail: Room;
-  CountryCurrency: string;
 };
 
-export default function PriceSummary({ RoomDetail, CountryCurrency }: Props) {
+export default function PriceSummary({ RoomDetail }: Props) {
   const {
     UserSearchObj: { checkInDate, checkOutDate },
   } = useUserSearch();
@@ -30,8 +28,7 @@ export default function PriceSummary({ RoomDetail, CountryCurrency }: Props) {
       <StackSpaceBetween sx={{ padding: "0rem 1rem" }}>
         <Text>Original price</Text>
         <Text sx={{ fontWeight: 550 }}>
-          {getSymbolFromCurrency(CountryCurrency)} {RoomDetail.price} for 1
-          night
+          {RoomDetail.currency} {RoomDetail.price} for 1 night
         </Text>
       </StackSpaceBetween>
 
@@ -50,7 +47,7 @@ export default function PriceSummary({ RoomDetail, CountryCurrency }: Props) {
         <SubTitle>Total Price</SubTitle>
         <Box>
           <SubTitle>
-            {getSymbolFromCurrency(CountryCurrency)}{" "}
+            {RoomDetail.currency}{" "}
             {RoomDetail.price *
               DateFormatter.getInstance().getDifferenceInDays(
                 checkInDate!,

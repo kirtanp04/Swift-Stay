@@ -175,7 +175,7 @@ class PaymentDetail {
 
 
 
-enum PaymentStatus {
+export enum PaymentStatus {
     pending = 'pending',
     paid = 'paid',
     fail = 'fail'

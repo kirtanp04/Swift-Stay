@@ -1,17 +1,18 @@
 import * as CryptoTS from "crypto-ts";
 import { ProjectResponse } from "./Response";
 import { Convert } from "./Convert";
+import { SecretKey } from "src/env";
 // import { logEntry } from 'src/logging/logger';
 
 // const key = process.env.ENCRYPTION_KEY;
 
 export class Crypt {
     private static key = CryptoTS.enc.Utf8.parse(
-        "knjbvuigbuvhuy84578953686578ty78"
+        SecretKey.crypt.key
     );
 
     private static Iv = CryptoTS.enc.Utf8.parse(
-        "knjbvuigbuvhuy84578953686578ty78"
+        SecretKey.crypt.Iv
     );
 
     static Decryption(value: string): ProjectResponse {

@@ -10,6 +10,8 @@ export class FilterClass {
 
     reviewScore: number | null = null
 
+    page: number | undefined = undefined
+
 
     static getFilterObj = (objFilter: FilterClass) => {
         try {

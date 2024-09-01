@@ -2,35 +2,35 @@ import {
   Alert,
   Box,
   Divider,
+  Pagination,
   styled,
   Typography,
   useTheme,
 } from "@mui/material";
-import getSymbolFromCurrency from "currency-symbol-map";
-import { memo, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { memo } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Path } from "src/Router/path";
 import Img from "src/assets/img/GujaratIMG.jpeg";
 import LazyImage from "src/components/LazyImage";
 import { TFilterProperty } from "../PropertyListByState";
-import { GetCountryByCode } from "src/common/common";
-import showMessage from "src/util/ShowMessage";
 
 interface TProps {
   FilteredPropertyList: TFilterProperty[];
+  onChangePage: (pageNumber: number) => void;
+  totalProperty: number | undefined;
 }
 
-function PropertyList({ FilteredPropertyList }: TProps) {
+function PropertyList({
+  FilteredPropertyList,
+  onChangePage,
+  totalProperty,
+}: TProps) {
   const { state, country } = useParams();
-  const [CountryCurrency, setCountryCurrency] = useState<string>("");
+  const [searchParam] = useSearchParams();
 
   const navigate = useNavigate();
 
   const theme = useTheme();
-
-  useEffect(() => {
-    getCountryCurrency(country as any);
-  }, []);
 
   const onClickSeeAvailability = (propertyId: string, propertyName: string) => {
     navigate(
@@ -38,15 +38,8 @@ function PropertyList({ FilteredPropertyList }: TProps) {
     );
   };
 
-  const getCountryCurrency = async (pCountry: string) => {
-    try {
-      const countryObj = await GetCountryByCode(
-        pCountry.split("-")[1] as string
-      );
-      setCountryCurrency(countryObj.currency);
-    } catch (error: any) {
-      showMessage(error, "error", theme, () => {});
-    }
+  const onChangePagination = (number: number) => {
+    onChangePage(number);
   };
 
   return (
@@ -72,7 +65,11 @@ function PropertyList({ FilteredPropertyList }: TProps) {
             </SubTitle>
           </Ribbon>
           <ImageWrapper>
-            <LazyImage alt="" src={Img} style={{ height: "100%" }} />
+            <LazyImage
+              alt=""
+              src={objProperty.images[0] || Img}
+              style={{ height: "100%" }}
+            />
           </ImageWrapper>
 
           {/* ---------------------------------------------- */}
@@ -200,7 +197,7 @@ function PropertyList({ FilteredPropertyList }: TProps) {
                 Max price of room for 1 night
               </Text>
               <Header sx={{ textAlign: "right" }}>
-                {getSymbolFromCurrency(CountryCurrency)} {objProperty.maxPrice}
+                {objProperty.currency} {objProperty.maxPrice}
               </Header>
               <Text sx={{ textAlign: "right" }}>Incluging all Tax.</Text>
             </PriceWrapper>
@@ -216,6 +213,30 @@ function PropertyList({ FilteredPropertyList }: TProps) {
           </RightContentWrapper>
         </PropertyDetailWrapper>
       ))}
+      {FilteredPropertyList.length > 0 && (
+        <FlextCenter>
+          <Pagination
+            count={
+              totalProperty !== undefined
+                ? Math.ceil(totalProperty / 5)
+                : undefined
+            }
+            defaultPage={
+              searchParam.has("page")
+                ? Number(searchParam.get("page"))
+                : undefined
+            }
+            shape="rounded"
+            sx={{
+              "& .Mui-selected": {
+                backgroundColor: `${theme.palette.color.pink.main} !important`,
+                color: theme.palette.background.default,
+              },
+            }}
+            onChange={(_, number) => onChangePagination(number)}
+          />
+        </FlextCenter>
+      )}
     </Rootstyle>
   );
 }
@@ -368,4 +389,11 @@ const Ribbon = styled(Box)(({ theme }) => ({
     display: "block",
     textAlign: "center",
   },
+}));
+
+const FlextCenter = styled(Box)(() => ({
+  width: "100%",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
 }));

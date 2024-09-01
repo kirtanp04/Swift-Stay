@@ -289,6 +289,25 @@ export function PlusIcon({ IconColor, ...other }: Props) {
   );
 }
 
+export function HorizontalLineIcon({ IconColor, ...other }: Props) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 20 20"
+      {...other}
+    >
+      <path
+        fill={IconColor ? IconColor : "currentColor"}
+        fillRule="evenodd"
+        d="M1 10a1 1 0 0 1 1-1h16a1 1 0 1 1 0 2H2a1 1 0 0 1-1-1"
+        clipRule="evenodd"
+      ></path>
+    </svg>
+  );
+}
+
 export function CloseIcon({ IconColor, ...other }: Props) {
   return (
     <svg

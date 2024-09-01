@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { HeartIcon, LocationIcon, ShareIcon } from "src/assets/iconify";
-import { getChipColor, GetCountryByCode } from "src/common/common";
+import { getChipColor } from "src/common/common";
 import { Storage } from "src/common/Storage";
 import EToolTip from "src/components/EToolTip";
 import IfLogedin from "src/components/IfLogedin";
@@ -38,7 +38,7 @@ export default function PropertyDetails() {
   const [PropertDetail, setPropertyDetail] = useState<TPropertydetail>(
     new TPropertydetail()
   );
-  const [CountryCurrency, setCountryCurrency] = useState<string>("");
+
   const [WishlistIDS, setWishlistId] = useState<string[]>([]);
   const [AmISubscriber, setAmISubscriber] = useState<boolean>(false);
   const [openChat, setOpenChat] = useState<boolean>(false);
@@ -55,7 +55,6 @@ export default function PropertyDetails() {
         if (res.subscribers.map((obj) => obj.email === email)) {
           setAmISubscriber(true);
         }
-        getCountrybyCode(res.propertyDetails.country);
       },
       (err) => {
         showMessage(err, "error", theme, () => {});
@@ -72,17 +71,6 @@ export default function PropertyDetails() {
       setWishlistId(propertIDS);
     }
   }, []);
-
-  const getCountrybyCode = async (pCountry: string) => {
-    try {
-      const countryObj = await GetCountryByCode(
-        pCountry.split("-")[1] as string
-      );
-      setCountryCurrency(countryObj.currency);
-    } catch (error: any) {
-      showMessage(error, "error", theme, () => {});
-    }
-  };
 
   const SaveToWishlist = (pPropertyID: string) => {
     const propertyIDs = Storage.getFromSessionStorage("Wishlist");
@@ -282,10 +270,7 @@ export default function PropertyDetails() {
             </StackSpaceBetween>
           </FlexWrapper>
           <FlexWrapper isLoading={PropertDetail.propertyID === ""}>
-            <RoomDetail
-              Rooms={PropertDetail!.Rooms}
-              currency={CountryCurrency}
-            />
+            <RoomDetail Rooms={PropertDetail!.Rooms} />
           </FlexWrapper>
         </Box>
 

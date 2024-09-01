@@ -1,29 +1,26 @@
 import { Box, Button, styled, useTheme } from "@mui/material";
+import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import { GetCountryByCode } from "src/common/common";
+import { VisacardIcon } from "src/assets/iconify";
+import DateFormatter from "src/common/DateFormate";
 import FormProvider from "src/components/Form/FormProvider";
 import Page from "src/components/Page";
+import { SecretKey } from "src/env";
 import useAuth from "src/hooks/useAuth";
+import useUserSearch from "src/hooks/useUserSearch";
 import { Booking } from "src/ObjMgr/Booking";
 import { Property, TPropertydetail } from "src/ObjMgr/Property";
 import { Room } from "src/ObjMgr/Room";
+import showLoading from "src/util/ShowLoading";
 import showMessage from "src/util/ShowMessage";
-import BookinForm, { BookingFormSchema } from "./BookinForm";
+import BookinForm from "./BookinForm";
 import BookinDetail from "./BookingDetail";
+import { SubTitle } from "./CommonStyle";
 import PriceSummary from "./PriceSummary";
 import PropertyDetail from "./PropertyDetail";
 import RoomDetails from "./RoomDetails";
-import useUserSearch from "src/hooks/useUserSearch";
-import DateFormatter from "src/common/DateFormate";
-import getSymbolFromCurrency from "currency-symbol-map";
-import { loadStripe, Stripe } from "@stripe/stripe-js";
-import { SecretKey } from "src/env";
-import { SubTitle } from "./CommonStyle";
-import { VisacardIcon } from "src/assets/iconify";
-import showLoading from "src/util/ShowLoading";
-import { yupResolver } from "@hookform/resolvers/yup";
 
 type Props = {};
 
@@ -32,7 +29,7 @@ export default function Bookin({}: Props) {
     new TPropertydetail()
   );
   const [RoomDetail, setRoomDetail] = useState<Room>(new Room());
-  const [CountryCurrency, setCountryCurrency] = useState<string>("");
+
   const { propertyName, state, country, propertyID, roomID } = useParams();
   const theme = useTheme();
   const {
@@ -88,7 +85,6 @@ export default function Bookin({}: Props) {
         propertyName!,
         propertyID!,
         (res: TPropertydetail) => {
-          getCountrybyCode(res.propertyDetails.country);
           resolve(res);
         },
         (err) => {
@@ -100,24 +96,12 @@ export default function Bookin({}: Props) {
     return property;
   };
 
-  const getCountrybyCode = async (pCountry: string) => {
-    try {
-      const countryObj = await GetCountryByCode(
-        pCountry.split("-")[1] as string
-      );
-      setCountryCurrency(countryObj.currency);
-    } catch (error: any) {
-      showMessage(error, "error", theme, () => {});
-    }
-  };
-
   const SaveBooking = async (objbooking: Booking) => {
     showLoading(theme, true);
     objbooking.propertyID = PropertDetail.propertyID;
     objbooking.roomID = RoomDetail._id;
     objbooking.totalPay =
-      getSymbolFromCurrency(CountryCurrency)! +
-      " " +
+      RoomDetail.currency +
       (
         RoomDetail.price *
         DateFormatter.getInstance().getDifferenceInDays(
@@ -185,10 +169,7 @@ export default function Bookin({}: Props) {
         <LeftContentWrapper>
           <PropertyDetail Property={PropertDetail} />
           <BookinDetail />
-          <PriceSummary
-            RoomDetail={RoomDetail}
-            CountryCurrency={CountryCurrency}
-          />
+          <PriceSummary RoomDetail={RoomDetail} />
         </LeftContentWrapper>
         <RightContentWrapper>
           <FormProvider

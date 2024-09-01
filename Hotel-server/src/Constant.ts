@@ -96,6 +96,7 @@ export const CacheKey = {
   user: {
     property: (propertyID: string) => `#@User${propertyID}#@Property#@`,
     room: (roomID: string) => `#@User${roomID}#@Room#@`,
+    bookingList: (userID: string) => `#@ManagerChat#@${userID}#@UserChat#@`
   },
   manager: {
     property: (emailID: string) => `#@Manager#@${emailID}#@Property#@`,
@@ -105,7 +106,7 @@ export const CacheKey = {
   },
 
   chat: (chatKey: string) => `#@ManagerChat#@${chatKey}#@UserChat#@`,
-  bookingList: (userID: string) => `#@ManagerChat#@${userID}#@UserChat#@`
+
 };
 
 export const EmailTemplate = {
@@ -318,7 +319,123 @@ export const EmailTemplate = {
     </body>
     </html>
     `;
+  },
+
+  FailedBooking: ({ propertyName, failReason }: { propertyName: string, failReason: string }) => {
+    return `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Booking Failed</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            color: #333;
+          }
+          .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+          }
+          .header {
+            text-align: center;
+            padding-bottom: 20px;
+          }
+          .header svg {
+            width: 50px;
+            height: 50px;
+          }
+          .header h1 {
+            margin: 0;
+            color: #333;
+          }
+          .details {
+            margin-bottom: 20px;
+          }
+          .details h2 {
+            color: #333;
+            font-size: 20px;
+          }
+          .details p {
+            margin: 0;
+          }
+          .images {
+            margin: 20px 0;
+            display:grid;
+            grid-template-columns: repeat(3,1fr);
+          }
+          .images img {
+            width: 100%;
+            height: auto;
+          }
+          .footer {
+            margin-top: 30px;
+            text-align: center;
+          }
+          .footer p {
+            color: #999;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              x="0px"
+              y="0px"
+              width="50"
+              height="50"
+              viewBox="0 0 172 172"
+              fill="#e74c3c"
+            >
+              <g
+                fill="none"
+                fill-rule="nonzero"
+                stroke="none"
+                stroke-width="1"
+                stroke-linecap="butt"
+                stroke-linejoin="miter"
+                stroke-miterlimit="10"
+                stroke-dasharray=""
+                stroke-dashoffset="0"
+                font-family="none"
+                font-weight="none"
+                font-size="none"
+                text-anchor="none"
+                style="mix-blend-mode: normal"
+              >
+                <path d="M0,172v-172h172v172z" fill="none"></path>
+                <g fill="#e74c3c">
+                  <path d="M86,0c-47.46094,0 -86,38.53906 -86,86c0,47.46094 38.53906,86 86,86c47.46094,0 86,-38.53906 86,-86c0,-47.46094 -38.53906,-86 -86,-86zM129.66406,115.15625c1.46094,1.46094 1.46094,3.80469 0,5.26562c-1.46094,1.46094 -3.80469,1.46094 -5.26562,0l-38.39844,-38.39844l-38.39844,38.39844c-1.46094,1.46094 -3.80469,1.46094 -5.26562,0c-1.46094,-1.46094 -1.46094,-3.80469 0,-5.26562l38.39844,-38.39844l-38.39844,-38.39844c-1.46094,-1.46094 -1.46094,-3.80469 0,-5.26562c1.46094,-1.46094 3.80469,-1.46094 5.26562,0l38.39844,38.39844l38.39844,-38.39844c1.46094,-1.46094 3.80469,-1.46094 5.26562,0c1.46094,1.46094 1.46094,3.80469 0,5.26562l-38.39844,38.39844z"></path>
+                </g>
+              </g>
+            </svg>
+            <h1>Swift Stay</h1>
+          </div>
+    
+          <div class="details">
+            <h2>Booking Failed</h2>
+            <p>Unfortunately, your booking for <strong>${propertyName}</strong> could not be completed.</p>
+            <p><strong>Reason:</strong> ${failReason || "Unknown error"}</p>
+            <p>We apologize for the inconvenience caused. Please try again later or contact our support team for assistance.</p>
+          </div>
+    
+          <div class="footer">
+            <p>If you need further assistance, please reach out to our customer service team.</p>
+            <p>Thank you for choosing Swift Stay!</p>
+          </div>
+        </div>
+      </body>
+      </html>
+      `;
   }
+
 };
 
 

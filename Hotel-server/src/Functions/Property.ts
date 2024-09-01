@@ -628,6 +628,12 @@ class Functions {
                     },
                 },
                 {
+                    $addFields: {
+                        currency: { $arrayElemAt: ['$roomDetails.currency', 0] }
+                    }
+                },
+
+                {
                     $match: {
                         $and: [
                             {
@@ -662,31 +668,53 @@ class Functions {
                 },
 
                 {
-                    $project: {
-                        _id: 1,
-                        images: 1,
-                        name: 1,
-                        city: 1,
-                        country: 1,
-                        state: 1,
-                        amenities: 1,
-                        jobHiring: 1,
-                        avgRating: 1,
-                        totalReviews: 1,
-                        totalRooms: 1,
-                        maxPrice: 1,
-                        propertyType: 1,
-                        address: 1,
-                        availableRooms: 1,
-                        // roomDetails: 1,
-                    },
+                    $facet: {
+                        totalCount: [
+                            { $count: 'count' }
+                        ],
+                        properties: [
+
+                            { $skip: skip },
+                            { $limit: limit },
+                            {
+                                $project: {
+                                    _id: 1,
+                                    images: 1,
+                                    name: 1,
+                                    city: 1,
+                                    country: 1,
+                                    state: 1,
+                                    amenities: 1,
+                                    jobHiring: 1,
+                                    avgRating: 1,
+                                    totalReviews: 1,
+                                    totalRooms: 1,
+                                    maxPrice: 1,
+                                    propertyType: 1,
+                                    address: 1,
+                                    availableRooms: 1,
+                                    currency: 1,
+                                },
+                            },
+                        ],
+                    }
                 },
                 {
-                    $limit: limit,
+                    $unwind: '$totalCount'
                 },
                 {
-                    $skip: skip,
+                    $addFields: {
+                        totalProperties: '$totalCount.count'
+                    }
                 },
+                {
+                    $replaceRoot: {
+                        newRoot: {
+                            properties: '$properties',
+                            totalProperties: '$totalProperties'
+                        }
+                    }
+                }
             ]);
 
             this.objUserResponse = GetUserSuccessObj(Properties, HttpStatusCodes.OK);
@@ -696,6 +724,8 @@ class Functions {
             return this.objUserResponse;
         }
     };
+
+
 
     public GetSinglePropertyDetail = async (): Promise<UserResponse> => {
         try {

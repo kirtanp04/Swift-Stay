@@ -37,19 +37,6 @@ export default function Filter({ onSearchbyFilter }: Props) {
   const { country, state } = useParams();
   const FilterobjRef = useRef<FilterClass>(new FilterClass());
 
-  // useEffect(() => {
-  //   let newSearchObj: any = {};
-
-  //   if (searchParam.size > 0) {
-  //     for (const [key, value] of searchParam) {
-  //       newSearchObj[key] = value;
-  //     }
-  //   }
-
-  //   FilterobjRef.current = newSearchObj;
-  //   setRefresh(new Date());
-  // }, [searchParam]);
-
   useEffect(() => {
     try {
       const _Country = Country.getCountryByCode(country!.split("-")[1]);

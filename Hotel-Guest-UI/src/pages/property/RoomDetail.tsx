@@ -12,7 +12,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import getSymbolFromCurrency from "currency-symbol-map";
 import { useParams } from "react-router-dom";
 import { PersonIcon, PreviewIcon } from "src/assets/iconify";
 import EToolTip from "src/components/EToolTip";
@@ -25,10 +24,9 @@ import { Path } from "src/Router/path";
 
 type Props = {
   Rooms: TRoom[];
-  currency: string;
 };
 
-export default function RoomDetail({ Rooms, currency }: Props) {
+export default function RoomDetail({ Rooms }: Props) {
   const { propertyName, state, country, propertyID } = useParams();
 
   const theme = useTheme();
@@ -128,7 +126,7 @@ export default function RoomDetail({ Rooms, currency }: Props) {
                     >
                       <Box padding={"0.5rem 1rem"}>
                         <SubTitleHeader>
-                          {getSymbolFromCurrency(currency)}
+                          {objRoom.currency}
                           {objRoom.price}
                         </SubTitleHeader>
                         <SubTitle>Including all taxes</SubTitle>

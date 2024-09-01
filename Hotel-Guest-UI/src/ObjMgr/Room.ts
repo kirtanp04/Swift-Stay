@@ -21,6 +21,7 @@ export class Room {
     amenities: string[] = []
     images: string[] = []
     price: number = 0
+    currency: string = ''
     maxOccupancy: number = 0
     isAvailable: boolean = true
     createdAt: Date = new Date()
