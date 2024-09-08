@@ -100,15 +100,14 @@ export default function Bookin({}: Props) {
     showLoading(theme, true);
     objbooking.propertyID = PropertDetail.propertyID;
     objbooking.roomID = RoomDetail._id;
+    objbooking.currency = RoomDetail.currency;
+    objbooking.adminID = RoomDetail.adminID;
     objbooking.totalPay =
-      RoomDetail.currency +
-      (
-        RoomDetail.price *
-        DateFormatter.getInstance().getDifferenceInDays(
-          checkInDate!,
-          checkOutDate!
-        )
-      ).toString();
+      RoomDetail.price *
+      DateFormatter.getInstance().getDifferenceInDays(
+        checkInDate!,
+        checkOutDate!
+      );
 
     try {
       const stripe: Stripe | null = await loadStripe(

@@ -23,11 +23,15 @@ export class BookingClass {
 
     userID: string = '';
 
+    adminID: string = '';
+
     UserInfo: UserInfo = new UserInfo();
 
     stayInfo: StayInfo = new StayInfo();
 
-    totalPay: string | null = null;
+    totalPay: number | null = null;
+
+    currency: string = ''
 
     bookingStatus: enumBookingStatus = enumBookingStatus.pending;
 
@@ -45,13 +49,13 @@ export class BookingClass {
 
     ReasonForCancle: string | null = null
 
-
 }
 
 const BookingSchema = new Schema<BookingClass>({
     propertyID: { type: String, required: [true, 'Property is required.'] },
     roomID: { type: String, required: [true, 'Room is required.'] },
     userID: { type: String, required: [true, 'User is required.'] },
+    adminID: { type: String, required: [true, 'Admin is required.'] },
     UserInfo: {
         name: { type: String, required: [true, 'User name is required.'] },
         email: { type: String, required: [true, 'User email is required.'] },
@@ -69,7 +73,8 @@ const BookingSchema = new Schema<BookingClass>({
         childrens: { type: Number, required: [true, 'User childrens is required.'] },
         totalStay: { type: String, required: [true, 'User totalStay is required.'] },
     },
-    totalPay: { type: String, required: [true, 'Total payment getting empty is required.'] },
+    totalPay: { type: Number, required: [true, 'Total payment getting empty is required.'] },
+    currency: { type: String },
     bookingStatus: { type: String },
     PaymentDetail: {
         PaymentID: { type: String || null, default: null },

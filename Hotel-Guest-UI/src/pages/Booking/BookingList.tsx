@@ -48,6 +48,31 @@ export default function BookingList() {
       }
     );
   };
+
+  const GenerateBookingInvoice = (bookingID: string) => {
+    showLoading(theme, true);
+    Booking.GenerateInvoice(
+      bookingID,
+      id,
+      (res: BookingListObj) => {
+        const UpdatedList = Bookings?.filter((objBook) => {
+          if (objBook._id === res._id) {
+            objBook.invoice = res.invoice;
+          }
+          return objBook;
+        });
+
+        if (UpdatedList) {
+          setBookings(UpdatedList);
+        }
+        showLoading(theme, false);
+      },
+      (err) => {
+        showMessage(err, "error", theme, () => {});
+        showLoading(theme, false);
+      }
+    );
+  };
   return (
     <Page title="My bookings">
       <RootStyle>
@@ -134,7 +159,9 @@ export default function BookingList() {
                     </MUITableCell>
 
                     <MUITableCell component="th" scope="row" align="center">
-                      <HeaderSubtitle>{objBooking.totalPay}</HeaderSubtitle>
+                      <HeaderSubtitle>
+                        {objBooking.currency} {objBooking.totalPay}
+                      </HeaderSubtitle>
                     </MUITableCell>
 
                     <MUITableCell component="th" scope="row" align="center">
@@ -165,7 +192,9 @@ export default function BookingList() {
                           }}
                         />
                       ) : (
-                        <GenerateInvoice>
+                        <GenerateInvoice
+                          onClick={() => GenerateBookingInvoice(objBooking._id)}
+                        >
                           <HeaderSubtitle
                             sx={{ color: theme.palette.background.default }}
                           >

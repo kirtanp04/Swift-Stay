@@ -14,9 +14,14 @@
     ## Server
 
     - Express JS
+
     - Mongoose
+
     - Typescript
+
     - pdfkit -> to create and generate pdf
+
+    - node-cron -> to schedule task taht run every time base on time period
 
     - Payment integration
 
@@ -55,11 +60,17 @@
     ## Frontend
 
     - ReactJS
+
     - Typescript
+
     - React-router-dom
+
     - Material UI
+
     - axios
+
     - react-hook-form
+
     - react-dropzone
 
     - Real_Time_Chat

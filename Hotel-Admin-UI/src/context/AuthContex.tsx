@@ -20,6 +20,7 @@ export class TUser {
   id: string = "";
   loginPeriod: Date = new Date();
   isEmailVerified: boolean = false;
+  country: string = "";
 }
 
 export class TAuth {
@@ -129,6 +130,7 @@ function AuthContexProvider({ children }: Props) {
         _user.id = res.id;
         _user.loginPeriod = new Date();
         _user.isEmailVerified = res.isEmailVerified;
+        _user.country = res.country;
         setUser({ ...user, isAuthenticated: true, userInfo: _user });
         Storage.setToSessionStorage("Auth", _user);
       },

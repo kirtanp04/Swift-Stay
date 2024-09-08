@@ -85,4 +85,18 @@ export class Cache {
             return _res;
         }
     };
+
+
+    static ClearAllCache = (): ProjectResponse => {
+        let _res: ProjectResponse = new ProjectResponse();
+
+        try {
+            this._myCache.flushAll()
+            _res.data = 'cleared all cached'
+        } catch (error) {
+            _res.error = errorPath('common/Cache', 'getCacheData', 84) + error;
+        } finally {
+            return _res;
+        }
+    };
 }

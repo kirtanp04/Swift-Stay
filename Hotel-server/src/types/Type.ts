@@ -74,6 +74,8 @@ class InvoiceBooking {
     TotalStay: string = ''
 
     TotalPay: string = ''
+
+    currency: string = ''
 }
 class InvoicePayment {
 
@@ -115,6 +117,7 @@ class InvoiceRoom {
 
     RoomPrice: number = 0
 
+    currency: string = ''
 }
 
 
@@ -127,4 +130,54 @@ export interface BookingListObj extends BookingClass {
     property: PropertyClass | null
 
     room: RoomClass | null
+}
+
+
+
+
+
+// -------------------------------- Analytic
+
+export class Analytic {
+    TotalBookings: number = 0
+    TotalRevenue: string = ''
+    BookingAnalytics: TBookingAnalytics[] = []
+    RevenueAnalytics: TRevenueAnalytics[] = []
+    TopPropertiesByBooking: TToppropertyByBooking[] = []
+    TotalPropertyandRooms: TTotalpropertyAndRoom = {
+        property: 0,
+        room: 0
+    }
+    AllPropertyWithAvgReview: TAllPropertyWithAvgReview[] = []
+}
+
+
+export interface TTotalpropertyAndRoom {
+    property: number
+    room: number
+}
+export interface TAllPropertyWithAvgReview {
+    propertyName: string
+    AvgReview: number
+}
+
+export interface TBookingAnalytics {
+    bookingCount: number
+    year: number
+    monthName: string
+    currency: string
+}
+
+export interface TRevenueAnalytics {
+    totalPaySum: number
+    year: number
+    currency: string
+    monthName: string
+}
+
+
+
+export interface TToppropertyByBooking {
+    count: number
+    name: string
 }

@@ -66,13 +66,7 @@ export function RoomIcon({ IconColor, ...other }: Props) {
 
 export function BookingIcon({ IconColor, ...other }: Props) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="1em"
-      height="1em"
-      viewBox="0 0 24 24"
-      {...other}
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...other}>
       <g
         fill="none"
         stroke={IconColor ? IconColor : "currentColor"}

@@ -55,7 +55,6 @@ export default function HotelList({}: Props) {
       (res) => {
         if (res.length > 0) {
           setPropertyList(res);
-          console.log(res);
         }
         showLoading(theme, false);
       },
@@ -93,18 +92,13 @@ export default function HotelList({}: Props) {
   };
 
   useEffect(() => {
-    console.log(objProperty);
     if (objProperty._id !== "") {
       setOpenAddHotelDialog(true);
     }
   }, [objProperty]);
 
   const onEditProperty = (_objProperty: PropertyClass) => {
-    // console.log(objPropert);
-    _objProperty.images = [];
     let newProp = PropertyClass.getCopy(_objProperty);
-    // console.log("copy", newProp);
-    // console.log("original", _objProperty);
     setObjPropert(newProp);
   };
 
@@ -199,7 +193,7 @@ export default function HotelList({}: Props) {
             {
               field: "country",
               headerName: "Country",
-              width: 200,
+              width: 120,
             },
             {
               field: "state",
@@ -209,17 +203,17 @@ export default function HotelList({}: Props) {
             {
               field: "city",
               headerName: "City",
-              width: 200,
+              width: 150,
             },
             {
               field: "zipCode",
               headerName: "Zip code",
-              width: 200,
+              width: 120,
             },
             {
               field: "phone",
               headerName: "Phone",
-              width: 200,
+              width: 120,
             },
             {
               field: "email",
@@ -249,7 +243,7 @@ export default function HotelList({}: Props) {
             {
               field: "createdAt",
               headerName: "Created On",
-              width: 200,
+              width: 120,
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Text>
@@ -261,7 +255,7 @@ export default function HotelList({}: Props) {
             {
               field: "updatedAt",
               headerName: "Last Updated",
-              width: 200,
+              width: 120,
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Text>
@@ -355,7 +349,7 @@ const RootStyle = styled(Box)(() => ({
 const TextWrapper = styled(Box)(() => ({
   width: "100%",
   display: "flex",
-  justifyContent: "center",
+  justifyContent: "flex-start",
   alignItems: "center",
   padding: "0.4rem",
   overflow: "hidden",

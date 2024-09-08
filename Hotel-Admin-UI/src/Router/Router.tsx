@@ -21,7 +21,11 @@ const PropertyList = Loadable(
 const PropertyViewer = Loadable(
   lazy(() => import("src/pages/Property/PropertyViewer"))
 );
+const BookingList = Loadable(
+  lazy(() => import("src/pages/Booking/BookingList"))
+);
 const RoomList = Loadable(lazy(() => import("src/pages/room/RoomList")));
+const Dashboard = Loadable(lazy(() => import("src/pages/Dashboard/Dashboard")));
 const Errorlogs = Loadable(lazy(() => import("src/pages/ErrorLogs/Errorlogs")));
 const ChatViewer = Loadable(lazy(() => import("src/pages/Chat/ChatViewer")));
 const ReviewList = Loadable(lazy(() => import("src/pages/Review/ReviewList")));
@@ -74,7 +78,7 @@ export default function Router() {
           element: <Navigate to="/swiftstay/dashboard" replace />,
           index: true,
         },
-        { path: "dashboard", element: <>dashboard</> },
+        { path: "dashboard", element: <Dashboard /> },
         {
           path: "properties",
           element: <Outlet />,
@@ -90,7 +94,7 @@ export default function Router() {
           ],
         },
         { path: "rooms", element: <RoomList /> },
-        { path: "bookings", element: <>bookings</> },
+        { path: "bookings", element: <BookingList /> },
         { path: "reviews", element: <ReviewList /> },
         { path: "errorlogs", element: <Errorlogs /> },
         { path: "chats", element: <ChatViewer /> },

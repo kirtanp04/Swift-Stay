@@ -151,7 +151,7 @@ export default function RoomList({}: Props) {
             {
               field: "type",
               headerName: "Room Type",
-              width: 200,
+              width: 150,
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Chip
@@ -187,6 +187,11 @@ export default function RoomList({}: Props) {
                   </Text>
                 </TextWrapper>
               ),
+            },
+            {
+              field: "currency",
+              headerName: "currency",
+              width: 80,
             },
             {
               field: "price",
@@ -273,7 +278,7 @@ const RootStyle = styled(Box)(() => ({
 const TextWrapper = styled(Box)(() => ({
   width: "100%",
   display: "flex",
-  justifyContent: "center",
+  justifyContent: "flex-start",
   alignItems: "center",
   padding: "0.4rem",
   overflow: "hidden",

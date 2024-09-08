@@ -16,6 +16,7 @@ const _ManagerChatBroker: string = Param.broker.manager.chat;
 const _ManagerReviewBroker: string = Param.broker.manager.review;
 const _ManagerRedisBroker: string = Param.broker.manager.Redis;
 const _ManagerBookingBroker: string = Param.broker.manager.booking;
+const _ManagerAnalyticBroker: string = Param.broker.manager.analytic;
 
 ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -49,6 +50,9 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
 
           case _ManagerBookingBroker:
             return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
+
+          case _ManagerAnalyticBroker:
+            return SendResponseToUser(await Functions.AnalyticFunction.findFunction(paramObj, req, res, next), next);
 
           default:
             const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
@@ -92,6 +96,9 @@ ManagerBrokerRouter.post('/:param', async (req: Request, res: Response, next: Ne
 
             case _ManagerBookingBroker:
               return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
+
+            case _ManagerAnalyticBroker:
+              return SendResponseToUser(await Functions.AnalyticFunction.findFunction(paramObj, req, res, next), next);
 
             default:
               const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);

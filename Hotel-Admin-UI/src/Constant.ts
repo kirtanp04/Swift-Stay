@@ -20,6 +20,8 @@ export const Param = {
             chat: 'ManagerChatBroker',
             review: 'ManagerReviewBroker',
             Redis: 'ManagerRedisBroker',
+            booking: 'ManagerBookingBroker',
+            analytic: 'ManagerAnalyticBroker'
         },
 
         guest: {
@@ -28,6 +30,8 @@ export const Param = {
             Room: 'GuestRoomBroker',
             Redis: 'GuestRedisBroker',
             chat: 'GuestChatBroker',
+            payment: 'GuestPaymentBroker',
+            booking: 'GuestBookingBroker'
         },
     },
 
@@ -36,6 +40,10 @@ export const Param = {
             register: 'CreateManagerAccount',
             login: 'ManagerLogin',
             EmailVerification: 'ManagerEmailVerification',
+            analytics: {
+                GetOverviewMetrics: 'ManagerGetOverviewMetrics',
+                PropertybyStates: 'ManagerPropertybyStates'
+            },
             Property: {
                 AddProperty: 'ManagerAddProperty',
                 GetSingleProperty: 'ManagerGetSingleProperty',
@@ -60,6 +68,9 @@ export const Param = {
             },
             chat: {
                 saveChat: 'ManagerSaveChatService'
+            },
+            booking: {
+                GetBookingListByAdmin: 'ManagerGetBookinListByAdmin',
             }
         },
         guest: {
@@ -78,6 +89,19 @@ export const Param = {
             },
             chat: {
                 saveChat: 'GuestSaveChatService'
+            },
+            room: {
+                GetRoomDetail: 'GuestGetRoomDetail'
+            },
+            payment: {
+                CheckOut: 'GuestCheckOut',
+                WebHook: 'GuestWebhook'
+            },
+            booking: {
+                SaveBookingInfo: 'GuestSaveBookingInfo',
+                UpdateBookingInfo: 'GuestUpdateBookinInfo',
+                generateInvoice: 'GuestGenerateInvoice',
+                getMyBookingList: 'GuestGetMyBookingList'
             }
         },
     },

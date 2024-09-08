@@ -6,5 +6,6 @@ import { ReviewFunction } from './Review'
 import { RedisFunction } from './Redis'
 import { PaymentFunction } from './Payment'
 import { BookingFunction } from './Booking'
+import { AnalyticFunction } from './Analytics'
 
-export { PropertyFunction, UserFunction, RoomFunction, SubscriberFunction, ReviewFunction, RedisFunction, PaymentFunction, BookingFunction }
+export { PropertyFunction, UserFunction, RoomFunction, SubscriberFunction, ReviewFunction, RedisFunction, PaymentFunction, BookingFunction, AnalyticFunction }

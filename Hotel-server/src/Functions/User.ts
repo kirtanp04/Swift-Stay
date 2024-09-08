@@ -286,14 +286,14 @@ class Functions {
     public ManagerLogin = async (): Promise<UserResponse> => {
         try {
             const { email, password } = this.objParam!.data;
-            console.log(this.objParam.data)
+
 
             const isUser: UserClass | null = await User.findOne({ email: email });
 
             if (isUser) {
                 const isVerifiePass = await Crypt.compareHash(isUser.password, password);
 
-                console.log(isVerifiePass)
+
 
                 if (isVerifiePass.error === '') {
                     if (isUser.isEmailVerified) {
@@ -336,6 +336,7 @@ class Functions {
                                                 role: isUser.role,
                                                 id: isUser._id,
                                                 isEmailVerified: isUser.isEmailVerified,
+                                                country: isUser.country
                                             },
                                             HttpStatusCodes.ACCEPTED
                                         );

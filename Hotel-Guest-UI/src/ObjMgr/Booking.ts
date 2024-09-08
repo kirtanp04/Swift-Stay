@@ -13,15 +13,19 @@ export class Booking {
 
     userID: string | null = null;
 
+    adminID: string = '';
+
     UserInfo: UserInfo = new UserInfo();
 
     stayInfo: StayInfo = new StayInfo();
 
-    totalPay: string | null = null;
+    totalPay: number | null = null;
 
     bookingStatus: enumBookingStatus = enumBookingStatus.pending;
 
     PaymentDetail: PaymentDetail = new PaymentDetail()
+
+    currency: string = ''
 
     invoice: string | null = null
 

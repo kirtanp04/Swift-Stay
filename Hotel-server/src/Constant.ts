@@ -10,7 +10,8 @@ export const Param = {
       chat: 'ManagerChatBroker',
       review: 'ManagerReviewBroker',
       Redis: 'ManagerRedisBroker',
-      booking: 'ManagerBookingBroker'
+      booking: 'ManagerBookingBroker',
+      analytic: 'ManagerAnalyticBroker'
     },
 
     guest: {
@@ -29,6 +30,10 @@ export const Param = {
       register: 'CreateManagerAccount',
       login: 'ManagerLogin',
       EmailVerification: 'ManagerEmailVerification',
+      analytics: {
+        GetOverviewMetrics: 'ManagerGetOverviewMetrics',
+        PropertybyStates: 'ManagerPropertybyStates'
+      },
       Property: {
         AddProperty: 'ManagerAddProperty',
         GetSingleProperty: 'ManagerGetSingleProperty',
@@ -96,16 +101,21 @@ export const CacheKey = {
   user: {
     property: (propertyID: string) => `#@User${propertyID}#@Property#@`,
     room: (roomID: string) => `#@User${roomID}#@Room#@`,
-    bookingList: (userID: string) => `#@ManagerChat#@${userID}#@UserChat#@`
+    bookingList: (userID: string) => `#@User#@${userID}#@bookingList#@`
   },
   manager: {
     property: (emailID: string) => `#@Manager#@${emailID}#@Property#@`,
     room: (emailID: string) => `#@Manager#@${emailID}#@Room#@`,
     review: (emailID: string) => `#@Manager#@${emailID}#@Review#@`,
     subscriber: (emailID: string) => `#@Manager#@${emailID}#@Subscriber#@`,
+    bookingList: (adminID: string) => `#@Manager#@${adminID}#@bookingList#@`,
+    Analytics: {
+      BookingBase: (emailID: string) => `#@Manager#@${emailID}#@BookingBase#@`
+    }
   },
 
   chat: (chatKey: string) => `#@ManagerChat#@${chatKey}#@UserChat#@`,
+
 
 };
 

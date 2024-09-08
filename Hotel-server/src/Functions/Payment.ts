@@ -63,7 +63,7 @@ class Functions {
             if (isVerified.error === '') {
                 const PropertyDetail = await Property.findOne({ _id: bookingInfo.propertyID });
 
-                const encryptedMetaData: any[] = splitIntoThreeParts(Crypt.Encryption(bookingInfo).data);
+                const encryptedMetaData: any[] = splitIntoFourParts(Crypt.Encryption(bookingInfo).data);
 
                 if (PropertyDetail !== undefined) {
                     try {
@@ -82,7 +82,7 @@ class Functions {
                                             description: PropertyDetail?.description,
                                             images: PropertyDetail?.images.length! > 0 ? PropertyDetail?.images : undefined,
                                         },
-                                        unit_amount: Number(bookingInfo.totalPay?.split(' ')[1]) * 100,
+                                        unit_amount: bookingInfo.totalPay! * 100,
                                     },
                                     quantity: 1,
                                 },
@@ -91,6 +91,7 @@ class Functions {
                                 key_1: encryptedMetaData[0],
                                 key_2: encryptedMetaData[1],
                                 key_3: encryptedMetaData[2],
+                                key_4: encryptedMetaData[3],
                             },
                         });
                         const _Param = new TParam();
@@ -98,7 +99,7 @@ class Functions {
                         _Param.function = Param.function.guest.booking.SaveBookingInfo;
 
                         bookingInfo.PaymentDetail.PaymentStatus = PaymentStatus.pending;
-                        bookingInfo.totalPay = (Session.currency! + '-' + Session.amount_total! / 100) as any;
+                        bookingInfo.totalPay = Session.amount_total! / 100;
                         bookingInfo.bookingStatus = enumBookingStatus.pending;
 
                         _Param.data = bookingInfo;
@@ -148,12 +149,14 @@ class Functions {
                     try {
                         const paymentIntent = event.data.object as Stripe.Checkout.Session;
                         const _metadata = paymentIntent.metadata;
-                        const _EncryptBookingInfo = _metadata!.key_1 + _metadata!.key_2 + _metadata!.key_3;
+                        const _EncryptBookingInfo = _metadata!.key_1 + _metadata!.key_2 + _metadata!.key_3 + _metadata!.key_4;
                         let _bookingInfo: BookingClass = Crypt.Decryption(_EncryptBookingInfo).data;
 
                         const _Param = new TParam();
                         _Param.Broker = Param.broker.guest.booking;
                         _Param.function = Param.function.guest.booking.UpdateBookingInfo;
+
+
 
                         _bookingInfo.PaymentDetail.PaymentID = paymentIntent.id;
                         _bookingInfo.PaymentDetail.PaymentStatus = PaymentStatus.paid;
@@ -196,7 +199,7 @@ class Functions {
                 if (event.type === 'checkout.session.async_payment_failed') {
                     const failedPaymentIntent = event.data.object as Stripe.Checkout.Session;
                     const failed_metadata = failedPaymentIntent.metadata;
-                    const failed_EncryptBookingInfo = failed_metadata!.key_1 + failed_metadata!.key_2 + failed_metadata!.key_3;
+                    const failed_EncryptBookingInfo = failed_metadata!.key_1 + failed_metadata!.key_2 + failed_metadata!.key_3 + failed_metadata!.key_4;
                     let Failed_BookingInfo: BookingClass = Crypt.Decryption(failed_EncryptBookingInfo).data;
 
                     const Failed_Param = new TParam();
@@ -204,6 +207,9 @@ class Functions {
                     Failed_Param.function = Param.function.guest.booking.UpdateBookingInfo;
 
                     const paymentError = (await stripe.paymentIntents.retrieve(failedPaymentIntent.id)).last_payment_error
+
+
+
 
                     Failed_BookingInfo.PaymentDetail.failPaymentID = failedPaymentIntent.id;
                     Failed_BookingInfo.PaymentDetail.PaymentStatus = PaymentStatus.fail;
@@ -228,7 +234,7 @@ class Functions {
                             _Email.subject = 'Fail to Book' + ' ' + property.name;
                             _Email.html = EmailTemplate.FailedBooking({
                                 propertyName: property.name,
-                                failReason: paymentError?.message || 'Fail to pay',
+                                failReason: Failed_res.Message,
                             });
                             await _Email.sendEmail(
                                 () => { },
@@ -250,10 +256,12 @@ class Functions {
     };
 }
 
-function splitIntoThreeParts(str: string): string[] {
-    const partLength = Math.ceil(str.length / 3);
+function splitIntoFourParts(str: string): string[] {
+    const partLength = Math.ceil(str.length / 4);
     const part1 = str.substring(0, partLength);
     const part2 = str.substring(partLength, partLength * 2);
-    const part3 = str.substring(partLength * 2);
-    return [part1, part2, part3];
+    const part3 = str.substring(partLength * 2, partLength * 3);
+    const part4 = str.substring(partLength * 3);
+    return [part1, part2, part3, part4];
 }
+
