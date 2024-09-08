@@ -21,7 +21,7 @@
 
     - pdfkit -> to create and generate pdf
 
-    - node-cron -> to schedule task taht run every time base on time period
+    - node-cron -> to schedule task that run every time base on time period
 
     - Payment integration
 
