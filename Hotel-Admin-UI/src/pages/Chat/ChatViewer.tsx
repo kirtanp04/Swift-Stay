@@ -1,20 +1,20 @@
 import { Box, styled, Typography, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SendMessageIcon } from "src/assets/iconify";
 import MUIAvatar from "src/components/mui/MUIAvatar";
 import Page from "src/components/Page";
 import Scrollbar from "src/components/Scrollbar";
-import { SocketKeyName } from "src/Constant";
+import { SocketIoBaseUrl, SocketKeyName } from "src/Constant";
 import useAuth from "src/hooks/useAuth";
 import { SocketService } from "src/service/Socket";
 import showMessage from "src/util/ShowMessage";
-import { ChatApi, ChatObj, SubscriberClass, TSubscriber } from "./DataObject";
 import { enumUserRole } from "../Authentication/AuthMgr";
+import { ChatApi, ChatObj, SubscriberClass, TSubscriber } from "./DataObject";
 
 export default function ChatViewer() {
   const [Message, setMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatObj[]>([]);
-  const [socketError, setSocketError] = useState<ChatObj | null>(null);
+
   const [ShowTypingLoading, setShowTypingLoading] = useState<boolean>(false);
   const [Subscribers, setSubscriberList] = useState<SubscriberClass[]>([]);
   const [SelectedSubscriber, setSelectedSubscriber] = useState<TSubscriber>(
@@ -27,25 +27,31 @@ export default function ChatViewer() {
   } = useAuth();
   const theme = useTheme();
 
+  const _Socket = useMemo(() => {
+    return new SocketService(
+      SocketIoBaseUrl,
+      {
+        _id: id,
+        email: email,
+        name: name,
+        role: role as any,
+      },
+      GetChatMessage,
+      onUserTyping,
+      GetChatError,
+      (value) => {
+        if (value == false) {
+          InitRedis();
+        }
+      }
+    );
+  }, []);
+
   useEffect(() => {
     ChatApi.getAllSubscribedUsers(
       id,
-
       (res) => {
         setSubscriberList(res);
-
-        ChatApi.initRedisService(
-          id,
-          role,
-          (res) => {
-            //
-            if (res) {
-            }
-          },
-          (err) => {
-            showMessage(err, theme, () => {});
-          }
-        );
       },
       (err) => {
         showMessage(err, theme, () => {});
@@ -53,29 +59,19 @@ export default function ChatViewer() {
     );
   }, []);
 
-  const _Socket = new SocketService(
-    {
-      _id: id,
-      email: email,
-      name: name,
-      role: role as any,
-    },
-    GetChatMessage,
-    onUserTyping,
-    GetChatError,
-    (value) => {
-      console.log(value);
-      // if (value !== ConnectionLoading) {
-      //   // setConnectionLoading(value);
-      // }
-    }
-  );
+  const InitRedis = () => {
+    ChatApi.InitRedis(
+      id,
+      role,
+      (res) => {
+        showMessage(res, theme, () => {});
+      },
 
-  useEffect(() => {
-    if (socketError !== null) {
-      showMessage(socketError.message, theme, () => {});
-    }
-  }, [socketError]);
+      (err) => {
+        showMessage(err, theme, () => {});
+      }
+    );
+  };
 
   const GetChatObj = (message: string): ChatObj => {
     const _ChatObj = new ChatObj();
@@ -96,12 +92,13 @@ export default function ChatViewer() {
   function GetChatMessage(msg: ChatObj) {
     let newChatObj = new ChatObj();
     newChatObj = { ...msg, date: msg.date };
+    console.log(msg);
     setChatMessages((prevMessages) => [...prevMessages, newChatObj]);
     setShowTypingLoading(false);
   }
 
-  function GetChatError(err: ChatObj) {
-    setSocketError(err);
+  function GetChatError(err: string) {
+    showMessage(err, theme, () => {});
   }
 
   function onUserTyping(msg: ChatObj) {
@@ -117,18 +114,19 @@ export default function ChatViewer() {
       SocketKeyName.SendMessage,
       GetChatObj(Message),
       (err) => {
-        console.log(err);
+        console.log("err", err);
       }
     );
+    setMessage("");
   };
 
   const OnChangeMessage = (value: string) => {
-    if (!ShowTypingLoading) {
-      _Socket.sendChatMessageInRoom(
-        SocketKeyName.TypingMessage,
-        GetChatObj("user is typing")
-      );
-    }
+    // if (!ShowTypingLoading) {
+    //   _Socket.sendChatMessageInRoom(
+    //     SocketKeyName.TypingMessage,
+    //     GetChatObj("user is typing")
+    //   );
+    // }
     setMessage(value);
   };
 

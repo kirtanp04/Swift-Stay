@@ -54,7 +54,7 @@ export class Api {
             }
           },
         });
-        console.log(response);
+
       } else {
         _res.error = encryptData.error;
       }

@@ -9,7 +9,6 @@ export class Redis {
     private subscriber: RedisClientType;
     private isConnected: boolean = false;
 
-
     private SubscribeUserChannelName: string = 'GetUserChatMess';
     private SubscribeAdminChannelName: string = 'PublishAdminChatMess';
     private isSubscribedAdmin: boolean = false;
@@ -22,8 +21,8 @@ export class Redis {
             password: SecrtKey.REDIS.PASSWORD,
             socket: {
                 host: SecrtKey.REDIS.URL,
-                port: SecrtKey.REDIS.PORT
-            }
+                port: SecrtKey.REDIS.PORT,
+            },
         });
 
         this.publisher = this.redisClient.duplicate();
@@ -63,23 +62,30 @@ export class Redis {
         });
     }
 
-    async connect(): Promise<void> {
-        if (!this.isConnected) {
-            await Promise.all([
-                this.redisClient.connect(),
-                this.publisher.connect(),
-                this.subscriber.connect()
-            ]);
-            this.isConnected = true;
-        } else {
-            console.log('Redis client is already connected.');
+    async connect(onSuccess: (res: any) => void, onfail: (err: any) => void): Promise<void> {
+        if (this.redisClient.isOpen) {
+            console.log('Redis Already opened');
+            return;
+        }
+
+        try {
+            if (!this.isConnected) {
+                await Promise.all([this.redisClient.connect(), this.publisher.connect(), this.subscriber.connect()]);
+                this.isConnected = true;
+                onSuccess('redis is connected successfully');
+            } else {
+                console.log('Redis client is already connected.');
+                onfail('Redis client is already connected.');
+            }
+        } catch (error: any) {
+            console.log('Redis Error:' + error.message);
+            onfail('Redis Error:' + error.message);
         }
     }
 
-
     async subscribeAdminChat(onMessage: (message: ChatObj) => void, onError: (err: any) => void): Promise<void> {
         if (this.isSubscribedAdmin) {
-            console.log("Already subscribed to admin channel.");
+            console.log('Already subscribed to admin channel.');
             return;
         }
 
@@ -99,10 +105,9 @@ export class Redis {
         }
     }
 
-
     async subscribeUserChat(onMessage: (message: ChatObj) => void, onError: (err: any) => void): Promise<void> {
         if (this.isSubscribedUser) {
-            console.log("Already subscribed to user channel.");
+            console.log('Already subscribed to user channel.');
             return;
         }
 
@@ -132,7 +137,6 @@ export class Redis {
             console.log(`Duplicate message with id: ${messageId} ignored.`);
         }
     }
-
 
     cleanProcessedMessages(): void {
         this.processedMessages.clear();

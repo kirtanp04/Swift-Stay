@@ -7,18 +7,18 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
-import { CloseIcon, LoadingAnimation } from "src/assets/iconify";
+import { useMemo, useState } from "react";
+import { CloseIcon } from "src/assets/iconify";
+import { TimeFormatter } from "src/common/TimeFormater";
 import MUIAvatar from "src/components/mui/MUIAvatar";
 import Scrollbar from "src/components/Scrollbar";
+import { ChatSocketIoBaseUrl, SocketKeyName } from "src/Constant";
 import useAuth from "src/hooks/useAuth";
 import { Property } from "src/ObjMgr/Property";
 import { SocketService } from "src/service/Socket";
 import showMessage from "src/util/ShowMessage";
-import { Chat as TChat } from "./DataObject";
-import { SocketKeyName } from "src/Constant";
-import { TimeFormatter } from "src/common/TimeFormater";
 import { enumUserRole } from "../Authentication/AuthMgr";
+import { Chat as TChat } from "./DataObject";
 
 type Props = {
   open: boolean;
@@ -30,8 +30,6 @@ type Props = {
 export default function Chat({ open, property, onClose, propertyID }: Props) {
   const [chatMessages, setChatMessages] = useState<TChat[]>([]);
   const [Message, setMessage] = useState("");
-  const [ShowTypingLoading, setShowTypingLoading] = useState<boolean>(false);
-  const [ConnectionLoading, setConnectionLoading] = useState<boolean>(false);
   const theme = useTheme();
   const {
     user: {
@@ -41,6 +39,7 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
 
   const _Socket = useMemo(() => {
     return new SocketService(
+      ChatSocketIoBaseUrl,
       {
         _id: id,
         email: email,
@@ -53,35 +52,37 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
       (value) => {
         console.log(value);
         if (value == false) {
-          InitRedisService();
+          InitRedis();
         }
       }
     );
-  }, [id, email, name, role]);
-  useEffect(() => {
-    const _ChatObj = new TChat();
-    _ChatObj.key = propertyID + id; // first property id  then subscriber id
-    _Socket.joinRoom(_ChatObj, (err) => {
-      console.log(err);
-    });
+  }, []);
 
-    // return () => {
-    //   _Socket.disconnect();
-    // };
-  }, [_Socket, propertyID, id]);
+  // useEffect(() => {
+  //   const _ChatObj = new TChat();
+  //   _ChatObj.key = propertyID + id;
+  //   _Socket.joinRoom(_ChatObj, (err) => {
+  //     showMessage(err, "error", theme, () => {});
+  //   });
+  // }, [_Socket, propertyID, id]);
 
-  const InitRedisService = () => {
-    setConnectionLoading(true);
-    TChat.initRedisService(
+  const InitRedis = () => {
+    TChat.InitRedis(
       id,
       role,
       (res) => {
-        showMessage(res, "success", theme, () => {});
-        setConnectionLoading(false);
+        if (res) {
+        }
+        // showMessage(res, "success", theme, () => {});
+
+        const _ChatObj = new TChat();
+        _ChatObj.key = propertyID + id;
+        _Socket.joinRoom(_ChatObj, (err) => {
+          showMessage(err, "error", theme, () => {});
+        });
       },
       (err) => {
         showMessage(err, "error", theme, () => {});
-        setConnectionLoading(false);
       }
     );
   };
@@ -110,6 +111,7 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
         console.log(err);
       }
     );
+    setMessage("");
   };
 
   function GetChatMessage(msg: TChat) {
@@ -117,7 +119,6 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
     console.log(msg);
     newChatObj = { ...msg, date: msg.date };
     setChatMessages((prevMessages) => [...prevMessages, newChatObj]);
-    setShowTypingLoading(false);
   }
 
   function GetChatError(err: string) {
@@ -125,11 +126,13 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
   }
 
   function onUserTyping(msg: TChat) {
-    if (!ShowTypingLoading) {
-      setShowTypingLoading(true);
-    }
     if (msg) {
     }
+    // if (!ShowTypingLoading) {
+    //   setShowTypingLoading(true);
+    // }
+    // if (msg) {
+    // }
   }
 
   return (
@@ -161,49 +164,36 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
         <Divider sx={{ margin: "5px 0px" }} />
 
         <ChatWrapper>
-          {!ConnectionLoading && (
-            <Scrollbar sx={{ height: "100%", width: "100%" }}>
-              {chatMessages.map((objChat, i) => (
-                <MessageTextWrapper
-                  sx={{
-                    backgroundColor:
-                      objChat.senderDetail.email === email
-                        ? theme.palette.background.neutral
-                        : theme.palette.color.violet.lighter,
-                    marginRight:
-                      objChat.senderDetail.email !== email ? "auto" : null,
-                    marginLeft:
-                      objChat.senderDetail.email === email ? "auto" : null,
-                  }}
-                  key={i}
-                >
-                  <MUIAvatar name={property.name} src={property.images[0]} />
-                  <Box width={"100%"}>
-                    <MessageText>{objChat.message}</MessageText>
-                    <Text
-                      sx={{
-                        justifyContent: "end",
-                        color: theme.palette.background.default,
-                      }}
-                    >
-                      {TimeFormatter.formatTimeDifference(objChat.date)}
-                    </Text>
-                  </Box>
-                </MessageTextWrapper>
-              ))}
-            </Scrollbar>
-          )}
-
-          {ConnectionLoading && (
-            <LoadingWrapper>
-              <LoadingAnimation
-                IconColor={theme.themeColor}
-                height={25}
-                width={25}
-              />
-              <SubTitle>Connecting to Redis Service....</SubTitle>
-            </LoadingWrapper>
-          )}
+          <Scrollbar sx={{ height: "100%", width: "100%" }}>
+            {chatMessages.map((objChat, i) => (
+              <MessageTextWrapper
+                sx={{
+                  backgroundColor:
+                    objChat.senderDetail.email === email
+                      ? theme.palette.background.neutral
+                      : theme.palette.color.violet.lighter,
+                  marginRight:
+                    objChat.senderDetail.email !== email ? "auto" : null,
+                  marginLeft:
+                    objChat.senderDetail.email === email ? "auto" : null,
+                }}
+                key={i}
+              >
+                <MUIAvatar name={property.name} src={property.images[0]} />
+                <Box width={"100%"}>
+                  <MessageText>{objChat.message}</MessageText>
+                  <Text
+                    sx={{
+                      justifyContent: "end",
+                      color: theme.palette.background.default,
+                    }}
+                  >
+                    {TimeFormatter.formatTimeDifference(objChat.date)}
+                  </Text>
+                </Box>
+              </MessageTextWrapper>
+            ))}
+          </Scrollbar>
         </ChatWrapper>
         <Divider sx={{ margin: "5px 0px" }} />
         <MessageTextFieldWrapper>
@@ -328,13 +318,4 @@ const Text = styled(Typography)(({ theme }) => ({
   textOverflow: "ellipsis",
   display: "flex",
   alignItems: "center",
-}));
-
-const LoadingWrapper = styled(Box)(() => ({
-  height: "100%",
-  width: "100%",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: "10px",
 }));

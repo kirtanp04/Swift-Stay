@@ -11,16 +11,13 @@ const GuestBrokerRouter: Router = express.Router();
 const _GuestAuthBroker: string = Param.broker.guest.Auth;
 const _GuestPropertyBroker: string = Param.broker.guest.Property;
 const _GuestRoomBroker: string = Param.broker.guest.Room;
-const _GuestChatBroker: string = Param.broker.guest.chat;
-const _GuestRedisBroker: string = Param.broker.guest.Redis;
 const _GuestPaymentBroker: string = Param.broker.guest.payment;
 const _GuestBookingBroker: string = Param.broker.guest.booking;
+const _GuestChatBroker: string = Param.broker.guest.chat;
 
 GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const isDBConnected = await MongoDB.ConnectDB(next);
-
-
 
         if (isDBConnected.isError === false) {
             const { param } = req.params;
@@ -33,9 +30,6 @@ GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextF
                     case _GuestAuthBroker:
                         return SendResponseToUser(await Functions.UserFunction.findFunction(paramObj, req, res, next), next);
 
-                    case _GuestRedisBroker:
-                        return SendResponseToUser(await Functions.RedisFunction.findFunction(paramObj, req, res, next), next);
-
                     case _GuestPaymentBroker:
                         return SendResponseToUser(await Functions.PaymentFunction.findFunction(paramObj, req, res, next), next);
 
@@ -47,6 +41,9 @@ GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextF
 
                     case _GuestBookingBroker:
                         return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
+
+                    case _GuestChatBroker:
+                        return SendResponseToUser(await Functions.ChatFunction.findFunction(paramObj, req, res, next), next);
 
                     default:
                         const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
@@ -65,7 +62,6 @@ GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextF
 
 GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: NextFunction) => {
     try {
-
         const isDBConnected = await MongoDB.ConnectDB(next);
         if (isDBConnected.isError === false) {
             const { param } = req.params;
@@ -79,13 +75,9 @@ GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: Next
 
                     paramObj.data = decryptResBody.data;
 
-
                     switch (paramObj.Broker) {
                         case _GuestAuthBroker:
                             return SendResponseToUser(await Functions.UserFunction.findFunction(paramObj, req, res, next), next);
-
-                        case _GuestRedisBroker:
-                            return SendResponseToUser(await Functions.RedisFunction.findFunction(paramObj, req, res, next), next);
 
                         case _GuestPaymentBroker:
                             return SendResponseToUser(await Functions.PaymentFunction.findFunction(paramObj, req, res, next), next);
@@ -96,6 +88,9 @@ GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: Next
                         case _GuestBookingBroker:
                             return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
 
+                        case _GuestChatBroker:
+                            return SendResponseToUser(await Functions.ChatFunction.findFunction(paramObj, req, res, next), next);
+
                         default:
                             const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
                             return SendResponseToUser(errMess, next);
@@ -105,7 +100,10 @@ GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: Next
                     return SendResponseToUser(errMess, next);
                 }
             } else {
-                return SendResponseToUser(GetUserErrorObj(`Server Error: ${objDecrypt.error} + Params`, HttpStatusCodes.BAD_REQUEST), next);
+                return SendResponseToUser(
+                    GetUserErrorObj(`Server Error: ${objDecrypt.error} + Params`, HttpStatusCodes.BAD_REQUEST),
+                    next
+                );
             }
         } else {
             return SendResponseToUser(GetUserErrorObj(` ${isDBConnected.Message}`, HttpStatusCodes.BAD_REQUEST), next);

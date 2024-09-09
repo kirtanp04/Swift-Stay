@@ -76,16 +76,17 @@ export class Redis {
         }
     }
 
-    async publish(message: any, onError: (err: any) => void): Promise<void> {
+    async publish(message: any, onSuccess: () => void, onError: (err: any) => void): Promise<void> {
         try {
             const encryptdata = Crypt.Encryption(message);
             if (encryptdata.error === '') {
                 await this.publisher.publish(this.PublishChannelName, encryptdata.data);
+                onSuccess()
             } else {
                 onError(encryptdata.error);
             }
-        } catch (error) {
-            onError(error);
+        } catch (error: any) {
+            onError(error.message);
         }
     }
 

@@ -13,8 +13,8 @@ const _ManagerAuthBroker: string = Param.broker.manager.Auth;
 const _ManagerPropertyBroker: string = Param.broker.manager.Property;
 const _ManagerRoomBroker: string = Param.broker.manager.Room;
 const _ManagerChatBroker: string = Param.broker.manager.chat;
+const _ManagerSubscriberBroker: string = Param.broker.manager.subscriber;
 const _ManagerReviewBroker: string = Param.broker.manager.review;
-const _ManagerRedisBroker: string = Param.broker.manager.Redis;
 const _ManagerBookingBroker: string = Param.broker.manager.booking;
 const _ManagerAnalyticBroker: string = Param.broker.manager.analytic;
 
@@ -29,6 +29,8 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
       if (objDecrypt.error === '') {
         const paramObj: TParam = objDecrypt.data;
 
+
+
         switch (paramObj.Broker) {
           case _ManagerAuthBroker:
             return SendResponseToUser(await Functions.UserFunction.findFunction(paramObj, req, res, next), next);
@@ -36,7 +38,7 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
           case _ManagerPropertyBroker:
             return SendResponseToUser(await Functions.PropertyFunction.findFunction(paramObj, req, res, next), next);
 
-          case _ManagerChatBroker:
+          case _ManagerSubscriberBroker:
             return SendResponseToUser(await Functions.SubscriberFunction.findFunction(paramObj, req, res, next), next);
 
           case _ManagerRoomBroker:
@@ -45,14 +47,14 @@ ManagerBrokerRouter.get('/:param', async (req: Request, res: Response, next: Nex
           case _ManagerReviewBroker:
             return SendResponseToUser(await Functions.ReviewFunction.findFunction(paramObj, req, res, next), next);
 
-          case _ManagerRedisBroker:
-            return SendResponseToUser(await Functions.RedisFunction.findFunction(paramObj, req, res, next), next);
-
           case _ManagerBookingBroker:
             return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
 
           case _ManagerAnalyticBroker:
             return SendResponseToUser(await Functions.AnalyticFunction.findFunction(paramObj, req, res, next), next);
+
+          case _ManagerChatBroker:
+            return SendResponseToUser(await Functions.ChatFunction.findFunction(paramObj, req, res, next), next);
 
           default:
             const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
@@ -99,6 +101,12 @@ ManagerBrokerRouter.post('/:param', async (req: Request, res: Response, next: Ne
 
             case _ManagerAnalyticBroker:
               return SendResponseToUser(await Functions.AnalyticFunction.findFunction(paramObj, req, res, next), next);
+
+            case _ManagerSubscriberBroker:
+              return SendResponseToUser(await Functions.SubscriberFunction.findFunction(paramObj, req, res, next), next);
+
+            case _ManagerChatBroker:
+              return SendResponseToUser(await Functions.ChatFunction.findFunction(paramObj, req, res, next), next);
 
             default:
               const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);

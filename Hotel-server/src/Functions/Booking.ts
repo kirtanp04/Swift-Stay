@@ -20,6 +20,7 @@ const _GuestGetMyBookinglist = Param.function.guest.booking.getMyBookingList;
 
 //Admin
 const _GetAllBookingListByAdmin = Param.function.manager.booking.GetBookingListByAdmin
+const _GetAllBookedUser = Param.function.manager.booking.GetAllBookedUser
 
 export class BookingFunction {
     private static objUserResponse: UserResponse = new UserResponse();
@@ -50,6 +51,10 @@ export class BookingFunction {
 
             case _GetAllBookingListByAdmin:
                 this.objUserResponse = await _Function.GetManagerBookingList();
+                break;
+
+            case _GetAllBookedUser:
+                this.objUserResponse = await _Function.GetAllBookedUser();
                 break;
 
             default:
@@ -601,6 +606,75 @@ class Functions {
     };
 
     public GetManagerBookingList = async (): Promise<UserResponse> => {
+        try {
+            const adminID = this.objParam.data;
+
+            const isAdmin = await checkAdminVerification(adminID);
+
+            if (isAdmin.error === '') {
+                const BookingListCache = Cache.getCacheData(CacheKey.manager.bookingList(adminID));
+
+                if (BookingListCache.error === '') {
+                    this.objUserResponse = GetUserSuccessObj(BookingListCache.data, HttpStatusCodes.OK);
+                } else {
+                    const BookingList = await Booking.aggregate([
+                        {
+                            $match: {
+                                adminID: adminID,
+                            },
+
+                        },
+                        {
+                            $addFields: {
+                                propertyID: { $toObjectId: "$propertyID" },
+                                roomID: { $toObjectId: "$roomID" },
+                            },
+                        },
+                        {
+                            $lookup: {
+                                from: "properties",
+                                localField: "propertyID",
+                                foreignField: "_id",
+                                as: "property",
+                            },
+                        },
+
+                        {
+                            $lookup: {
+                                from: "rooms",
+                                localField: "roomID",
+                                foreignField: "_id",
+                                as: "room",
+                            },
+                        },
+                        {
+                            $unwind: {
+                                path: "$property",
+                                preserveNullAndEmptyArrays: true,
+                            },
+                        },
+                        {
+                            $unwind: {
+                                path: "$room",
+                                preserveNullAndEmptyArrays: true,
+                            },
+                        },
+                    ]);
+
+                    Cache.SetCache(CacheKey.manager.bookingList(adminID), BookingList);
+                    this.objUserResponse = GetUserSuccessObj(BookingList, HttpStatusCodes.OK);
+                }
+            } else {
+                this.objUserResponse = GetUserErrorObj(isAdmin.error, HttpStatusCodes.NOT_ACCEPTABLE);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    public GetAllBookedUser = async (): Promise<UserResponse> => {
         try {
             const adminID = this.objParam.data;
 

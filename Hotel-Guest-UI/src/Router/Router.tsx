@@ -1,6 +1,7 @@
 import { ElementType, Suspense, lazy } from "react";
 import { useRoutes } from "react-router-dom";
 import LoadingPage from "src/components/LoadingPage";
+import NotificationContext from "src/context/Notification";
 import { UserSearchContextProvider } from "src/context/UserSearchContext";
 import AuthGaurd from "src/guard/AuthGaurd";
 import LoginGaurd from "src/guard/LoginGaurd";
@@ -38,9 +39,11 @@ export default function Router() {
     {
       path: "/",
       element: (
-        <UserSearchContextProvider>
-          <Layout />
-        </UserSearchContextProvider>
+        <NotificationContext>
+          <UserSearchContextProvider>
+            <Layout />
+          </UserSearchContextProvider>
+        </NotificationContext>
       ),
       children: [
         { path: "", element: <HomePage />, index: true },

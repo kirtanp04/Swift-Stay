@@ -129,7 +129,10 @@ export class WebSocket {
         try {
             const encryptedChat = Crypt.Encryption(data).data;
             this.Socket!.to(data.key).emit(SocketName, encryptedChat);
-        } catch (error) { }
+            console.log(encryptedChat, data.key)
+        } catch (error) {
+            console.log(error)
+        }
     };
 
     public getChatMessage = (

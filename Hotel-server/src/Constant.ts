@@ -9,7 +9,7 @@ export const Param = {
       Room: 'ManagerRoomBroker',
       chat: 'ManagerChatBroker',
       review: 'ManagerReviewBroker',
-      Redis: 'ManagerRedisBroker',
+      subscriber: 'ManagerSubscriberBroker',
       booking: 'ManagerBookingBroker',
       analytic: 'ManagerAnalyticBroker'
     },
@@ -18,7 +18,7 @@ export const Param = {
       Auth: 'GuestAuthBroker',
       Property: 'GuestPropertyBroker',
       Room: 'GuestRoomBroker',
-      Redis: 'GuestRedisBroker',
+
       chat: 'GuestChatBroker',
       payment: 'GuestPaymentBroker',
       booking: 'GuestBookingBroker'
@@ -53,14 +53,14 @@ export const Param = {
       subscriber: {
         GetAllSubscriber: 'ManagerGetAllSubscriber'
       },
-      redis: {
-        initRedis: 'ManagerInitRedisService'
-      },
+
       chat: {
-        saveChat: 'ManagerSaveChatService'
+        saveChat: 'ManagerSaveChatService',
+        initRedisForChat: 'InitRedisForChat'
       },
       booking: {
         GetBookingListByAdmin: 'ManagerGetBookinListByAdmin',
+        GetAllBookedUser: "ManagerGetAllBookedUser"
       }
     },
     guest: {
@@ -74,11 +74,10 @@ export const Param = {
         GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
         GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
       },
-      redis: {
-        initRedis: 'GuestInitRedisService'
-      },
+
       chat: {
-        saveChat: 'GuestSaveChatService'
+        saveChat: 'GuestSaveChatService',
+        initRedisForChat: 'InitRedisForChat'
       },
       room: {
         GetRoomDetail: 'GuestGetRoomDetail'

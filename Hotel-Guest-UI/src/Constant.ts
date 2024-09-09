@@ -4,7 +4,7 @@ export const baseUrlName: string = "/swiftstay";
 export const descriptionContent =
     "Book the best hotels, resort, appartments and manymore all over India.";
 
-export const SocketIoBaseUrl = 'http://localhost:5001'
+export const ChatSocketIoBaseUrl = 'http://localhost:5001'
 
 export const BackendBaseApi = "http://localhost:8080"; // main api for manager
 
@@ -14,7 +14,7 @@ export const Param = {
         Auth: 'GuestAuthBroker',
         Property: 'GuestPropertyBroker',
         Room: 'GuestRoomBroker',
-        Redis: 'GuestRedisBroker',
+
         chat: 'GuestChatBroker',
         payment: 'GuestPaymentBroker',
         booking: 'GuestBookingBroker'
@@ -31,11 +31,10 @@ export const Param = {
             GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
             GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
         },
-        redis: {
-            initRedis: 'GuestInitRedisService'
-        },
+
         chat: {
-            saveChat: 'GuestSaveChatService'
+            saveChat: 'GuestSaveChatService',
+            initRedisForChat: 'InitRedisForChat'
         },
         room: {
             GetRoomDetail: 'GuestGetRoomDetail'

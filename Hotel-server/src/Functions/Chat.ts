@@ -1,17 +1,25 @@
 import { NextFunction, Request, Response } from 'express';
 import { Cache, GetUserErrorObj, GetUserSuccessObj, HttpStatusCodes, ProjectResponse, UserResponse } from '../common';
 import { CacheKey, Param } from '../Constant';
-import { checkGuestVerification } from '../middleware/GuestVerification';
-import { ChatObj, TParam } from '../types/Type';
-import { enumUserRole } from '../models/UserModel';
 import { checkAdminVerification } from '../middleware/AdiminVerification';
+import { checkGuestVerification } from '../middleware/GuestVerification';
 import { Chat } from '../models/ChatModel';
+import { enumUserRole } from '../models/UserModel';
+import { Redis } from '../service/Redis';
+import { ChatObj, TParam } from '../types/Type';
 
 // guest
 const _GuestSaveChat = Param.function.guest.chat.saveChat;
 
 // Admin
 const _ManagerSaveChat = Param.function.manager.chat.saveChat;
+
+// common
+
+const _InitAdminRedis = Param.function.guest.chat.initRedisForChat;
+const _InitGuestRedis = Param.function.guest.chat.initRedisForChat;
+
+const _Redis = new Redis();
 
 export class ChatFunction {
     private static objUserResponse: UserResponse = new UserResponse();
@@ -30,6 +38,14 @@ export class ChatFunction {
 
             case _ManagerSaveChat:
                 this.objUserResponse = await _Function.SaveChatData();
+                break;
+
+            case _InitGuestRedis:
+                this.objUserResponse = await _Function.InitRedisForChat();
+                break;
+
+            case _InitAdminRedis:
+                this.objUserResponse = await _Function.InitRedisForChat();
                 break;
 
             default:
@@ -93,6 +109,55 @@ class Functions {
                 //clear cache base on chat key
             } else {
                 this.objUserResponse = GetUserErrorObj(verifiyRes.error, HttpStatusCodes.NOT_ACCEPTABLE);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    public InitRedisForChat = async (): Promise<UserResponse> => {
+        try {
+            const { id, role } = this.objParam.data;
+
+            let res = new ProjectResponse();
+
+            if (role === enumUserRole.admin) {
+                res = await checkAdminVerification(id);
+            }
+
+            if (role === enumUserRole.guest) {
+                res = await checkGuestVerification(id);
+            }
+
+            if (res.error === '') {
+
+                _Redis.connect(
+                    (res) => {
+                        this.objUserResponse = GetUserSuccessObj(res, HttpStatusCodes.OK);
+                    },
+                    (err) => {
+                        this.objUserResponse = GetUserErrorObj(err, HttpStatusCodes.NOT_ACCEPTABLE);
+                    }
+                );
+
+                _Redis.subscribeAdminChat((mess) => {
+                    console.log("Admin", mess)
+                }, (err) => {
+                    console.log(err)
+                })
+
+                _Redis.subscribeUserChat((mess) => {
+                    console.log("guest", mess)
+                }, (err) => {
+                    console.log(err)
+                })
+            } else {
+                this.objUserResponse = GetUserErrorObj(
+                    res.error !== '' ? res.error : 'Server error: you are not a valid user.',
+                    HttpStatusCodes.NOT_ACCEPTABLE
+                );
             }
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);

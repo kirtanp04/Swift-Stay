@@ -1,44 +1,57 @@
-import { Api, getGETParamData } from "src/common/ApiCall"
-import { Param } from "src/Constant"
-import { enumUserRole } from "../Authentication/AuthMgr"
+import { Api, getGETParamData } from "src/common/ApiCall";
+import { Param } from "src/Constant";
+import { enumUserRole } from "../Authentication/AuthMgr";
 
 class Sender {
-    _id: string = ''
+    _id: string = "";
 
-    email: string = ''
+    email: string = "";
 
-    name: string = ''
+    name: string = "";
 
-    profileImg: string = ''
+    profileImg: string = "";
 
-    role: enumUserRole = enumUserRole.guest
+    role: enumUserRole = enumUserRole.guest;
 }
 
 export class Chat {
-    message: string = ''
+    _id: string = "";
 
-    date: Date = new Date()
+    message: string = "";
 
-    key: string = ''
+    date: Date = new Date();
 
-    senderDetail: Sender = new Sender()
+    key: string = "";
 
-    static initRedisService = async (guestID: string, role: string, onSuccess: (res: any) => void, onError: (err: any) => void) => {
-        const _Param = getGETParamData(Param.broker.Redis, Param.function.redis.initRedis, { id: guestID, role: role })
+    senderDetail: Sender = new Sender();
 
+    static InitRedis = async (
+        userID: string,
+        role: string,
+        onsuccess: (res: any) => void,
+        onfail: (err: any) => void
+    ) => {
         try {
-            await Api.get(_Param, (res) => {
-
-                if (res.error === '') {
-                    onSuccess(res.data)
-                } else {
-                    onError(res.error)
+            const _Param = getGETParamData(
+                Param.broker.chat,
+                Param.function.chat.initRedisForChat,
+                { id: userID, role: role }
+            );
+            await Api.get(
+                _Param,
+                (res) => {
+                    if (res.error === "") {
+                        onsuccess(res.data);
+                    } else {
+                        onfail(res.error);
+                    }
+                },
+                (progressValue) => {
+                    console.log(progressValue);
                 }
-
-            })
+            );
         } catch (error: any) {
-            onError(error)
+            onfail(error.message);
         }
-    }
+    };
 }
-

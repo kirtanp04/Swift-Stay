@@ -4,6 +4,8 @@ import { StoreError } from "src/util/StoreError"
 import { _Register, enumUserRole } from "../Authentication/AuthMgr"
 
 export class ChatObj {
+
+    _id: string = ''
     message: string = ''
 
     date: Date = new Date()
@@ -49,23 +51,35 @@ export class TSubscriber extends Sender {
 
 export class ChatApi {
 
-    static initRedisService = async (AdminID: string, role: string, onSuccess: (res: any) => void, onError: (err: any) => void) => {
-        const _Param = getGETParamData(Param.broker.manager.Redis, Param.function.manager.redis.initRedis, { id: AdminID, role: role })
-
+    static InitRedis = async (
+        AdminID: string,
+        role: string,
+        onsuccess: (res: any) => void,
+        onfail: (err: any) => void
+    ) => {
         try {
-            await Api.get(_Param, (res) => {
-
-                if (res.error === '') {
-                    onSuccess(res.data)
-                } else {
-                    onError(res.error)
+            const _Param = getGETParamData(
+                Param.broker.manager.chat,
+                Param.function.manager.chat.initRedisForChat,
+                { id: AdminID, role: role }
+            );
+            await Api.protectedGet(
+                _Param,
+                (res) => {
+                    if (res.error === "") {
+                        onsuccess(res.data);
+                    } else {
+                        onfail(res.error);
+                    }
+                },
+                (progressValue) => {
+                    console.log(progressValue);
                 }
-
-            })
+            );
         } catch (error: any) {
-            onError(error)
+            onfail(error.message);
         }
-    }
+    };
 
     static getAllSubscribedUsers = async (
         adminID: string,
@@ -73,7 +87,7 @@ export class ChatApi {
         onFail: (err: any) => void
     ) => {
         try {
-            const _Param = getGETParamData(Param.broker.manager.chat, Param.function.manager.subscriber.GetAllSubscriber,
+            const _Param = getGETParamData(Param.broker.manager.subscriber, Param.function.manager.subscriber.GetAllSubscriber,
                 adminID)
 
             await Api.protectedGet(_Param, (res) => {

@@ -1,8 +1,7 @@
 import Cluster, { Worker } from 'cluster';
 import cpu from 'os';
 import { _Express } from './server';
-import { Room } from './models/RoomModel';
-require('dotenv').config()
+require('dotenv').config();
 
 const _CpuLength: number = cpu.availableParallelism();
 const cluster: typeof Cluster = Cluster;
@@ -23,14 +22,6 @@ if (cluster.isPrimary) {
     });
 } else {
     const _Server = new _Express();
-
-
-
-    _Server.Port = 8080
-
-
-
+    _Server.Port = 8080;
     _Server.listen();
-
-
 }

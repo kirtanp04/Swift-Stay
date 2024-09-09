@@ -2,7 +2,7 @@ import { io, Socket } from "socket.io-client";
 import { Crypt } from "src/common/Crypt";
 import { enumUserRole } from "src/pages/Authentication/AuthMgr";
 import { ChatObj } from "src/pages/Chat/DataObject";
-import { SocketIoBaseUrl, SocketKeyName } from "../Constant";
+import { SocketKeyName } from "../Constant";
 
 export class SocketUserAuth {
     name: string = "";
@@ -12,28 +12,32 @@ export class SocketUserAuth {
 }
 
 export class SocketService {
-    private BackendURL: string = SocketIoBaseUrl;
     private _Socket: Socket | null = null;
 
-
     constructor(
+        sockerUrl: string,
         objUser: SocketUserAuth,
         onMessage: (msg: ChatObj) => void,
         onUserTyping: (data: ChatObj) => void,
         onError: (err: any) => void,
         connectionloading: (value: boolean) => void
     ) {
-
-        this._Socket = this.ConnectToSocket(objUser, connectionloading, onError);
+        // Check if socket is already connected before trying to reconnect
+        // if (!this._Socket || this._Socket.disconnected) {
+        this._Socket = this.ConnectToSocket(sockerUrl, objUser, connectionloading, onError);
         if (this._Socket) {
             this.setupEventListeners();
             this.setupMessageReception(onMessage, onUserTyping, onError);
         } else {
             onError("Failed to connect to socket server.");
         }
+        // } else {
+        //     console.log("Socket is already connected.");
+        // }
     }
 
     private ConnectToSocket = (
+        sockerUrl: string,
         objUser: SocketUserAuth,
         connectionloading: (value: boolean) => void,
         onError: (err: any) => void,
@@ -42,7 +46,7 @@ export class SocketService {
             const encryptedObj = Crypt.Encryption(objUser);
             if (encryptedObj.error === "") {
                 try {
-                    const socket = io(this.BackendURL, {
+                    const socket = io(sockerUrl, {
                         auth: {
                             userInfo: encryptedObj.data,
                         },
@@ -64,22 +68,24 @@ export class SocketService {
     };
 
     private setupConnectionHandlers(socket: Socket, connectionloading: (value: boolean) => void, onError: (err: any) => void) {
-        connectionloading(true)
+        connectionloading(true);
+
         socket.on("connect", () => {
             console.log("Connected to socket server.");
-
-            connectionloading(false)
-
+            connectionloading(false);
         });
 
         socket.on("disconnect", (reason: Socket.DisconnectReason) => {
             console.warn("Disconnected from socket server:", reason);
-            connectionloading(false)
+            if (reason === "io server disconnect") {
+                socket.connect();
+            }
+            connectionloading(false);
         });
 
         socket.on("reconnect_attempt", (attempt) => {
             console.log(`Reconnection attempt ${attempt}`);
-            connectionloading(false)
+            connectionloading(false);
         });
 
         socket.on("reconnect_failed", () => {
@@ -88,7 +94,7 @@ export class SocketService {
         });
 
         socket.on("connect_error", (err: Error) => {
-            onError("Connection error:" + err.message);
+            onError("Connection error: " + err.message);
             this.disconnect();
         });
     }
@@ -139,8 +145,6 @@ export class SocketService {
         this.GetChatMessage(SocketKeyName.ReceiveError, onError, onError);
     };
 
-
-
     public joinRoom = (roomKey: ChatObj, onfail?: (err: any) => void) => {
         if (!this._Socket) {
             onfail?.("Socket is not connected.");
@@ -177,7 +181,6 @@ export class SocketService {
         }
     };
 
-
     public reconnect = () => {
         if (this._Socket && this._Socket.disconnected) {
             console.log("Attempting to reconnect...");
@@ -189,6 +192,12 @@ export class SocketService {
 
     public disconnect() {
         if (this._Socket) {
+            this._Socket.off("roomJoined");
+            this._Socket.off("connect");
+            this._Socket.off("disconnect");
+            this._Socket.off("reconnect_attempt");
+            this._Socket.off("reconnect_failed");
+            this._Socket.off("connect_error");
             this._Socket.disconnect();
             this._Socket = null;
         }
