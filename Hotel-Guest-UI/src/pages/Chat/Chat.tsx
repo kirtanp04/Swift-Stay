@@ -19,6 +19,7 @@ import { SocketService } from "src/service/Socket";
 import showMessage from "src/util/ShowMessage";
 import { enumUserRole } from "../Authentication/AuthMgr";
 import { Chat as TChat } from "./DataObject";
+import { ShowTostMessage } from "src/util/ShowToast";
 
 type Props = {
   open: boolean;
@@ -29,6 +30,7 @@ type Props = {
 
 export default function Chat({ open, property, onClose, propertyID }: Props) {
   const [chatMessages, setChatMessages] = useState<TChat[]>([]);
+  // const [refersh, setRefresh] = useState<boolean>(false);
   const [Message, setMessage] = useState("");
   const theme = useTheme();
   const {
@@ -50,7 +52,6 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
       onUserTyping,
       GetChatError,
       (value) => {
-        console.log(value);
         if (value == false) {
           InitRedis();
         }
@@ -58,23 +59,14 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
     );
   }, []);
 
-  // useEffect(() => {
-  //   const _ChatObj = new TChat();
-  //   _ChatObj.key = propertyID + id;
-  //   _Socket.joinRoom(_ChatObj, (err) => {
-  //     showMessage(err, "error", theme, () => {});
-  //   });
-  // }, [_Socket, propertyID, id]);
-
   const InitRedis = () => {
     TChat.InitRedis(
       id,
       role,
       (res) => {
         if (res) {
+          ShowTostMessage(theme, "success", "Redis", res);
         }
-        // showMessage(res, "success", theme, () => {});
-
         const _ChatObj = new TChat();
         _ChatObj.key = propertyID + id;
         _Socket.joinRoom(_ChatObj, (err) => {

@@ -18,7 +18,6 @@ export class SocketService {
         sockerUrl: string,
         objUser: SocketUserAuth,
         onMessage: (msg: ChatObj) => void,
-        onUserTyping: (data: ChatObj) => void,
         onError: (err: any) => void,
         connectionloading: (value: boolean) => void
     ) {
@@ -27,7 +26,7 @@ export class SocketService {
         this._Socket = this.ConnectToSocket(sockerUrl, objUser, connectionloading, onError);
         if (this._Socket) {
             this.setupEventListeners();
-            this.setupMessageReception(onMessage, onUserTyping, onError);
+            this.setupMessageReception(onMessage, onError);
         } else {
             onError("Failed to connect to socket server.");
         }
@@ -137,11 +136,10 @@ export class SocketService {
 
     private setupMessageReception = (
         onMessage: (msg: ChatObj) => void,
-        onUserTyping: (data: ChatObj) => void,
         onError: (err: any) => void
     ) => {
         this.GetChatMessage(SocketKeyName.ReceiveMessage, onMessage, onError);
-        this.GetChatMessage(SocketKeyName.UserIsTyping, onUserTyping, onError);
+        this.GetChatMessage(SocketKeyName.UserIsTyping, onError);
         this.GetChatMessage(SocketKeyName.ReceiveError, onError, onError);
     };
 

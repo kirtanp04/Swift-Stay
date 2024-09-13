@@ -11,6 +11,7 @@ import CronScheduler from '../service/Cron';
 import { Invoice, TParam } from '../types/Type';
 import moment from 'moment';
 import { checkAdminVerification } from '../middleware/AdiminVerification';
+import mongoose from 'mongoose';
 
 // guest
 const _GuestSaveBookingInfo = Param.function.guest.booking.SaveBookingInfo;
@@ -19,8 +20,9 @@ const _GuestGenerateInvoice = Param.function.guest.booking.generateInvoice;
 const _GuestGetMyBookinglist = Param.function.guest.booking.getMyBookingList;
 
 //Admin
-const _GetAllBookingListByAdmin = Param.function.manager.booking.GetBookingListByAdmin
-const _GetAllBookedUser = Param.function.manager.booking.GetAllBookedUser
+const _GetAllBookingListByAdmin = Param.function.manager.booking.GetBookingListByAdmin;
+const _GetAllChatBookedUser = Param.function.manager.booking.GetAllChatBookedUser;
+const _GetUserBookingDetail = Param.function.manager.booking.GetUserBookingDetail;
 
 export class BookingFunction {
     private static objUserResponse: UserResponse = new UserResponse();
@@ -53,8 +55,12 @@ export class BookingFunction {
                 this.objUserResponse = await _Function.GetManagerBookingList();
                 break;
 
-            case _GetAllBookedUser:
-                this.objUserResponse = await _Function.GetAllBookedUser();
+            case _GetAllChatBookedUser:
+                this.objUserResponse = await _Function.GetAllChatBookedUser();
+                break;
+
+            case _GetUserBookingDetail:
+                this.objUserResponse = await _Function.GetUserBookingDetail();
                 break;
 
             default:
@@ -105,18 +111,16 @@ class Functions {
             ]);
 
             const currentDate = moment();
-            const Emails: string[] = []
+            const Emails: string[] = [];
             allBookings.forEach((objBook) => {
                 const dateDiff = moment(objBook.date, 'DD/MM/YYYY');
 
                 const duration = moment.duration(dateDiff.diff(currentDate));
 
                 if (duration.asDays() === 2) {
-                    Emails.push(objBook.email)
+                    Emails.push(objBook.email);
                 }
-
-            })
-
+            });
 
             //  loop to emails add to que and send email
         } catch (error) { }
@@ -142,12 +146,14 @@ class Functions {
                 UserInfo: objBooking.UserInfo,
                 YourArrivalTime: objBooking.YourArrivalTime,
                 currency: objBooking.currency,
-                adminID: objBooking.adminID
+                adminID: objBooking.adminID,
             });
             await _Booking.save();
 
             if (_Booking) {
                 const BookingListCache = Cache.getCacheData(CacheKey.user.bookingList(objBooking.userID));
+
+                const UserBookingCache = Cache.getCacheData(CacheKey.manager.userbookindetail(objBooking._id));
 
                 const GetCacheData = Cache.getCacheData(CacheKey.manager.Analytics.BookingBase(objBooking.adminID));
 
@@ -161,12 +167,15 @@ class Functions {
                     Cache.ClearCache(CacheKey.manager.Analytics.BookingBase(objBooking.adminID));
                 }
 
+                if (UserBookingCache.error === '') {
+                    Cache.ClearCache(CacheKey.manager.userbookindetail(objBooking._id));
+                }
+
                 if (BookingListCache.error === '') {
                     Cache.ClearCache(CacheKey.user.bookingList(objBooking.userID));
                 }
 
                 const res = this.Scheduler.listJobs();
-
 
                 if (!res.message.includes(this.JobName)) {
                     this.Scheduler.addCronJob(
@@ -176,7 +185,6 @@ class Functions {
                         true
                     );
                 }
-
 
                 this.objUserResponse = GetUserSuccessObj('Success: booking info store in DB', HttpStatusCodes.OK);
             } else {
@@ -340,6 +348,7 @@ class Functions {
                             InvoiceData.RoomInfo.RoomPrice = RoomData.price;
                             InvoiceData.RoomInfo.currency = RoomData.currency;
                             InvoiceData.RoomInfo.RoomType = RoomData.type;
+                            InvoiceData.RoomInfo.RoomNo = RoomData.roomNumber
                         }
 
                         try {
@@ -475,7 +484,8 @@ class Functions {
                                 .fontSize(12)
                                 .fillColor('gray')
                                 .text(`Room Type: ${InvoiceData.RoomInfo.RoomType}`, leftColumnX, yPos)
-                                .text(`Room Price: ${InvoiceData.RoomInfo.RoomPrice}`, leftColumnX, yPos + lineHeight);
+                                .text(`Room Price: ${InvoiceData.RoomInfo.RoomPrice}`, leftColumnX, yPos + lineHeight)
+                                .text(`Room no: ${InvoiceData.RoomInfo.RoomNo}`, leftColumnX, yPos + lineHeight * 2);
                             // .text(`Room Price Currency: ${InvoiceData.RoomInfo.currency}`, leftColumnX, yPos + lineHeight + lineHeight);
 
                             // Footer
@@ -622,40 +632,39 @@ class Functions {
                             $match: {
                                 adminID: adminID,
                             },
-
                         },
                         {
                             $addFields: {
-                                propertyID: { $toObjectId: "$propertyID" },
-                                roomID: { $toObjectId: "$roomID" },
+                                propertyID: { $toObjectId: '$propertyID' },
+                                roomID: { $toObjectId: '$roomID' },
                             },
                         },
                         {
                             $lookup: {
-                                from: "properties",
-                                localField: "propertyID",
-                                foreignField: "_id",
-                                as: "property",
+                                from: 'properties',
+                                localField: 'propertyID',
+                                foreignField: '_id',
+                                as: 'property',
                             },
                         },
 
                         {
                             $lookup: {
-                                from: "rooms",
-                                localField: "roomID",
-                                foreignField: "_id",
-                                as: "room",
+                                from: 'rooms',
+                                localField: 'roomID',
+                                foreignField: '_id',
+                                as: 'room',
                             },
                         },
                         {
                             $unwind: {
-                                path: "$property",
+                                path: '$property',
                                 preserveNullAndEmptyArrays: true,
                             },
                         },
                         {
                             $unwind: {
-                                path: "$room",
+                                path: '$room',
                                 preserveNullAndEmptyArrays: true,
                             },
                         },
@@ -674,14 +683,14 @@ class Functions {
         }
     };
 
-    public GetAllBookedUser = async (): Promise<UserResponse> => {
+    public GetAllChatBookedUser = async (): Promise<UserResponse> => {
         try {
             const adminID = this.objParam.data;
 
             const isAdmin = await checkAdminVerification(adminID);
 
             if (isAdmin.error === '') {
-                const BookingListCache = Cache.getCacheData(CacheKey.manager.bookingList(adminID));
+                const BookingListCache = Cache.getCacheData(CacheKey.manager.chatUserbaseBooking(adminID));
 
                 if (BookingListCache.error === '') {
                     this.objUserResponse = GetUserSuccessObj(BookingListCache.data, HttpStatusCodes.OK);
@@ -691,50 +700,140 @@ class Functions {
                             $match: {
                                 adminID: adminID,
                             },
-
                         },
                         {
                             $addFields: {
-                                propertyID: { $toObjectId: "$propertyID" },
-                                roomID: { $toObjectId: "$roomID" },
+                                userID: { $toObjectId: '$userID' },
+                            },
+                        },
+                        {
+                            $addFields: {
+                                PropertyID: { $toObjectId: '$propertyID' },
                             },
                         },
                         {
                             $lookup: {
-                                from: "properties",
-                                localField: "propertyID",
-                                foreignField: "_id",
-                                as: "property",
+                                from: 'users',
+                                localField: 'userID',
+                                foreignField: '_id',
+                                as: 'user',
                             },
                         },
-
                         {
                             $lookup: {
-                                from: "rooms",
-                                localField: "roomID",
-                                foreignField: "_id",
-                                as: "room",
+                                from: 'properties',
+                                localField: 'PropertyID',
+                                foreignField: '_id',
+                                as: 'property',
                             },
                         },
                         {
                             $unwind: {
-                                path: "$property",
+                                path: '$user',
                                 preserveNullAndEmptyArrays: true,
                             },
                         },
                         {
                             $unwind: {
-                                path: "$room",
+                                path: '$property',
+                                preserveNullAndEmptyArrays: true,
+                            },
+                        },
+                        {
+                            $addFields: {
+                                PropertyName: '$property.name',
+                            },
+                        },
+                        {
+                            $project: {
+                                user: 1,
+                                propertyID: 1,
+                                _id: 1,
+                                adminID: 1,
+                                PropertyName: 1,
+                            },
+                        },
+                    ]);
+
+                    Cache.SetCache(CacheKey.manager.chatUserbaseBooking(adminID), BookingList);
+                    this.objUserResponse = GetUserSuccessObj(BookingList, HttpStatusCodes.OK);
+                }
+            } else {
+                this.objUserResponse = GetUserErrorObj(isAdmin.error, HttpStatusCodes.NOT_ACCEPTABLE);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    public GetUserBookingDetail = async (): Promise<UserResponse> => {
+        try {
+            const { BookingID, adminID } = this.objParam.data;
+
+            const idAdmin = await checkAdminVerification(adminID);
+
+            if (idAdmin.error === '') {
+                const UserBookingCache = Cache.getCacheData(CacheKey.manager.userbookindetail(BookingID));
+
+                if (UserBookingCache.error === '') {
+                    this.objUserResponse = GetUserSuccessObj(UserBookingCache.data, HttpStatusCodes.OK);
+                } else {
+                    const objBooking = await Booking.aggregate([
+                        {
+                            $match: {
+                                $and: [
+                                    {
+                                        adminID: adminID,
+                                    },
+                                    {
+                                        _id: new mongoose.Types.ObjectId(BookingID),
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            $addFields: {
+                                propertyID: { $toObjectId: '$propertyID' },
+                                roomID: { $toObjectId: '$roomID' },
+                            },
+                        },
+                        {
+                            $lookup: {
+                                from: 'properties',
+                                localField: 'propertyID',
+                                foreignField: '_id',
+                                as: 'property',
+                            },
+                        },
+                        {
+                            $lookup: {
+                                from: 'rooms',
+                                localField: 'roomID',
+                                foreignField: '_id',
+                                as: 'room',
+                            },
+                        },
+                        {
+                            $unwind: {
+                                path: '$room',
+                                preserveNullAndEmptyArrays: true,
+                            },
+                        },
+                        {
+                            $unwind: {
+                                path: '$property',
                                 preserveNullAndEmptyArrays: true,
                             },
                         },
                     ]);
 
-                    Cache.SetCache(CacheKey.manager.bookingList(adminID), BookingList);
-                    this.objUserResponse = GetUserSuccessObj(BookingList, HttpStatusCodes.OK);
+                    Cache.SetCache(CacheKey.manager.userbookindetail(BookingID), objBooking[0])
+                    this.objUserResponse = GetUserSuccessObj(objBooking[0], HttpStatusCodes.OK);
                 }
             } else {
-                this.objUserResponse = GetUserErrorObj(isAdmin.error, HttpStatusCodes.NOT_ACCEPTABLE);
+                this.objUserResponse = GetUserErrorObj(idAdmin.error, HttpStatusCodes.NOT_ACCEPTABLE);
             }
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);

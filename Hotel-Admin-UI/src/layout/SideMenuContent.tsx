@@ -133,10 +133,13 @@ export default function SideMenuContent({}: Props) {
         <ScrollBar sx={{ height: "100%", width: "100%" }}>
           <EList>
             {MenuList.map((objListItem, index) => (
-              <NavLink to={objListItem.path} style={{ textDecoration: "none" }}>
+              <NavLink
+                key={index}
+                to={objListItem.path}
+                style={{ textDecoration: "none" }}
+              >
                 {({ isActive }) => (
                   <ListItemWrapper
-                    key={index}
                     sx={{
                       "&:hover": {
                         background: theme.palette.background.neutral,

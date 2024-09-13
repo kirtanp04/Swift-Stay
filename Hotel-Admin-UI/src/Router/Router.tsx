@@ -24,6 +24,9 @@ const PropertyViewer = Loadable(
 const BookingList = Loadable(
   lazy(() => import("src/pages/Booking/BookingList"))
 );
+const BookingDetails = Loadable(
+  lazy(() => import("src/pages/Booking/BookingDetails"))
+);
 const RoomList = Loadable(lazy(() => import("src/pages/room/RoomList")));
 const Dashboard = Loadable(lazy(() => import("src/pages/Dashboard/Dashboard")));
 const Errorlogs = Loadable(lazy(() => import("src/pages/ErrorLogs/Errorlogs")));
@@ -62,7 +65,6 @@ export default function Router() {
             </LoginGaurd>
           ),
         },
-        // { path: "", element: <>About</> },
       ],
     },
 
@@ -94,7 +96,20 @@ export default function Router() {
           ],
         },
         { path: "rooms", element: <RoomList /> },
-        { path: "bookings", element: <BookingList /> },
+        {
+          path: "bookings",
+          element: <Outlet />,
+          children: [
+            {
+              element: <BookingList />,
+              index: true,
+            },
+            {
+              path: ":userName/bookingdetails/:bookingID",
+              element: <BookingDetails />,
+            },
+          ],
+        },
         { path: "reviews", element: <ReviewList /> },
         { path: "errorlogs", element: <Errorlogs /> },
         { path: "chats", element: <ChatViewer /> },

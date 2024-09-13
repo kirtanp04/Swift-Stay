@@ -60,7 +60,8 @@ export const Param = {
       },
       booking: {
         GetBookingListByAdmin: 'ManagerGetBookinListByAdmin',
-        GetAllBookedUser: "ManagerGetAllBookedUser"
+        GetAllChatBookedUser: "ManagerGetAllChatBookedUser",
+        GetUserBookingDetail: 'ManagerGetUserBookingDetail'
       }
     },
     guest: {
@@ -108,6 +109,8 @@ export const CacheKey = {
     review: (emailID: string) => `#@Manager#@${emailID}#@Review#@`,
     subscriber: (emailID: string) => `#@Manager#@${emailID}#@Subscriber#@`,
     bookingList: (adminID: string) => `#@Manager#@${adminID}#@bookingList#@`,
+    userbookindetail: (BookingID: string) => `#@Manager#@${BookingID}#@UserBookingDetail#@`,
+    chatUserbaseBooking: (adminID: string) => `#@Manager#@${adminID}#@chatUserbaseBooking#@`,
     Analytics: {
       BookingBase: (emailID: string) => `#@Manager#@${emailID}#@BookingBase#@`
     }
@@ -185,9 +188,7 @@ export const EmailTemplate = {
             <h1 style="color: #333333;">Welcome Back to Quick Stay!</h1>
             <p style="color: #666666; line-height: 1.5;">Hi ${UserName},</p>
             <p style="color: #666666; line-height: 1.5;">We're excited to see you again! Thank you for logging in. We hope you have a great experience with Quick Stay.</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <a href="https://your-website-url.com" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; font-size: 16px;">Explore Now</a>
-            </div>
+           
             <p style="color: #666666; line-height: 1.5;">If you have any questions or need assistance, feel free to reach out to our support team.</p>
             <p style="color: #666666; line-height: 1.5;">Happy browsing,<br>Quick Stay Team</p>
         </div>

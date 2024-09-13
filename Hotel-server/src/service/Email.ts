@@ -51,8 +51,9 @@ export class Email {
 
   public async sendEmail(onsuccess: () => void, callback: (err: string) => void) {
     try {
+
       const info = await this.transporter.sendMail({
-        from: this.from,
+        from: '"' + 'Swift Stay' + '"' + '<' + this.EMAIL_AUTH_USER + '>',
         to: this.to,
         subject: this.subject,
         text: this.text,

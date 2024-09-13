@@ -70,6 +70,8 @@ export const Param = {
             },
             booking: {
                 GetBookingListByAdmin: 'ManagerGetBookinListByAdmin',
+                GetAllChatBookedUser: "ManagerGetAllChatBookedUser",
+                GetUserBookingDetail: 'ManagerGetUserBookingDetail'
             }
         },
         guest: {

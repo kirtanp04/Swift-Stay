@@ -310,7 +310,7 @@ class Functions {
                                 if (setCookie.error === '') {
                                     let _Email = new Email({ next: this.next! });
 
-                                    _Email.from = 'kirtanpatel6189@gmail.com';
+                                    _Email.from = 'Swift Stay';
                                     _Email.to = email;
                                     _Email.subject = 'login Activity';
                                     _Email.html = EmailTemplate.LogedIn(isUser.name);

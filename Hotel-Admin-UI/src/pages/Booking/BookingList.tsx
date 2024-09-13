@@ -1,6 +1,6 @@
 import { Box, Button, Chip, styled, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
-import { RefreshIcon } from "src/assets/iconify";
+import { PreviewIcon, RefreshIcon } from "src/assets/iconify";
 import GridHeader from "src/components/GridHeader";
 import { MUIDataGrid } from "src/components/mui/MUIDataGrid";
 import Page from "src/components/Page";
@@ -9,10 +9,13 @@ import { BookingClass, enumBookingStatus, PaymentStatus } from "./Dataobject";
 import showMessage from "src/util/ShowMessage";
 import { enumRoomType } from "../room/DataObject";
 import showLoading from "src/util/ShowLoading";
+import { useNavigate } from "react-router-dom";
+import { Path } from "src/Router/path";
 
 export default function BookingList() {
   const [BookingList, setBookingList] = useState<BookingClass[]>([]);
   const theme = useTheme();
+  const navigate = useNavigate();
   const {
     user: {
       userInfo: { id },
@@ -216,6 +219,29 @@ export default function BookingList() {
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Text>{param.row.BookingDate}</Text>
+                </TextWrapper>
+              ),
+            },
+
+            {
+              field: "",
+              headerName: "",
+              width: 40,
+              renderCell: (param: any) => (
+                <TextWrapper sx={{ justifyContent: "space-around !important" }}>
+                  <PreviewIcon
+                    height={20}
+                    width={20}
+                    IconColor={theme.palette.color.info.main}
+                    onClick={() =>
+                      navigate(
+                        Path.booking.BookingDetails(
+                          param.row.UserInfo.name,
+                          param.row._id
+                        )
+                      )
+                    }
+                  />
                 </TextWrapper>
               ),
             },

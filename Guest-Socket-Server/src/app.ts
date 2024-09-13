@@ -44,17 +44,17 @@ export const runChat = async () => {
     Socket.getChatMessage(
         SocketKeyName.SendMessage,
         async (res: any) => {
+            Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, res);
 
-
-            await _Redis.publish(
-                res,
-                () => {
-                    Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, res);
-                },
-                (err) => {
-                    Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
-                }
-            );
+            // await _Redis.publish(
+            //     res,
+            //     () => {
+            //         Socket.SendChatMessageInRoom(SocketKeyName.ReceiveMessage, res);
+            //     },
+            //     (err) => {
+            //         Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
+            //     }
+            // );
         },
         (err: any) => {
             Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);

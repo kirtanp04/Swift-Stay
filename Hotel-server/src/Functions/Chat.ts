@@ -132,27 +132,31 @@ class Functions {
             }
 
             if (res.error === '') {
+                const Redisres = await _Redis.connect();
 
-                _Redis.connect(
-                    (res) => {
-                        this.objUserResponse = GetUserSuccessObj(res, HttpStatusCodes.OK);
+                _Redis.subscribeAdminChat(
+                    (mess) => {
+                        console.log('Admin', mess);
                     },
                     (err) => {
-                        this.objUserResponse = GetUserErrorObj(err, HttpStatusCodes.NOT_ACCEPTABLE);
+                        console.log(err);
                     }
                 );
 
-                _Redis.subscribeAdminChat((mess) => {
-                    console.log("Admin", mess)
-                }, (err) => {
-                    console.log(err)
-                })
+                _Redis.subscribeUserChat(
+                    (mess) => {
+                        console.log('guest', mess);
+                    },
+                    (err) => {
+                        console.log(err);
+                    }
+                );
 
-                _Redis.subscribeUserChat((mess) => {
-                    console.log("guest", mess)
-                }, (err) => {
-                    console.log(err)
-                })
+                if (Redisres.error === '') {
+                    this.objUserResponse = GetUserSuccessObj(Redisres.data, HttpStatusCodes.OK);
+                } else {
+                    this.objUserResponse = GetUserErrorObj(Redisres.error, HttpStatusCodes.NOT_ACCEPTABLE);
+                }
             } else {
                 this.objUserResponse = GetUserErrorObj(
                     res.error !== '' ? res.error : 'Server error: you are not a valid user.',

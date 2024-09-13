@@ -118,6 +118,8 @@ class InvoiceRoom {
     RoomPrice: number = 0
 
     currency: string = ''
+
+    RoomNo: number = 0
 }
 
 

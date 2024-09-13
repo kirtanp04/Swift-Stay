@@ -1,6 +1,6 @@
 import { Box, styled, Typography, useTheme } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
-import { SendMessageIcon } from "src/assets/iconify";
+import { HotelIcon, SendMessageIcon } from "src/assets/iconify";
 import MUIAvatar from "src/components/mui/MUIAvatar";
 import Page from "src/components/Page";
 import Scrollbar from "src/components/Scrollbar";
@@ -9,17 +9,14 @@ import useAuth from "src/hooks/useAuth";
 import { SocketService } from "src/service/Socket";
 import showMessage from "src/util/ShowMessage";
 import { enumUserRole } from "../Authentication/AuthMgr";
-import { ChatApi, ChatObj, SubscriberClass, TSubscriber } from "./DataObject";
+import { ChatApi, ChatObj, ChatUser } from "./DataObject";
 
 export default function ChatViewer() {
   const [Message, setMessage] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatObj[]>([]);
+  const [Users, setUsers] = useState<ChatUser[]>([]);
+  const [SelectedUser, setSelectedUser] = useState<ChatUser>(new ChatUser());
 
-  const [ShowTypingLoading, setShowTypingLoading] = useState<boolean>(false);
-  const [Subscribers, setSubscriberList] = useState<SubscriberClass[]>([]);
-  const [SelectedSubscriber, setSelectedSubscriber] = useState<TSubscriber>(
-    new TSubscriber()
-  );
   const {
     user: {
       userInfo: { email, name, id, role },
@@ -37,7 +34,7 @@ export default function ChatViewer() {
         role: role as any,
       },
       GetChatMessage,
-      onUserTyping,
+
       GetChatError,
       (value) => {
         if (value == false) {
@@ -48,10 +45,10 @@ export default function ChatViewer() {
   }, []);
 
   useEffect(() => {
-    ChatApi.getAllSubscribedUsers(
+    ChatApi.GetAllChatBookedUser(
       id,
       (res) => {
-        setSubscriberList(res);
+        setUsers(res);
       },
       (err) => {
         showMessage(err, theme, () => {});
@@ -64,6 +61,7 @@ export default function ChatViewer() {
       id,
       role,
       (res) => {
+        // alert('init redis')
         showMessage(res, theme, () => {});
       },
 
@@ -76,7 +74,7 @@ export default function ChatViewer() {
   const GetChatObj = (message: string): ChatObj => {
     const _ChatObj = new ChatObj();
     _ChatObj.date = new Date();
-    _ChatObj.key = SelectedSubscriber.chatKey;
+    _ChatObj.key = SelectedUser.propertyID + SelectedUser.user._id;
     _ChatObj.message = message;
     _ChatObj.senderDetail = {
       _id: id,
@@ -92,21 +90,12 @@ export default function ChatViewer() {
   function GetChatMessage(msg: ChatObj) {
     let newChatObj = new ChatObj();
     newChatObj = { ...msg, date: msg.date };
-    console.log(msg);
+
     setChatMessages((prevMessages) => [...prevMessages, newChatObj]);
-    setShowTypingLoading(false);
   }
 
   function GetChatError(err: string) {
     showMessage(err, theme, () => {});
-  }
-
-  function onUserTyping(msg: ChatObj) {
-    if (!ShowTypingLoading) {
-      setShowTypingLoading(true);
-    }
-    if (msg) {
-    }
   }
 
   const SendMessage = () => {
@@ -130,10 +119,10 @@ export default function ChatViewer() {
     setMessage(value);
   };
 
-  const OnSelectSubscriber = (subscriber: TSubscriber) => {
-    setSelectedSubscriber(subscriber);
+  const OnSelectSubscriber = (objUser: ChatUser) => {
+    setSelectedUser(objUser);
     const _ChatObj = new ChatObj();
-    _ChatObj.key = subscriber.chatKey;
+    _ChatObj.key = objUser.propertyID + objUser.user._id;
     _Socket.joinRoom(_ChatObj);
   };
 
@@ -142,33 +131,27 @@ export default function ChatViewer() {
       <RootStyle>
         <SubscriberListWrapper>
           <SubscriberListHeaderWrapper>
-            <SubscriberListHeader>Subscribers</SubscriberListHeader>
+            <SubscriberListHeader>Users</SubscriberListHeader>
           </SubscriberListHeaderWrapper>
           <SubscriberList>
             <Scrollbar sx={{ height: "100%" }}>
-              {Subscribers.map((objSub) =>
-                objSub.subscribers.map((objUser) => (
-                  <SubscriberDetailWrapper
-                    key={objUser._id}
-                    onClick={() =>
-                      OnSelectSubscriber({
-                        email: objUser.email,
-                        name: objUser.name,
-                        profileImg: objUser.profileImg,
-                        _id: objUser._id!,
-                        chatKey: objSub.property + objUser._id,
-                        role: role as enumUserRole,
-                      })
-                    }
-                  >
-                    <MUIAvatar name={objUser.name} />
-                    <UserContentWrapper>
-                      <UserNameText>{objUser.name}</UserNameText>
-                      <UserEmailText>{objUser.email}</UserEmailText>
-                    </UserContentWrapper>
-                  </SubscriberDetailWrapper>
-                ))
-              )}
+              {Users.map((objUser) => (
+                <SubscriberDetailWrapper
+                  key={objUser._id}
+                  onClick={() => OnSelectSubscriber(objUser)}
+                >
+                  <MUIAvatar name={objUser.user.name} />
+                  <UserContentWrapper>
+                    <UserNameText>{objUser.user.name}</UserNameText>
+                    <UserEmailText>
+                      <span style={{ marginRight: "5px" }}>
+                        <HotelIcon height={15} width={15} />
+                      </span>
+                      {objUser.PropertyName}
+                    </UserEmailText>
+                  </UserContentWrapper>
+                </SubscriberDetailWrapper>
+              ))}
             </Scrollbar>
           </SubscriberList>
         </SubscriberListWrapper>
@@ -176,20 +159,25 @@ export default function ChatViewer() {
         <MessageContentWrapper>
           <MessageListWrapper>
             <MessageContentHeader>
-              {SelectedSubscriber.profileImg !== "" ? (
+              {SelectedUser.user.profileImg !== "" ? (
                 <MUIAvatar
                   sx={{ height: 30, width: 30 }}
-                  name={SelectedSubscriber.name}
-                  src={SelectedSubscriber.profileImg}
+                  name={SelectedUser.user.name}
+                  src={SelectedUser.user.profileImg}
                 />
               ) : (
                 <MUIAvatar
                   sx={{ height: 30, width: 30 }}
-                  name={SelectedSubscriber.name}
+                  name={SelectedUser.user.name}
                 />
               )}
               <SubscriberListHeader>
-                {SelectedSubscriber?.name}
+                {SelectedUser.user?.name}
+              </SubscriberListHeader>
+              <SubscriberListHeader
+                sx={{ marginLeft: "auto", color: theme.themeColor }}
+              >
+                {SelectedUser.PropertyName}
               </SubscriberListHeader>
             </MessageContentHeader>
             <Scrollbar>
@@ -229,19 +217,6 @@ export default function ChatViewer() {
                     <MessageDate>{objChat.date as any}</MessageDate>
                   </MessageTextWrapper>
                 ))}
-                {ShowTypingLoading && (
-                  <MessageTextWrapper
-                    sx={{
-                      backgroundColor: theme.palette.grey[50012],
-                    }}
-                  >
-                    <MUIAvatar
-                      name={SelectedSubscriber.name}
-                      src={SelectedSubscriber.profileImg}
-                    />
-                    <MessageText>Typing....</MessageText>
-                  </MessageTextWrapper>
-                )}
               </div>
             </Scrollbar>
           </MessageListWrapper>
@@ -410,6 +385,7 @@ const SubscriberDetailWrapper = styled(Box)(({ theme }) => ({
 const UserContentWrapper = styled(Box)(() => ({
   display: "flex",
   flexDirection: "column",
+  gap: "5px",
 }));
 
 const UserNameText = styled(Typography)(({ theme }) => ({
@@ -422,4 +398,6 @@ const UserEmailText = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary,
   fontSize: "0.85rem",
   textAlign: "left",
+  display: "flex",
+  alignItems: "center",
 }));

@@ -1,5 +1,5 @@
 import { createClient, RedisClientType } from 'redis';
-import { Crypt } from '../common';
+import { Crypt, ProjectResponse } from '../common';
 import { SecrtKey } from '../env';
 import { ChatObj } from '../types/Type';
 
@@ -62,24 +62,23 @@ export class Redis {
         });
     }
 
-    async connect(onSuccess: (res: any) => void, onfail: (err: any) => void): Promise<void> {
-        if (this.redisClient.isOpen) {
-            console.log('Redis Already opened');
-            return;
-        }
-
+    async connect(): Promise<ProjectResponse> {
+        const res = new ProjectResponse();
         try {
-            if (!this.isConnected) {
+            if (!this.isConnected && !this.redisClient.isOpen) {
                 await Promise.all([this.redisClient.connect(), this.publisher.connect(), this.subscriber.connect()]);
                 this.isConnected = true;
-                onSuccess('redis is connected successfully');
+                res.data = 'Redis is connected successfully';
+                res.error = '';
             } else {
-                console.log('Redis client is already connected.');
-                onfail('Redis client is already connected.');
+                res.data = 'Redis is already connected';
+                res.error = '';
             }
         } catch (error: any) {
-            console.log('Redis Error:' + error.message);
-            onfail('Redis Error:' + error.message);
+            res.data = '';
+            res.error = 'Redis Error:' + error.message;
+        } finally {
+            return res;
         }
     }
 

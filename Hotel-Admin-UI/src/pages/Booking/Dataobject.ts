@@ -91,6 +91,37 @@ export class BookingClass {
             onFail(error.message);
         }
     };
+
+    static getUserBookinDetail = async (
+        bookingID: string,
+        adminID: string,
+        onsuccess: (res: any) => void,
+        onFail: (err: any) => void,
+    ) => {
+        try {
+            const _Param = getGETParamData(
+                Param.broker.manager.booking,
+                Param.function.manager.booking.GetUserBookingDetail,
+                { adminID: adminID, BookingID: bookingID }
+            );
+
+            await Api.protectedGet(
+                _Param,
+                (res) => {
+                    if (res.error === "") {
+                        onsuccess(res.data);
+                    } else {
+                        StoreError("Getting All bookings", res.error);
+                        onFail(res.error);
+                    }
+                },
+
+            );
+        } catch (error: any) {
+            StoreError("Getting All bookings", error.message);
+            onFail(error.message);
+        }
+    };
 }
 
 class StayInfo {
