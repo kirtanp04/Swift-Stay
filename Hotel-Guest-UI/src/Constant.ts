@@ -41,7 +41,8 @@ export const Param = {
         },
         payment: {
             CheckOut: 'GuestCheckOut',
-            WebHook: 'GuestWebhook'
+            WebHook: 'GuestWebhook',
+            UPIPayment: "GuestUPIMethod",
         },
         booking: {
             SaveBookingInfo: 'GuestSaveBookingInfo',

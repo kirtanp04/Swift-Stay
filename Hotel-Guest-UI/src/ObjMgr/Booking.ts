@@ -62,6 +62,28 @@ export class Booking {
         }
     };
 
+    static UPIPayment = async (
+        objBooking: Booking,
+        onsuccess: (res: any) => void,
+        onfail: (err: any) => void
+    ) => {
+        try {
+            const _Param = getPostParamData(
+                Param.broker.payment,
+                Param.function.payment.UPIPayment
+            );
+            await Api.protectedPost(_Param, objBooking, (res) => {
+                if (res.error === "") {
+                    onsuccess(res.data);
+                } else {
+                    onfail(res.error);
+                }
+            });
+        } catch (error: any) {
+            onfail(error.message);
+        }
+    };
+
     static GetAllBookingList = async (
         userID: string,
         onsuccess: (res: any) => void,

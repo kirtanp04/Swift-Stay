@@ -8,7 +8,6 @@ interface TConstructor {
   ID?: string;
   EMAIL_AUTH_USER?: string;
   EMAIL_AUTH_PASS?: string;
-  next: NextFunction;
 }
 
 export class Email {
@@ -17,7 +16,6 @@ export class Email {
   private ID: string;
   private host: string;
   private port: number;
-  private next: NextFunction | null;
   private transporter: nodemailer.Transporter;
 
   public from: string = '';
@@ -26,11 +24,10 @@ export class Email {
   public html: string = '';
   public text: string = '';
 
-  constructor({ EMAIL_AUTH_USER, EMAIL_AUTH_PASS, ID, next }: TConstructor) {
+  constructor({ EMAIL_AUTH_USER, EMAIL_AUTH_PASS, ID }: TConstructor) {
     this.EMAIL_AUTH_USER = EMAIL_AUTH_USER || SecrtKey.NODEMAILER.EMAIL_AUTH_USER!;
     this.EMAIL_AUTH_PASS = EMAIL_AUTH_PASS || SecrtKey.NODEMAILER.EMAIL_AUTH_PASS!;
     this.ID = ID || '';
-    this.next = next;
     this.host = SecrtKey.NODEMAILER.EMAIL_HOST!;
     this.port = 587;
     this.transporter = this.createTransport();

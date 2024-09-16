@@ -12,6 +12,12 @@ import {
 import { BarChart, PieChart } from "@mui/x-charts";
 import { Country, ICountry } from "country-state-city";
 import { useCallback, useEffect, useState } from "react";
+import {
+  HorizontalMenuIcon,
+  HotelIcon,
+  ProfitDecreaseIcon,
+  ProfitIncreaseIcon,
+} from "src/assets/iconify";
 import { MUIMenu } from "src/components/mui/MUIMenu";
 import Page from "src/components/Page";
 import Scrollbar from "src/components/Scrollbar";
@@ -19,7 +25,12 @@ import useAuth from "src/hooks/useAuth";
 import getFlagClassName from "src/util/getCountryFlagUrl";
 import showLoading from "src/util/ShowLoading";
 import showMessage from "src/util/ShowMessage";
-import { Analytic, AnalyticlsImgs, TAllPropertyByState } from "./DataObject";
+import {
+  Analytic,
+  AnalyticlsImgs,
+  TAllPropertyByState,
+  TPropertyProfitByMonth,
+} from "./DataObject";
 import "/node_modules/flag-icons/css/flag-icons.min.css";
 
 export default function Dashboard() {
@@ -27,6 +38,9 @@ export default function Dashboard() {
   const [propertListbyState, setPropertyListbyState] = useState<
     TAllPropertyByState[]
   >([]);
+  const [PropertyProfit, setPropertProfit] = useState<TPropertyProfitByMonth[]>(
+    []
+  );
   const [countryList, setCountryList] = useState<ICountry[]>([]);
   const [anchorPointPropertyByState, setAnchorPointPropertyByState] =
     useState<null | HTMLElement>(null);
@@ -46,10 +60,15 @@ export default function Dashboard() {
     loadAnalyticdata();
 
     async function loadAnalyticdata() {
-      await Promise.all([GetOverviewMetrics(), GetPropertyByState(country)])
+      await Promise.all([
+        GetOverviewMetrics(),
+        GetPropertyByState(country),
+        GetPropertyProfitByMonth(2024),
+      ])
         .then((res) => {
           setOverviewMatrix(res[0]);
           setPropertyListbyState(res[1]);
+          setPropertProfit(res[2]);
         })
         .catch((err) => {
           showMessage(err, theme, () => {});
@@ -87,13 +106,37 @@ export default function Dashboard() {
 
   const GetPropertyByState = useCallback(
     async (countryname: string): Promise<TAllPropertyByState[]> => {
-      debugger;
       const res: TAllPropertyByState[] = await new Promise(
         async (resolve, reject) => {
           try {
             await Analytic.GetPropertyByState(
               id,
               countryname,
+              (obj: any) => {
+                resolve(obj);
+              },
+              (err) => {
+                reject(err);
+              }
+            );
+          } catch (error: any) {
+            reject(error.message);
+          }
+        }
+      );
+      return res;
+    },
+    []
+  );
+
+  const GetPropertyProfitByMonth = useCallback(
+    async (year: number): Promise<TPropertyProfitByMonth[]> => {
+      const res: TPropertyProfitByMonth[] = await new Promise(
+        async (resolve, reject) => {
+          try {
+            await Analytic.GetPropertyProfitByMonth(
+              id,
+              year,
               (obj: any) => {
                 resolve(obj);
               },
@@ -272,11 +315,13 @@ export default function Dashboard() {
                 >
                   <FlextAlignCenter sx={{ justifyContent: "space-between" }}>
                     <Header>Bookings per Month</Header>
-                    {AnalyticData.BookingAnalytics.length > 0 && (
-                      <Header sx={{ color: theme.palette.color.info.darker }}>
-                        {AnalyticData.BookingAnalytics[0].year}
-                      </Header>
-                    )}
+                    <CountryWrapper>
+                      {AnalyticData.BookingAnalytics.length > 0 && (
+                        <Text sx={{ color: theme.palette.color.info.darker }}>
+                          {AnalyticData.BookingAnalytics[0].year}
+                        </Text>
+                      )}
+                    </CountryWrapper>
                   </FlextAlignCenter>
 
                   <BarChart
@@ -311,13 +356,15 @@ export default function Dashboard() {
                 >
                   <FlextAlignCenter sx={{ justifyContent: "space-between" }}>
                     <Header>Revenue Generated per month</Header>
-                    {AnalyticData.RevenueAnalytics.length > 0 && (
-                      <Header
-                        sx={{ color: theme.palette.color.success.darker }}
-                      >
-                        {AnalyticData.RevenueAnalytics[0].year}
-                      </Header>
-                    )}
+                    <CountryWrapper>
+                      {AnalyticData.RevenueAnalytics.length > 0 && (
+                        <Text
+                          sx={{ color: theme.palette.color.success.darker }}
+                        >
+                          {AnalyticData.RevenueAnalytics[0].year}
+                        </Text>
+                      )}
+                    </CountryWrapper>
                   </FlextAlignCenter>
 
                   <BarChart
@@ -348,8 +395,8 @@ export default function Dashboard() {
 
               {/* ---------------------------- row 3------------------------------------------------ */}
 
-              {/* AllPropertyWithAvgReview */}
-              <Grid item xs={12} xl={12} md={6}>
+              {/* PropertyProfitByMonth */}
+              <Grid item xs={12} xl={12} md={12}>
                 <OverViewCard
                   sx={{
                     color: theme.palette.primary.main,
@@ -357,30 +404,140 @@ export default function Dashboard() {
                   }}
                 >
                   <FlextAlignCenter sx={{ justifyContent: "space-between" }}>
-                    <Header>Properties with Avg Ratings</Header>
+                    <Header>Property Profit per Month</Header>
+                    <CountryWrapper>
+                      <Text sx={{ color: theme.palette.color.warning.main }}>
+                        2024
+                      </Text>
+                    </CountryWrapper>
                   </FlextAlignCenter>
 
-                  <BarChart
-                    dataset={AnalyticData.AllPropertyWithAvgReview as any}
-                    sx={{ width: "100%" }}
-                    height={300}
-                    series={[
-                      {
-                        data: AnalyticData.AllPropertyWithAvgReview.map(
-                          (objBook) => objBook.AvgReview
-                        ),
-                        color: theme.palette.color.purple.lighter,
-                      },
-                    ]}
-                    xAxis={[
-                      {
-                        scaleType: "band",
-                        dataKey: "propertyName",
-                      },
-                    ]}
-                  />
+                  <PropertyProfitWrapper>
+                    <Grid container gap={1} width={"100%"}>
+                      <Scrollbar sx={{ height: "100%", width: "100%" }}>
+                        {PropertyProfit.length > 0 ? (
+                          PropertyProfit.map((objProp) => (
+                            <Grid
+                              item
+                              xs={12}
+                              xl={12}
+                              md={3}
+                              key={objProp.propertyID}
+                              marginTop={"10px"}
+                            >
+                              <OverViewCard
+                                sx={{
+                                  color: theme.palette.primary.main,
+                                  border: `1px solid ${theme.palette.border}`,
+                                  padding: "15px",
+                                  backgroundColor:
+                                    theme.palette.background.neutral,
+                                }}
+                              >
+                                <FlextAlignCenter
+                                  sx={{ justifyContent: "space-between" }}
+                                >
+                                  <Header
+                                    sx={{
+                                      fontSize: "0.9rem",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "5px",
+                                    }}
+                                  >
+                                    <HotelIcon
+                                      IconColor={
+                                        theme.palette.color.warning.lighter
+                                      }
+                                    />
+
+                                    {objProp.propertyName}
+                                  </Header>
+
+                                  <Header
+                                    sx={{
+                                      fontSize: "0.9rem",
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: "5px",
+                                      color: `${
+                                        objProp.profitChanges[0].status ===
+                                        "Increase"
+                                          ? theme.palette.color.success.main
+                                          : objProp.profitChanges[0].status ===
+                                            "Decrease"
+                                          ? theme.palette.color.error.main
+                                          : objProp.profitChanges[0].status ===
+                                            "Neutral"
+                                          ? theme.palette.color.warning.main
+                                          : ""
+                                      }`,
+                                    }}
+                                  >
+                                    {"% " +
+                                      Math.round(
+                                        Math.ceil(
+                                          objProp.profitChanges[0].profitChange
+                                        )
+                                      )}
+                                    {objProp.profitChanges[0].status ===
+                                      "Increase" && (
+                                      <ProfitIncreaseIcon
+                                        IconColor={
+                                          theme.palette.color.success.main
+                                        }
+                                      />
+                                    )}
+                                    {objProp.profitChanges[0].status ===
+                                      "Decrease" && (
+                                      <ProfitDecreaseIcon
+                                        IconColor={
+                                          theme.palette.color.error.main
+                                        }
+                                      />
+                                    )}
+                                    {objProp.profitChanges[0].status ===
+                                      "Neutral" && (
+                                      <HorizontalMenuIcon
+                                        IconColor={
+                                          theme.palette.color.warning.main
+                                        }
+                                      />
+                                    )}
+                                  </Header>
+                                </FlextAlignCenter>
+
+                                <PropertyMonthsWrapper>
+                                  {objProp.months.map((objMonth) => (
+                                    <PropertyMonthsCard key={objMonth.month}>
+                                      <Text sx={{ textAlign: "center" }}>
+                                        {objMonth.monthName}
+                                      </Text>
+                                      <Text
+                                        sx={{
+                                          textAlign: "center",
+                                          color:
+                                            theme.palette.color.warning.main,
+                                        }}
+                                      >
+                                        {objMonth.currency} {objMonth.totalPay}
+                                      </Text>
+                                    </PropertyMonthsCard>
+                                  ))}
+                                </PropertyMonthsWrapper>
+                              </OverViewCard>
+                            </Grid>
+                          ))
+                        ) : (
+                          <Text>No Booking done of a single property.</Text>
+                        )}
+                      </Scrollbar>
+                    </Grid>
+                  </PropertyProfitWrapper>
                 </OverViewCard>
               </Grid>
+
+              {/* ---------------------------- row 4------------------------------------------------ */}
 
               {/* TopPropertiesByBooking */}
               <Grid item xs={12} xl={5} md={6}>
@@ -436,7 +593,9 @@ export default function Dashboard() {
                           SelectedCountry.split("-")[1] as any
                         )}
                       />
-                      <Text>{SelectedCountry.split("-")[0]}</Text>
+                      <Text sx={{ color: theme.palette.color.rose.lighter }}>
+                        {SelectedCountry.split("-")[0]}
+                      </Text>
                     </CountryWrapper>
                   </FlextAlignCenter>
 
@@ -456,6 +615,41 @@ export default function Dashboard() {
                       {
                         scaleType: "band",
                         dataKey: "state",
+                      },
+                    ]}
+                  />
+                </OverViewCard>
+              </Grid>
+
+              {/* ---------------------------- row 4------------------------------------------------ */}
+              {/* AllPropertyWithAvgReview */}
+              <Grid item xs={12} xl={12} md={6}>
+                <OverViewCard
+                  sx={{
+                    color: theme.palette.primary.main,
+                    border: `1px solid ${theme.palette.border}`,
+                  }}
+                >
+                  <FlextAlignCenter sx={{ justifyContent: "space-between" }}>
+                    <Header>Properties with Avg Ratings</Header>
+                  </FlextAlignCenter>
+
+                  <BarChart
+                    dataset={AnalyticData.AllPropertyWithAvgReview as any}
+                    sx={{ width: "100%" }}
+                    height={300}
+                    series={[
+                      {
+                        data: AnalyticData.AllPropertyWithAvgReview.map(
+                          (objBook) => objBook.AvgReview
+                        ),
+                        color: theme.palette.color.purple.lighter,
+                      },
+                    ]}
+                    xAxis={[
+                      {
+                        scaleType: "band",
+                        dataKey: "propertyName",
                       },
                     ]}
                   />
@@ -532,13 +726,13 @@ const OverViewCard = styled(Box)(() => ({
   padding: "24px",
   overflow: "hidden",
   borderRadius: "10px",
-  justifyContent: "center",
+  // justifyContent: "center",
 }));
 
 const FlextAlignCenter = styled(Box)(() => ({
   width: "100%",
   display: "flex",
-  alignItems: "center",
+  // alignItems: "center",
   gap: "10px",
 }));
 
@@ -601,4 +795,33 @@ const MenuItemWrapper = styled(Box)(() => ({
   width: "100%",
   alignItems: "center",
   // gap: "10px",
+}));
+
+const PropertyProfitWrapper = styled(Box)(() => ({
+  maxHeight: 500,
+  height: "auto",
+  width: "100%",
+  display: "flex",
+}));
+
+const PropertyMonthsWrapper = styled(Box)(() => ({
+  width: "100%",
+  display: "flex",
+  flexWrap: "wrap",
+  flexShrink: "initial",
+  gap: "10px",
+}));
+
+const PropertyMonthsCard = styled(Box)(({ theme }) => ({
+  width: 120,
+  height: 80,
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.5rem",
+  padding: "10px",
+  overflow: "hidden",
+  borderRadius: "10px",
+  border: `1px solid ${theme.palette.border}`,
+  backgroundColor: theme.palette.background.default,
+  // justifyContent: "center",
 }));

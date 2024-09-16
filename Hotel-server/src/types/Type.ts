@@ -154,6 +154,11 @@ export class Analytic {
 }
 
 
+
+
+
+
+
 export interface TTotalpropertyAndRoom {
     property: number
     room: number

@@ -42,7 +42,8 @@ export const Param = {
             EmailVerification: 'ManagerEmailVerification',
             analytics: {
                 GetOverviewMetrics: 'ManagerGetOverviewMetrics',
-                PropertybyStates: 'ManagerPropertybyStates'
+                PropertybyStates: 'ManagerPropertybyStates',
+                GetPropertyProfitByMonth: 'ManagerGetPropertyProfitByMonth'
             },
             Property: {
                 AddProperty: 'ManagerAddProperty',

@@ -18,6 +18,7 @@ import { Review } from '../models/Review';
 // Admin
 const _ManagerGetOverviewMetrics = Param.function.manager.analytics.GetOverviewMetrics;
 const _ManagerPropertyByStates = Param.function.manager.analytics.PropertybyStates;
+const _ManagerGetPropertyProfitByMonth = Param.function.manager.analytics.GetPropertyProfitByMonth;
 
 export class AnalyticFunction {
     private static objUserResponse: UserResponse = new UserResponse();
@@ -36,6 +37,10 @@ export class AnalyticFunction {
 
             case _ManagerPropertyByStates:
                 this.objUserResponse = await _Function.getPropertyByState();
+                break;
+
+            case _ManagerGetPropertyProfitByMonth:
+                this.objUserResponse = await _Function.GetPropertyProfitByMonth();
                 break;
 
             default:
@@ -635,6 +640,196 @@ class Functions {
                         .catch((err) => {
                             this.objUserResponse = GetUserErrorObj(checkUser.error, HttpStatusCodes.BAD_REQUEST);
                         });
+                }
+            } else {
+                this.objUserResponse = GetUserErrorObj(checkUser.error, HttpStatusCodes.NOT_ACCEPTABLE);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+    public GetPropertyProfitByMonth = async (): Promise<UserResponse> => {
+        try {
+            const { adminID: adminID, year: year } = this.objParam.data;
+
+            const checkUser = await checkAdminVerification(adminID);
+            if (checkUser.error === '') {
+                this.adminID = adminID;
+
+                const GetCacheData = Cache.getCacheData(CacheKey.manager.Analytics.PropertyProfitByMonth(adminID, year));
+
+                if (GetCacheData.error === '') {
+                    this.objUserResponse = GetUserSuccessObj(GetCacheData.data, HttpStatusCodes.OK);
+                } else {
+                    const res = await Booking.aggregate([
+                        {
+                            $match: {
+                                adminID: adminID,
+                                $expr: {
+                                    $eq: [
+                                        {
+                                            $year: {
+                                                $dateFromString: {
+                                                    dateString: '$BookingDate',
+                                                    format: '%d/%m/%Y',
+                                                },
+                                            },
+                                        },
+                                        year,
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            $addFields: {
+                                parsedBookingDate: {
+                                    $dateFromString: {
+                                        dateString: '$BookingDate',
+                                        format: '%d/%m/%Y',
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: {
+                                    propertyID: '$propertyID',
+                                    month: { $month: '$parsedBookingDate' },
+                                    year: { $year: '$parsedBookingDate' },
+                                },
+                                totalPay: { $sum: '$totalPay' },
+                                currency: { $first: '$currency' },
+                            },
+                        },
+                        {
+                            $sort: { '_id.propertyID': 1, '_id.year': 1, '_id.month': 1 },
+                        },
+                        {
+                            $group: {
+                                _id: '$_id.propertyID',
+                                propertyID: { $first: '$_id.propertyID' },
+                                months: {
+                                    $push: {
+                                        month: '$_id.month',
+                                        year: '$_id.year',
+                                        totalPay: '$totalPay',
+                                        monthName: {
+                                            $arrayElemAt: [
+                                                [
+                                                    'January',
+                                                    'February',
+                                                    'March',
+                                                    'April',
+                                                    'May',
+                                                    'June',
+                                                    'July',
+                                                    'August',
+                                                    'September',
+                                                    'October',
+                                                    'November',
+                                                    'December',
+                                                ],
+                                                { $subtract: ['$_id.month', 1] },
+                                            ],
+                                        },
+                                        currency: '$currency',
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            $addFields: {
+                                ID: { $toObjectId: '$propertyID' },
+                            },
+                        },
+                        {
+                            $lookup: {
+                                from: 'properties',
+                                localField: 'ID',
+                                foreignField: '_id',
+                                as: 'property',
+                            },
+                        },
+                        {
+                            $unwind: {
+                                path: '$property',
+                                preserveNullAndEmptyArrays: true,
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                propertyID: 1,
+                                months: 1,
+                                propertyName: '$property.name',
+                                profitChanges: {
+                                    $cond: {
+                                        if: { $eq: [{ $size: '$months' }, 1] },
+                                        then: [{ profitChange: 100, status: 'Increase' }],
+                                        else: {
+                                            $map: {
+                                                input: { $range: [1, { $size: '$months' }] },
+                                                as: 'index',
+                                                in: {
+                                                    $let: {
+                                                        vars: {
+                                                            currentMonth: { $arrayElemAt: ['$months', '$$index'] },
+                                                            previousMonth: {
+                                                                $arrayElemAt: ['$months', { $subtract: ['$$index', 1] }],
+                                                            },
+                                                        },
+                                                        in: {
+                                                            profitChange: {
+                                                                $cond: [
+                                                                    { $eq: ['$$previousMonth.totalPay', 0] },
+                                                                    null,
+                                                                    {
+                                                                        $multiply: [
+                                                                            {
+                                                                                $divide: [
+                                                                                    {
+                                                                                        $subtract: ['$$currentMonth.totalPay', '$$previousMonth.totalPay'],
+                                                                                    },
+                                                                                    '$$previousMonth.totalPay',
+                                                                                ],
+                                                                            },
+                                                                            100,
+                                                                        ],
+                                                                    },
+                                                                ],
+                                                            },
+                                                            status: {
+                                                                $cond: [
+                                                                    {
+                                                                        $gt: ['$$currentMonth.totalPay', '$$previousMonth.totalPay'],
+                                                                    }, // Increase
+                                                                    'Increase',
+                                                                    {
+                                                                        $cond: [
+                                                                            {
+                                                                                $lt: ['$$currentMonth.totalPay', '$$previousMonth.totalPay'],
+                                                                            }, // Decrease
+                                                                            'Decrease',
+                                                                            'Neutral', // No change
+                                                                        ],
+                                                                    },
+                                                                ],
+                                                            },
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    ]);
+
+                    Cache.SetCache(CacheKey.manager.Analytics.PropertyProfitByMonth(adminID, year), res);
+                    this.objUserResponse = GetUserSuccessObj(res, HttpStatusCodes.OK);
                 }
             } else {
                 this.objUserResponse = GetUserErrorObj(checkUser.error, HttpStatusCodes.NOT_ACCEPTABLE);

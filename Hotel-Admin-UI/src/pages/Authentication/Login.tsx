@@ -8,15 +8,15 @@ import {
   useTheme,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
+import { NavLink } from "react-router-dom";
 import { FaviconIcon } from "src/assets/iconify";
 import FormProvider from "src/components/Form/FormProvider";
 import FormTextFiels from "src/components/Form/FormTextField";
 import Page from "src/components/Page";
 import useAuth from "src/hooks/useAuth";
+import { CommonPath } from "src/Router/path";
 import * as yup from "yup";
 import { _Login } from "./AuthMgr";
-import { CommonPath } from "src/Router/path";
-import { NavLink } from "react-router-dom";
 
 const loginSchema = yup.object().shape({
   email: yup
@@ -38,6 +38,7 @@ export default function Login() {
   const onLogin = async (objLogin: _Login) => {
     await LoginManager(objLogin);
   };
+
   return (
     <Page title="Sign in">
       <RootStyle>

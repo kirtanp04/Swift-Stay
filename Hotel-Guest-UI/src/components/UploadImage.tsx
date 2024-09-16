@@ -68,7 +68,7 @@ export default function UploadImage({
             setSaveImage([base64, ...saveImage]);
           },
           (err) => {
-            showMessage(err, theme, () => {});
+            showMessage(err, "error", theme, () => {});
           },
           (prrogress) => {
             setImageProgress(prrogress);
@@ -89,7 +89,7 @@ export default function UploadImage({
       onSaveImages(saveImage);
       onClose();
     } else {
-      showMessage("Select Image to Save", theme, () => {});
+      showMessage("Select Image to Save", "error", theme, () => {});
     }
   };
 

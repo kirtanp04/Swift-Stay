@@ -17,6 +17,8 @@ import * as yup from "yup";
 import { _Login } from "./AuthMgr";
 import { Path } from "src/Router/path";
 import { NavLink } from "react-router-dom";
+import moment from "moment";
+import { useEffect } from "react";
 
 const loginSchema = yup.object().shape({
   email: yup
@@ -38,6 +40,21 @@ export default function Login() {
   const onLogin = async (objLogin: _Login) => {
     LoginManager(objLogin);
   };
+
+  useEffect(() => {
+    alert("call");
+    const specificTime = moment("2024-09-16T10:00:00"); // Replace with your specific date and time
+
+    // Get the current time
+    const currentTime = moment();
+    const differenceInMinutes = currentTime.diff(specificTime, "minutes");
+    const differenceInHours = currentTime.diff(specificTime, "hours");
+    const differenceInSeconds = currentTime.diff(specificTime, "seconds");
+
+    console.log(`Difference in minutes: ${differenceInMinutes}`);
+    console.log(`Difference in hours: ${differenceInHours}`);
+    console.log(`Difference in seconds: ${differenceInSeconds}`);
+  }, []);
   return (
     <Page title="Sign in">
       <RootStyle>

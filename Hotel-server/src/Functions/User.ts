@@ -95,7 +95,7 @@ class Functions {
                     newUser.save();
                     const Token = Jwt.SignJwt({ _id: newUser._id, email: newUser.email }, '5m');
                     if (Token.error === '') {
-                        let Mail = new Email({ next: this.next! });
+                        const Mail = new Email({});
                         Mail.from = 'Quick Stay';
                         Mail.to = email;
                         Mail.subject = 'Email Verification';
@@ -154,7 +154,7 @@ class Functions {
                                 const setCookie = Storage.setCookie('Auth', getToken.data, this.res!);
 
                                 if (setCookie.error === '') {
-                                    let _Email = new Email({ next: this.next! });
+                                    const _Email = new Email({});
 
                                     _Email.from = 'Quick Stay';
                                     _Email.to = email;
@@ -252,7 +252,7 @@ class Functions {
                     const Token = Jwt.SignJwt({ _id: newUser._id, email: newUser.email }, '5m');
 
                     if (Token.error === '') {
-                        let Mail = new Email({ next: this.next! });
+                        const Mail = new Email({});
                         Mail.from = 'kirtanpatel6189@gmail.com';
                         Mail.to = email;
                         Mail.subject = 'Email Verification';
@@ -308,7 +308,7 @@ class Functions {
                                 const setCookie = Storage.setCookie('Auth', getToken.data, this.res!);
 
                                 if (setCookie.error === '') {
-                                    let _Email = new Email({ next: this.next! });
+                                    let _Email = new Email({});
 
                                     _Email.from = 'Swift Stay';
                                     _Email.to = email;

@@ -39,6 +39,26 @@ export interface TAllPropertyByState {
     state: string
 }
 
+interface TProfitMonth {
+    month: number
+    year: number
+    totalPay: number
+    monthName: string
+    currency: string
+}
+
+interface TProfitChange {
+    profitChange: number
+    status: "Increase" | "Decrease" | "Neutral"
+}
+
+export interface TPropertyProfitByMonth {
+    propertyID: string
+    propertyName: string
+    months: TProfitMonth[]
+    profitChanges: TProfitChange[]
+}
+
 
 
 export class Analytic {
@@ -91,6 +111,33 @@ export class Analytic {
                 Param.broker.manager.analytic,
                 Param.function.manager.analytics.PropertybyStates,
                 { adminID: adminID, country: country }
+            );
+
+            await Api.protectedGet(_Param, (res) => {
+                if (res.error === "") {
+                    onsuccess(res.data);
+                } else {
+                    StoreError("Dashboard: Getting Dashboard Data", res.error);
+                    onfail(res.error);
+                }
+            });
+        } catch (error: any) {
+            StoreError("Dashboard: Getting Property by state", error.message);
+            onfail(error.message);
+        }
+    };
+
+    static GetPropertyProfitByMonth = async (
+        adminID: string,
+        year: number,
+        onsuccess: (res: any) => void,
+        onfail: (err: any) => void
+    ) => {
+        try {
+            const _Param = getGETParamData(
+                Param.broker.manager.analytic,
+                Param.function.manager.analytics.GetPropertyProfitByMonth,
+                { adminID: adminID, year: year }
             );
 
             await Api.protectedGet(_Param, (res) => {

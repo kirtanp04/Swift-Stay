@@ -7,6 +7,8 @@ export class TimeFormatter {
         const now = moment.utc(); // Current time in UTC
 
 
+
+
         // Calculate differences
         const diffInMinutes = now.diff(momentDate, 'minutes');
         const diffInHours = now.diff(momentDate, 'hours');

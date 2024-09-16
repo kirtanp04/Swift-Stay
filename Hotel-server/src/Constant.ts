@@ -32,7 +32,8 @@ export const Param = {
       EmailVerification: 'ManagerEmailVerification',
       analytics: {
         GetOverviewMetrics: 'ManagerGetOverviewMetrics',
-        PropertybyStates: 'ManagerPropertybyStates'
+        PropertybyStates: 'ManagerPropertybyStates',
+        GetPropertyProfitByMonth: 'ManagerGetPropertyProfitByMonth'
       },
       Property: {
         AddProperty: 'ManagerAddProperty',
@@ -85,7 +86,8 @@ export const Param = {
       },
       payment: {
         CheckOut: 'GuestCheckOut',
-        WebHook: 'GuestWebhook'
+        WebHook: 'GuestWebhook',
+        UPIPayment: "GuestUPIMethod",
       },
       booking: {
         SaveBookingInfo: 'GuestSaveBookingInfo',
@@ -112,7 +114,8 @@ export const CacheKey = {
     userbookindetail: (BookingID: string) => `#@Manager#@${BookingID}#@UserBookingDetail#@`,
     chatUserbaseBooking: (adminID: string) => `#@Manager#@${adminID}#@chatUserbaseBooking#@`,
     Analytics: {
-      BookingBase: (emailID: string) => `#@Manager#@${emailID}#@BookingBase#@`
+      BookingBase: (emailID: string) => `#@Manager#@${emailID}#@BookingBase#@`,
+      PropertyProfitByMonth: (emailID: string, year: number) => `#@Manager#@${emailID}#@${year}#@#@PropertyProfitByMonth#@`
     }
   },
 

@@ -15,6 +15,7 @@ import { BookingFunction } from './Booking';
 // guest
 const _GuestCheckOut = Param.function.guest.payment.CheckOut;
 const _GuestWebHook = Param.function.guest.payment.WebHook;
+const _GuestUPIPayment = Param.function.guest.payment.UPIPayment;
 
 export class PaymentFunction {
     private static objUserResponse: UserResponse = new UserResponse();
@@ -32,6 +33,10 @@ export class PaymentFunction {
                 break;
             case _GuestWebHook:
                 this.objUserResponse = await _Function.webhookHandler();
+                break;
+
+            case _GuestUPIPayment:
+                this.objUserResponse = await _Function.UPIPayment();
                 break;
 
             default:
@@ -156,12 +161,10 @@ class Functions {
                         _Param.Broker = Param.broker.guest.booking;
                         _Param.function = Param.function.guest.booking.UpdateBookingInfo;
 
-
-
                         _bookingInfo.PaymentDetail.PaymentID = paymentIntent.id;
                         _bookingInfo.PaymentDetail.PaymentStatus = PaymentStatus.paid;
                         _bookingInfo.PaymentDetail.description = 'Payment was successfully done';
-                        _bookingInfo.PaymentDetail.Session = Crypt.Encryption(paymentIntent).data
+                        _bookingInfo.PaymentDetail.Session = Crypt.Encryption(paymentIntent).data;
                         _bookingInfo.bookingStatus = enumBookingStatus.booked;
 
                         _Param.data = _bookingInfo;
@@ -172,9 +175,7 @@ class Functions {
                             const room = await Room.findOne({ _id: _bookingInfo.roomID }).populate('property').exec();
 
                             if (room && user) {
-                                const _Email = new Email({
-                                    next: this.next!,
-                                });
+                                const _Email = new Email({});
 
                                 _Email.from = room.property.name;
                                 _Email.to = user.email;
@@ -199,35 +200,31 @@ class Functions {
                 if (event.type === 'checkout.session.async_payment_failed') {
                     const failedPaymentIntent = event.data.object as Stripe.Checkout.Session;
                     const failed_metadata = failedPaymentIntent.metadata;
-                    const failed_EncryptBookingInfo = failed_metadata!.key_1 + failed_metadata!.key_2 + failed_metadata!.key_3 + failed_metadata!.key_4;
+                    const failed_EncryptBookingInfo =
+                        failed_metadata!.key_1 + failed_metadata!.key_2 + failed_metadata!.key_3 + failed_metadata!.key_4;
                     let Failed_BookingInfo: BookingClass = Crypt.Decryption(failed_EncryptBookingInfo).data;
 
                     const Failed_Param = new TParam();
                     Failed_Param.Broker = Param.broker.guest.booking;
                     Failed_Param.function = Param.function.guest.booking.UpdateBookingInfo;
 
-                    const paymentError = (await stripe.paymentIntents.retrieve(failedPaymentIntent.id)).last_payment_error
-
-
-
+                    const paymentError = (await stripe.paymentIntents.retrieve(failedPaymentIntent.id)).last_payment_error;
 
                     Failed_BookingInfo.PaymentDetail.failPaymentID = failedPaymentIntent.id;
                     Failed_BookingInfo.PaymentDetail.PaymentStatus = PaymentStatus.fail;
                     Failed_BookingInfo.PaymentDetail.description = paymentError?.message || 'Fail to pay';
                     Failed_BookingInfo.bookingStatus = enumBookingStatus.cancelled;
+                    Failed_BookingInfo.PaymentDetail.Session = Crypt.Encryption(failedPaymentIntent).data;
                     Failed_Param.data = Failed_BookingInfo;
-
 
                     const Failed_res = await BookingFunction.findFunction(Failed_Param, this.req!, this.res!, this.next!);
 
                     if (!Failed_res.isError) {
                         const user = await User.findOne({ _id: Failed_BookingInfo.userID });
-                        const property = await Property.findOne({ _id: Failed_BookingInfo.propertyID })
+                        const property = await Property.findOne({ _id: Failed_BookingInfo.propertyID });
 
                         if (property !== null && user !== null) {
-                            const _Email = new Email({
-                                next: this.next!,
-                            });
+                            const _Email = new Email({});
 
                             _Email.from = property.name;
                             _Email.to = user.email;
@@ -254,6 +251,24 @@ class Functions {
             return this.objUserResponse;
         }
     };
+
+    public UPIPayment = async (): Promise<UserResponse> => {
+        try {
+            const bookingInfo: BookingClass = this.objParam.data;
+
+            const isVerified = await checkGuestVerification(bookingInfo.userID);
+
+            if (isVerified.error === '') {
+
+            } else {
+                this.objUserResponse = GetUserErrorObj(isVerified.error, HttpStatusCodes.NOT_ACCEPTABLE);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
 }
 
 function splitIntoFourParts(str: string): string[] {
@@ -264,4 +279,3 @@ function splitIntoFourParts(str: string): string[] {
     const part4 = str.substring(partLength * 3);
     return [part1, part2, part3, part4];
 }
-

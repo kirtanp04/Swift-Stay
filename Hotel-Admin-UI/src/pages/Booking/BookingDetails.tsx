@@ -182,6 +182,16 @@ export default function BookingDetails() {
 
               <TextWrapper>
                 <TextSkeleton isLoading={BookingInfo._id !== "" ? false : true}>
+                  <Label>Room Price :</Label>
+                  <Text>
+                    {BookingInfo.room.currency}
+                    {BookingInfo.room.price}
+                  </Text>
+                </TextSkeleton>
+              </TextWrapper>
+
+              <TextWrapper>
+                <TextSkeleton isLoading={BookingInfo._id !== "" ? false : true}>
                   <Label>Room no :</Label>
                   <Text>{BookingInfo.room.roomNumber}</Text>
                 </TextSkeleton>
