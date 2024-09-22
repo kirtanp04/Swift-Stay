@@ -32,6 +32,8 @@ const PropertyDetails = Loadable(
 const PropertyListByState = Loadable(
   lazy(() => import("src/pages/PropertylistByState/PropertyListByState"))
 );
+
+const JobDetail = Loadable(lazy(() => import("src/pages/Jobs/JobDetail")));
 const Bookin = Loadable(lazy(() => import("src/pages/Booking/Booking")));
 
 export default function Router() {
@@ -49,7 +51,16 @@ export default function Router() {
         { path: "", element: <HomePage />, index: true },
         {
           path: ":country/:state",
-          element: <PropertyListByState />,
+          children: [
+            {
+              index: true,
+              element: <PropertyListByState />,
+            },
+            {
+              path: ":propertyName/:propertyID/job-detail",
+              element: <JobDetail />,
+            },
+          ],
         },
         {
           path: ":country/:state/:propertyName/:propertyID",

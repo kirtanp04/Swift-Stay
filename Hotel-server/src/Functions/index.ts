@@ -7,5 +7,6 @@ import { PaymentFunction } from './Payment'
 import { BookingFunction } from './Booking'
 import { AnalyticFunction } from './Analytics'
 import { ChatFunction } from './Chat'
+import { JobFunction } from './Job'
 
-export { PropertyFunction, UserFunction, RoomFunction, SubscriberFunction, ReviewFunction, PaymentFunction, BookingFunction, AnalyticFunction, ChatFunction }
+export { PropertyFunction, UserFunction, RoomFunction, SubscriberFunction, ReviewFunction, PaymentFunction, BookingFunction, AnalyticFunction, ChatFunction, JobFunction }

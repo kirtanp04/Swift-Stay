@@ -1,6 +1,11 @@
 import { SecrtKey } from './env';
 import { TSuccessbooking } from './types/Type';
 
+export const QueueName = {
+  EmailQueue: '#@EmailQueu#@',
+  ChatQueue: '#@ChatQueue#@',
+};
+
 export const Param = {
   broker: {
     manager: {
@@ -11,17 +16,17 @@ export const Param = {
       review: 'ManagerReviewBroker',
       subscriber: 'ManagerSubscriberBroker',
       booking: 'ManagerBookingBroker',
-      analytic: 'ManagerAnalyticBroker'
+      analytic: 'ManagerAnalyticBroker',
+      Job: 'ManagerJobBroker',
     },
 
     guest: {
       Auth: 'GuestAuthBroker',
       Property: 'GuestPropertyBroker',
       Room: 'GuestRoomBroker',
-
       chat: 'GuestChatBroker',
       payment: 'GuestPaymentBroker',
-      booking: 'GuestBookingBroker'
+      booking: 'GuestBookingBroker',
     },
   },
 
@@ -33,7 +38,7 @@ export const Param = {
       analytics: {
         GetOverviewMetrics: 'ManagerGetOverviewMetrics',
         PropertybyStates: 'ManagerPropertybyStates',
-        GetPropertyProfitByMonth: 'ManagerGetPropertyProfitByMonth'
+        GetPropertyProfitByMonth: 'ManagerGetPropertyProfitByMonth',
       },
       Property: {
         AddProperty: 'ManagerAddProperty',
@@ -49,52 +54,56 @@ export const Param = {
         GetAllRoom: 'ManagerGetAllRoom',
       },
       review: {
-        GetAllReviewsByAdmin: 'ManagerGetAllReviewsByAdmin'
+        GetAllReviewsByAdmin: 'ManagerGetAllReviewsByAdmin',
       },
       subscriber: {
-        GetAllSubscriber: 'ManagerGetAllSubscriber'
+        GetAllSubscriber: 'ManagerGetAllSubscriber',
       },
 
       chat: {
         saveChat: 'ManagerSaveChatService',
-        initRedisForChat: 'InitRedisForChat'
+        initRedisForChat: 'InitRedisForChat',
       },
       booking: {
         GetBookingListByAdmin: 'ManagerGetBookinListByAdmin',
-        GetAllChatBookedUser: "ManagerGetAllChatBookedUser",
-        GetUserBookingDetail: 'ManagerGetUserBookingDetail'
-      }
+        GetAllChatBookedUser: 'ManagerGetAllChatBookedUser',
+        GetUserBookingDetail: 'ManagerGetUserBookingDetail',
+      },
+      Job: {
+        GetAllJobs: 'ManagerGetAllJobs',
+        AddnewJob: 'ManagerAddnewJob',
+        UpdateJob: 'ManagerUpdateJob',
+        DeleteJob: 'ManagerDeleteJob',
+      },
     },
     guest: {
       register: 'CreateGuestAccount',
       login: 'GuestLogin',
       property: {
-        GetAllPropertyByState: 'GuestGetAllPropertyByState',
         GetAllPropertyByCountry: 'GuestGetAllPropertyByCountry',
-        GetTotalPropertByCountry: 'GuestGetTotalPropertByCountry',
-        GetTotalPropertyByType: 'GuestGetTotalPropertyByType',
+        GetHomePagePropertyData: 'GuestGethomePagePropertyData',
         GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
-        GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
+        GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail',
       },
 
       chat: {
         saveChat: 'GuestSaveChatService',
-        initRedisForChat: 'InitRedisForChat'
+        initRedisForChat: 'InitRedisForChat',
       },
       room: {
-        GetRoomDetail: 'GuestGetRoomDetail'
+        GetRoomDetail: 'GuestGetRoomDetail',
       },
       payment: {
         CheckOut: 'GuestCheckOut',
         WebHook: 'GuestWebhook',
-        UPIPayment: "GuestUPIMethod",
+        UPIPayment: 'GuestUPIMethod',
       },
       booking: {
         SaveBookingInfo: 'GuestSaveBookingInfo',
         UpdateBookingInfo: 'GuestUpdateBookinInfo',
         generateInvoice: 'GuestGenerateInvoice',
-        getMyBookingList: 'GuestGetMyBookingList'
-      }
+        getMyBookingList: 'GuestGetMyBookingList',
+      },
     },
   },
 };
@@ -103,7 +112,7 @@ export const CacheKey = {
   user: {
     property: (propertyID: string) => `#@User${propertyID}#@Property#@`,
     room: (roomID: string) => `#@User${roomID}#@Room#@`,
-    bookingList: (userID: string) => `#@User#@${userID}#@bookingList#@`
+    bookingList: (userID: string) => `#@User#@${userID}#@bookingList#@`,
   },
   manager: {
     property: (emailID: string) => `#@Manager#@${emailID}#@Property#@`,
@@ -115,13 +124,12 @@ export const CacheKey = {
     chatUserbaseBooking: (adminID: string) => `#@Manager#@${adminID}#@chatUserbaseBooking#@`,
     Analytics: {
       BookingBase: (emailID: string) => `#@Manager#@${emailID}#@BookingBase#@`,
-      PropertyProfitByMonth: (emailID: string, year: number) => `#@Manager#@${emailID}#@${year}#@#@PropertyProfitByMonth#@`
-    }
+      PropertyProfitByMonth: (emailID: string, year: number) => `#@Manager#@${emailID}#@${year}#@#@PropertyProfitByMonth#@`,
+    },
+    JobList: (adminID: string) => `#@Manager#@${adminID}#@jobList#@`,
   },
 
   chat: (chatKey: string) => `#@ManagerChat#@${chatKey}#@UserChat#@`,
-
-
 };
 
 export const EmailTemplate = {
@@ -180,7 +188,6 @@ export const EmailTemplate = {
     </div>
 </body>`,
 
-
   LogedIn: (UserName: string) => `
     <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
     <div style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
@@ -203,7 +210,6 @@ export const EmailTemplate = {
 `,
 
   Successbooking: ({ objBooking, objRoom }: TSuccessbooking) => {
-
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -334,7 +340,7 @@ export const EmailTemplate = {
     `;
   },
 
-  FailedBooking: ({ propertyName, failReason }: { propertyName: string, failReason: string }) => {
+  FailedBooking: ({ propertyName, failReason }: { propertyName: string; failReason: string }) => {
     return `
       <!DOCTYPE html>
       <html lang="en">
@@ -435,7 +441,7 @@ export const EmailTemplate = {
           <div class="details">
             <h2>Booking Failed</h2>
             <p>Unfortunately, your booking for <strong>${propertyName}</strong> could not be completed.</p>
-            <p><strong>Reason:</strong> ${failReason || "Unknown error"}</p>
+            <p><strong>Reason:</strong> ${failReason || 'Unknown error'}</p>
             <p>We apologize for the inconvenience caused. Please try again later or contact our support team for assistance.</p>
           </div>
     
@@ -447,8 +453,5 @@ export const EmailTemplate = {
       </body>
       </html>
       `;
-  }
-
+  },
 };
-
-

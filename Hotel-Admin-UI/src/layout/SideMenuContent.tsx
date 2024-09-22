@@ -19,6 +19,7 @@ import {
   ErrorLogIcon,
   GraphIcon,
   HotelIcon,
+  JobIcon,
   LightModeIcon,
   LogoutIcon,
   ReviewIcon,
@@ -94,6 +95,17 @@ export default function SideMenuContent({}: Props) {
         />
       ),
       path: Path.review.root,
+    },
+    {
+      name: "Jobs",
+      icon: (
+        <JobIcon
+          height={25}
+          width={25}
+          IconColor={theme.palette.text.primary}
+        />
+      ),
+      path: Path.job.root,
     },
     {
       name: "Chats",

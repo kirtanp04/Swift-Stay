@@ -29,7 +29,8 @@ export const Param = {
             GetTotalPropertByCountry: 'GuestGetTotalPropertByCountry',
             GetTotalPropertyByType: 'GuestGetTotalPropertyByType',
             GetPropertyListByFilterSearch: 'GuestGetPropertyListByFilterSearch',
-            GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail'
+            GetSinglePropertyDetail: 'GuestGetSinglePropertyDetail',
+            GetHomePagePropertyData: 'GuestGethomePagePropertyData',
         },
 
         chat: {

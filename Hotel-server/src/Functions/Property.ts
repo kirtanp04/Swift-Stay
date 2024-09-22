@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { Cache, Crypt, GetUserErrorObj, GetUserSuccessObj, HttpStatusCodes, UserResponse } from '../common';
-import { TParam } from '../types/Type';
+import { THomePageData, TParam } from '../types/Type';
 import { Param, CacheKey } from '../Constant';
 import { Property as PropertyModel, PropertyClass, enumPropertyType } from '../models/PropertyModel';
 // import { User, UserClass, enumUserRole } from '';
 import { checkAdminVerification } from '../middleware/AdiminVerification';
 import { Room } from '../models/RoomModel';
 import mongoose, { FilterQuery } from 'mongoose';
+import { Booking } from '../models/BookingModel';
 
 const _AddProperty = Param.function.manager.Property.AddProperty;
 const _GetSingleProperty = Param.function.manager.Property.GetSingleProperty;
@@ -15,10 +16,10 @@ const _UpdateProperty = Param.function.manager.Property.UpdateProperty;
 const _DeleteProperty = Param.function.manager.Property.DeleteProperty;
 
 // Guest--
-const _GetAllPropertyByState = Param.function.guest.property.GetAllPropertyByState;
+
 const _GetAllPropertiesByCountry = Param.function.guest.property.GetAllPropertyByCountry;
-const _GetTotalPropertByCountry = Param.function.guest.property.GetTotalPropertByCountry;
-const _GetTotalPropertyByType = Param.function.guest.property.GetTotalPropertyByType;
+const _GetHomePagePropertyData = Param.function.guest.property.GetHomePagePropertyData;
+
 const _GetPropertyListByFilterSearch = Param.function.guest.property.GetPropertyListByFilterSearch;
 const _GetGuestSinglePropertDetail = Param.function.guest.property.GetSinglePropertyDetail;
 
@@ -51,21 +52,16 @@ export class PropertyFunction {
             case _GetAllPropertiesByCountry:
                 this.objUserResponse = await _Function.getAllPropertyByCountry();
                 break;
-            case _GetTotalPropertByCountry:
-                this.objUserResponse = await _Function.getTotalPropertyByCountry();
-                break;
-            case _GetTotalPropertyByType:
-                this.objUserResponse = await _Function.getTotalPropertyByPropertType();
-                break;
+
             case _GetPropertyListByFilterSearch:
                 this.objUserResponse = await _Function.GetPropertyListByFilterSearch();
                 break;
             case _GetGuestSinglePropertDetail:
                 this.objUserResponse = await _Function.GetSinglePropertyDetail();
                 break;
-            // case _GetAllPropertyByState:
-            //     this.objUserResponse = await _Function.get();
-            //     break;
+            case _GetHomePagePropertyData:
+                this.objUserResponse = await _Function.GetGuestHomePagePropertyData();
+                break;
 
             default:
                 this.objUserResponse = GetUserErrorObj('Server error: Wronge Function.', HttpStatusCodes.BAD_REQUEST);
@@ -109,7 +105,7 @@ class Functions {
                 updatedAt,
                 jobHiring,
                 checkInTime,
-                checkOutTime
+                checkOutTime,
             } = this.objParam!.data as PropertyClass;
 
             const checkUser = await checkAdminVerification(adminID);
@@ -142,7 +138,7 @@ class Functions {
                         updatedAt: updatedAt,
                         jobHiring: jobHiring,
                         checkInTime: checkInTime,
-                        checkOutTime: checkOutTime
+                        checkOutTime: checkOutTime,
                     });
 
                     // const insert = await PropertyModel.insertMany(dummy)
@@ -157,7 +153,6 @@ class Functions {
                         if (ManagerPropertyCache.data !== '') {
                             Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                         }
-
                     } else {
                         this.objUserResponse = GetUserErrorObj(
                             `Server error not able to save ` + propertyType + `. Create Manager account first.`,
@@ -266,7 +261,7 @@ class Functions {
                 updatedAt,
                 jobHiring,
                 checkInTime,
-                checkOutTime
+                checkOutTime,
             } = this.objParam!.data as PropertyClass;
 
             const checkUser = await checkAdminVerification(adminID);
@@ -281,7 +276,6 @@ class Functions {
                     const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
                     const UserPropertyCache = Cache.getCacheData(CacheKey.user.property(_id));
                     const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(checkUser.data.email));
-
 
                     const isUpdated = await PropertyModel.findOneAndUpdate(
                         {
@@ -305,14 +299,13 @@ class Functions {
                                 updatedAt: updatedAt,
                                 jobHiring: jobHiring,
                                 checkInTime: checkInTime,
-                                checkOutTime: checkOutTime
+                                checkOutTime: checkOutTime,
                             },
                         },
                         { new: true }
                     );
 
                     if (isUpdated) {
-
                         if (ManagerPropertyCache.data !== '') {
                             Cache.ClearCache(CacheKey.manager.property(checkUser.data.email));
                         }
@@ -353,7 +346,6 @@ class Functions {
                 const ManagerPropertyCache = Cache.getCacheData(CacheKey.manager.property(checkUser.data.email));
                 const UserPropertyCache = Cache.getCacheData(CacheKey.user.property(PropertyID));
                 const ManagerRoomCache = Cache.getCacheData(CacheKey.manager.room(checkUser.data.email));
-
 
                 const isDeleted = await PropertyModel.findOneAndDelete({
                     $and: [
@@ -449,82 +441,6 @@ class Functions {
         }
     };
 
-    public getTotalPropertyByCountry = async (): Promise<UserResponse> => {
-        try {
-            const { country } = this.objParam.data;
-
-            const propertiesByState = await PropertyModel.aggregate([
-                {
-                    $match: {
-                        country: country,
-                    },
-                },
-                {
-                    $group: {
-                        _id: '$state',
-                        totalProperties: { $sum: 1 },
-                    },
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        state: '$_id',
-                        totalProperties: 1,
-                    },
-                },
-                {
-                    $sort: {
-                        state: 1
-                    }
-                }
-            ]);
-
-            this.objUserResponse = GetUserSuccessObj(propertiesByState, HttpStatusCodes.OK);
-        } catch (error: any) {
-            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
-        } finally {
-            return this.objUserResponse;
-        }
-    };
-
-    public getTotalPropertyByPropertType = async (): Promise<UserResponse> => {
-        try {
-            const { country } = this.objParam.data;
-
-            const propertiesByState = await PropertyModel.aggregate([
-                {
-                    $match: {
-                        country: country,
-                    },
-                },
-                {
-                    $group: {
-                        _id: '$propertyType',
-                        totalProperties: { $sum: 1 },
-                    },
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        propertyType: '$_id',
-                        totalProperties: 1,
-                    },
-                },
-                {
-                    $sort: {
-                        propertyType: 1
-                    }
-                }
-            ]);
-
-            this.objUserResponse = GetUserSuccessObj(propertiesByState, HttpStatusCodes.OK);
-        } catch (error: any) {
-            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
-        } finally {
-            return this.objUserResponse;
-        }
-    };
-
     public GetPropertyListByFilterSearch = async (): Promise<UserResponse> => {
         try {
             const { FilterData } = this.objParam.data;
@@ -600,8 +516,8 @@ class Functions {
                 },
                 {
                     $match: {
-                        totalRooms: { $gte: 1 }
-                    }
+                        totalRooms: { $gte: 1 },
+                    },
                 },
                 {
                     $group: {
@@ -629,8 +545,8 @@ class Functions {
                 },
                 {
                     $addFields: {
-                        currency: { $arrayElemAt: ['$roomDetails.currency', 0] }
-                    }
+                        currency: { $arrayElemAt: ['$roomDetails.currency', 0] },
+                    },
                 },
 
                 {
@@ -669,11 +585,8 @@ class Functions {
 
                 {
                     $facet: {
-                        totalCount: [
-                            { $count: 'count' }
-                        ],
+                        totalCount: [{ $count: 'count' }],
                         properties: [
-
                             { $skip: skip },
                             { $limit: limit },
                             {
@@ -697,24 +610,24 @@ class Functions {
                                 },
                             },
                         ],
-                    }
+                    },
                 },
                 {
-                    $unwind: '$totalCount'
+                    $unwind: '$totalCount',
                 },
                 {
                     $addFields: {
-                        totalProperties: '$totalCount.count'
-                    }
+                        totalProperties: '$totalCount.count',
+                    },
                 },
                 {
                     $replaceRoot: {
                         newRoot: {
                             properties: '$properties',
-                            totalProperties: '$totalProperties'
-                        }
-                    }
-                }
+                            totalProperties: '$totalProperties',
+                        },
+                    },
+                },
             ]);
 
             this.objUserResponse = GetUserSuccessObj(Properties, HttpStatusCodes.OK);
@@ -725,45 +638,41 @@ class Functions {
         }
     };
 
-
-
     public GetSinglePropertyDetail = async (): Promise<UserResponse> => {
         try {
-            const { country, state, propertyName, propertyID } = this.objParam.data
+            const { country, state, propertyName, propertyID } = this.objParam.data;
 
             const UserPropertyCache = Cache.getCacheData(CacheKey.user.property(propertyID));
 
             if (UserPropertyCache.error === '') {
                 this.objUserResponse = GetUserSuccessObj(UserPropertyCache.data, HttpStatusCodes.OK);
             } else {
-
                 const property = await PropertyModel.aggregate([
                     {
                         $match: {
                             $and: [
                                 {
-                                    _id: new mongoose.Types.ObjectId(propertyID)
+                                    _id: new mongoose.Types.ObjectId(propertyID),
                                 },
                                 {
-                                    country: country
+                                    country: country,
                                 },
                                 {
-                                    state: state
+                                    state: state,
                                 },
                                 {
-                                    name: propertyName.split('-').join(' ')
-                                }
-                            ]
+                                    name: propertyName.split('-').join(' '),
+                                },
+                            ],
                         },
-
                     },
                     {
                         $lookup: {
                             from: 'rooms',
                             localField: 'rooms',
                             foreignField: '_id',
-                            as: 'rooms'
-                        }
+                            as: 'rooms',
+                        },
                     },
 
                     {
@@ -771,8 +680,8 @@ class Functions {
                             from: 'reviews',
                             localField: 'reviews',
                             foreignField: '_id',
-                            as: 'review'
-                        }
+                            as: 'review',
+                        },
                     },
 
                     {
@@ -780,8 +689,8 @@ class Functions {
                             from: 'subscribers',
                             localField: '_id',
                             foreignField: 'property',
-                            as: 'subscribersData'
-                        }
+                            as: 'subscribersData',
+                        },
                     },
 
                     {
@@ -789,11 +698,9 @@ class Functions {
                             from: 'users',
                             localField: 'subscribersData.subscribers',
                             foreignField: '_id',
-                            pipeline: [
-                                { $project: { _id: 0, email: 1 } }
-                            ],
-                            as: 'subscribers'
-                        }
+                            pipeline: [{ $project: { _id: 0, email: 1 } }],
+                            as: 'subscribers',
+                        },
                     },
 
                     {
@@ -803,24 +710,24 @@ class Functions {
                                     $map: {
                                         input: { $ifNull: [{ $arrayElemAt: ['$review.reviewInfo', 0] }, []] },
                                         as: 'review',
-                                        in: '$$review.rating'
-                                    }
-                                }
+                                        in: '$$review.rating',
+                                    },
+                                },
                             },
                             review: { $arrayElemAt: ['$review', 0] },
-                            subscribers: '$subscribers'
-                        }
+                            subscribers: '$subscribers',
+                        },
                     },
 
                     {
-                        $unwind: '$rooms'
+                        $unwind: '$rooms',
                     },
 
                     {
                         $group: {
                             _id: {
                                 propertyID: '$_id',
-                                roomType: '$rooms.type'
+                                roomType: '$rooms.type',
                             },
                             rooms: { $push: '$rooms' },
                             avgReview: { $first: '$avgReview' },
@@ -843,10 +750,10 @@ class Functions {
                                     amenities: '$amenities',
                                     adminID: '$adminID',
                                     checkInTime: '$checkInTime',
-                                    checkOutTime: '$checkOutTime'
-                                }
-                            }
-                        }
+                                    checkOutTime: '$checkOutTime',
+                                },
+                            },
+                        },
                     },
 
                     {
@@ -855,14 +762,14 @@ class Functions {
                             Rooms: {
                                 $push: {
                                     type: '$_id.roomType',
-                                    roomInfo: '$rooms'
-                                }
+                                    roomInfo: '$rooms',
+                                },
                             },
                             avgReview: { $first: '$avgReview' },
                             review: { $first: '$review' },
                             subscribers: { $first: '$subscribers' },
-                            propertyDetails: { $first: '$propertyDetails' }
-                        }
+                            propertyDetails: { $first: '$propertyDetails' },
+                        },
                     },
 
                     {
@@ -873,22 +780,21 @@ class Functions {
                             review: 1,
                             propertyDetails: 1,
                             Rooms: 1,
-                            subscribers: 1
-                        }
-                    }
-                ])
-
+                            subscribers: 1,
+                        },
+                    },
+                ]);
 
                 if (property !== undefined) {
-                    Cache.SetCache(CacheKey.user.property(propertyID), property[0])
+                    Cache.SetCache(CacheKey.user.property(propertyID), property[0]);
                     this.objUserResponse = GetUserSuccessObj(property[0], HttpStatusCodes.OK);
                 } else {
-                    this.objUserResponse = GetUserErrorObj('The property you are looking for is not available might wron url. Please try for another property', HttpStatusCodes.NOT_FOUND);
+                    this.objUserResponse = GetUserErrorObj(
+                        'The property you are looking for is not available might wron url. Please try for another property',
+                        HttpStatusCodes.NOT_FOUND
+                    );
                 }
-
             }
-
-
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
         } finally {
@@ -896,8 +802,176 @@ class Functions {
         }
     };
 
-}
+    public GetGuestHomePagePropertyData = async (): Promise<UserResponse> => {
+        try {
+            const { country } = this.objParam.data
 
+            await Promise.all([this.GetTrendingProperties(country), this.getTotalPropertyByState(country), this.getTotalPropertyByPropertType(country)]).then((res) => {
+                const objHomeData = new THomePageData()
+                objHomeData.TrendingDestinations = res[0]
+                objHomeData.TotalPropertByCountryState = res[1]
+                objHomeData.TotalPropertByPropertyType = res[2]
+
+                this.objUserResponse = GetUserSuccessObj(objHomeData, HttpStatusCodes.OK);
+            }).catch((err) => {
+                this.objUserResponse = GetUserErrorObj(err, HttpStatusCodes.BAD_GATEWAY);
+            })
+
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_GATEWAY);
+        } finally {
+            return this.objUserResponse;
+        }
+    }
+
+    private getTotalPropertyByState = async (country: string): Promise<{ state: string, totalProperties: number }[]> => {
+        try {
+
+            const res: { state: string, totalProperties: number }[] = await new Promise(async (resolve, reject) => {
+                try {
+                    const propertiesByState = await PropertyModel.aggregate([
+                        {
+                            $match: {
+                                country: country,
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: '$state',
+                                totalProperties: { $sum: 1 },
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                state: '$_id',
+                                totalProperties: 1,
+                            },
+                        },
+                        {
+                            $sort: {
+                                state: 1,
+                            },
+                        },
+                    ]);
+                    resolve(propertiesByState)
+                } catch (error: any) {
+                    reject(error.message)
+                }
+            })
+
+
+            return res
+        } catch (error: any) {
+            return []
+        }
+    };
+
+    private getTotalPropertyByPropertType = async (country: string): Promise<{ propertyType: string, totalProperties: number }[]> => {
+        try {
+
+
+            const res: { propertyType: string, totalProperties: number }[] = await new Promise(async (resolve, reject) => {
+                try {
+                    const propertiesByState = await PropertyModel.aggregate([
+                        {
+                            $match: {
+                                country: country,
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: '$propertyType',
+                                totalProperties: { $sum: 1 },
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                propertyType: '$_id',
+                                totalProperties: 1,
+                            },
+                        },
+                        {
+                            $sort: {
+                                propertyType: 1,
+                            },
+                        },
+                    ]);
+
+                    resolve(propertiesByState);
+                } catch (error: any) {
+                    reject(error.message);
+                }
+            });
+
+            return res
+        } catch (error: any) {
+            return []
+        }
+    };
+
+    private GetTrendingProperties = async (country: string): Promise<PropertyClass[]> => {
+        try {
+
+
+            const res: PropertyClass[] = await new Promise(async (resolve, reject) => {
+                try {
+                    const propertyList = await Booking.aggregate([
+                        {
+                            $group: {
+                                _id: '$propertyID',
+                                propertyID: { $first: { $toObjectId: '$propertyID' } },
+                                count: { $sum: 1 },
+                            },
+                        },
+                        {
+                            $sort: {
+                                count: -1,
+                            },
+                        },
+                        {
+                            $limit: 5,
+                        },
+
+                        {
+                            $lookup: {
+                                from: 'properties',
+                                localField: 'propertyID',
+                                foreignField: '_id',
+                                as: 'property',
+                            },
+                        },
+                        {
+                            $unwind: {
+                                path: '$property',
+                                preserveNullAndEmptyArrays: true,
+                            },
+                        },
+                        {
+                            $match: {
+                                'property.country': country,
+                            },
+                        },
+                        {
+                            $replaceRoot: {
+                                newRoot: '$property',
+                            },
+                        },
+                    ]);
+                    resolve(propertyList);
+                } catch (error: any) {
+                    reject(error.message);
+                }
+            });
+
+            return res;
+        } catch (error: any) {
+
+            return [];
+        }
+    };
+}
 
 const getPropertyFilterAndCondition = (FilterData: any) => {
     const { Price, state, city, propertyType, page, country } = FilterData;
@@ -916,9 +990,7 @@ const getPropertyFilterAndCondition = (FilterData: any) => {
         and.push({
             city: {
                 $in: city.split(','),
-
             },
-
         });
     }
 
@@ -948,5 +1020,3 @@ const getMaxPrice = (FilterData: any): number => {
 
     return maxPrice;
 };
-
-

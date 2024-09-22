@@ -13,11 +13,13 @@ import { _UserSearchObj as TUserSearchObj } from "src/context/UserSearchContext"
 import useUserSearch from "src/hooks/useUserSearch";
 
 import { useNavigate } from "react-router-dom";
+import GuestSelectionDialog from "src/components/UserSearchInput/GuestSelectionDialog";
+import { HomePageData as _HomePageData } from "src/ObjMgr/HomePage";
 import { Path } from "src/Router/path";
 import ExploreByProperty from "./components/ExploreByProperty";
 import ExploreCountryState from "./components/ExploreCountryState";
 import TrendingDestinations from "./components/TrendingDestinations";
-import GuestSelectionDialog from "src/components/UserSearchInput/GuestSelectionDialog";
+import showMessage from "src/util/ShowMessage";
 
 const IconSize = {
   height: 22,
@@ -26,14 +28,15 @@ const IconSize = {
 
 export default function HomePage() {
   const { UserSearchObj, UpdateFullobj } = useUserSearch();
+  const [HomePageData, setHomePageData] = useState<_HomePageData>(
+    new _HomePageData()
+  );
   const [UserSearch, setUserSearch] = useState<TUserSearchObj>(UserSearchObj);
   const [ShowDateRange, setShowDateRange] = useState<boolean>(false);
   const [ShowGuestSelectionDialog, setShowGuestSelectionDialog] =
     useState<boolean>(false);
   const [ShowSearchStateDialog, setShowSearchStateDialog] =
     useState<boolean>(false);
-
-  // console.log(UserSearchObj);
 
   const navigate = useNavigate();
 
@@ -43,8 +46,34 @@ export default function HomePage() {
   const _Date = DateFormatter.getInstance();
 
   useEffect(() => {
+    GetHomePageData();
+  }, []);
+
+  useEffect(() => {
+    if (UserSearchObj.selectedCountry !== UserSearch.selectedCountry) {
+      GetHomePageData();
+    }
+
     setUserSearch(UserSearchObj);
   }, [UserSearchObj]);
+
+  const GetHomePageData = () => {
+    try {
+      if (UserSearchObj.selectedCountry !== "") {
+        _HomePageData.GetHomePagePropertyData(
+          UserSearchObj.selectedCountry,
+          (res) => {
+            setHomePageData(res);
+          },
+          (err) => {
+            showMessage(err, "error", theme, () => {});
+          }
+        );
+      }
+    } catch (error: any) {
+      showMessage(error.message, "error", theme, () => {});
+    }
+  };
 
   const UpdateUserSearch = <K extends keyof TUserSearchObj>(
     PropertyName: K,
@@ -169,7 +198,13 @@ export default function HomePage() {
             </span>
           </HeaderSubtitle>
         </HeaderWrapper>
-        <TrendingDestinations />
+
+        {HomePageData.TrendingDestinations.length > 0 && (
+          <TrendingDestinations
+            Properties={HomePageData.TrendingDestinations}
+          />
+        )}
+
         {/* --------------------------------------------- Explore More------------------------------------------------------------- */}
         <HeaderWrapper>
           <HeaderTitle>
@@ -188,13 +223,17 @@ export default function HomePage() {
           </HeaderSubtitle>
         </HeaderWrapper>
 
-        <ExploreCountryState />
+        <ExploreCountryState
+          TotalPropertByCountryState={HomePageData.TotalPropertByCountryState}
+        />
 
         {/* --------------------------------------------- Explore by Propertry type------------------------------------------------------------- */}
         <HeaderWrapper>
           <HeaderTitle>Browse by property type</HeaderTitle>
         </HeaderWrapper>
-        <ExploreByProperty />
+        <ExploreByProperty
+          TotalPropertByCountryState={HomePageData.TotalPropertByPropertyType}
+        />
       </ContentWrapper>
 
       {ShowDateRange && (

@@ -21,7 +21,8 @@ export const Param = {
             review: 'ManagerReviewBroker',
             subscriber: 'ManagerSubscriberBroker',
             booking: 'ManagerBookingBroker',
-            analytic: 'ManagerAnalyticBroker'
+            analytic: 'ManagerAnalyticBroker',
+            Job: 'ManagerJobBroker'
         },
 
         guest: {
@@ -73,6 +74,12 @@ export const Param = {
                 GetBookingListByAdmin: 'ManagerGetBookinListByAdmin',
                 GetAllChatBookedUser: "ManagerGetAllChatBookedUser",
                 GetUserBookingDetail: 'ManagerGetUserBookingDetail'
+            },
+            Job: {
+                GetAllJobs: 'ManagerGetAllJobs',
+                AddnewJob: 'ManagerAddnewJob',
+                UpdateJob: 'ManagerUpdateJob',
+                DeleteJob: 'ManagerDeleteJob'
             }
         },
         guest: {

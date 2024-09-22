@@ -135,6 +135,17 @@ export interface BookingListObj extends BookingClass {
 }
 
 
+// ------------------------------- guest hompage data
+
+export class THomePageData {
+    TrendingDestinations: PropertyClass[] = [];
+    TotalPropertByCountryState: { state: string; totalProperties: number }[] = [];
+    TotalPropertByPropertyType: {
+        propertyType: string;
+        totalProperties: number;
+    }[] = [];
+}
+
 
 
 

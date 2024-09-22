@@ -24,6 +24,7 @@ const PropertyViewer = Loadable(
 const BookingList = Loadable(
   lazy(() => import("src/pages/Booking/BookingList"))
 );
+const JobList = Loadable(lazy(() => import("src/pages/Job/JobList")));
 const BookingDetails = Loadable(
   lazy(() => import("src/pages/Booking/BookingDetails"))
 );
@@ -107,6 +108,16 @@ export default function Router() {
             {
               path: ":userName/bookingdetails/:bookingID",
               element: <BookingDetails />,
+            },
+          ],
+        },
+        {
+          path: "jobs",
+          element: <Outlet />,
+          children: [
+            {
+              element: <JobList />,
+              index: true,
             },
           ],
         },

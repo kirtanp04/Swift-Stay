@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
-import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Response';
-import { TParam } from '../types/Type';
+import { Queue } from '..';
 import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
-import { Login, User, UserClass, enumUserRole } from '../models/UserModel';
-import { EmailTemplate, Param } from '../Constant';
-import { Email } from '../service/Email';
+import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Response';
+import { EmailTemplate, Param, QueueName } from '../Constant';
 import { SecrtKey } from '../env';
+import { enumUserRole, Login, User, UserClass } from '../models/UserModel';
+import { Email } from '../service/Email';
+import { TParam } from '../types/Type';
 
 const _CreateGuestAccount: string = Param.function.guest.register;
 
@@ -314,6 +315,8 @@ class Functions {
                                     _Email.to = email;
                                     _Email.subject = 'login Activity';
                                     _Email.html = EmailTemplate.LogedIn(isUser.name);
+
+                                    // Queue.addDataInQueue(QueueName.EmailQueue, _Email)
 
                                     let isError: boolean = false;
 

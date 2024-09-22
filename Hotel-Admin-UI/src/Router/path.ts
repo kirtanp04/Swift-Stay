@@ -30,6 +30,9 @@ export const Path = {
     chat: {
         root: rootPath + "/chats",
     },
+    job: {
+        root: rootPath + "/jobs",
+    },
     errorLogs: rootPath + "/errorlogs",
 };
 

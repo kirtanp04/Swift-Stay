@@ -19,9 +19,7 @@ import { _UserSearchObj } from "src/context/UserSearchContext";
 import LoginPopOver from "src/components/LoginPopOver";
 import EToolTip from "src/components/EToolTip";
 
-type Props = {};
-
-export default function NavBarContent({}: Props) {
+export default function NavBarContent() {
   const navigate = useNavigate();
   const [anchorPoint, setAnchorPoint] = useState<null | HTMLElement>(null);
   const openCtxMenuPoint = Boolean(anchorPoint);
@@ -85,7 +83,9 @@ export default function NavBarContent({}: Props) {
           <IfLogedin
             Else={
               <>
-                <LoginButton>Sign in</LoginButton>
+                <LoginButton onClick={() => navigate(Path.login)}>
+                  Sign in
+                </LoginButton>
                 <SignupButton onClick={() => navigate(Path.signup)}>
                   Sign up
                 </SignupButton>

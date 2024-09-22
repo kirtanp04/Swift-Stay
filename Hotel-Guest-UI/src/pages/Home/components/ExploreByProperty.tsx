@@ -1,47 +1,34 @@
-import { Box, Stack, styled, Typography, useTheme } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { Box, Stack, styled, Typography } from "@mui/material";
+import { useRef } from "react";
 import { NextIcon, PreviousIcon } from "src/assets/iconify";
 import Img from "src/assets/img/GujaratIMG.jpeg";
 import LazyImage from "src/components/LazyImage";
-import useUserSearch from "src/hooks/useUserSearch";
-import { Property } from "src/ObjMgr/Property";
-import showMessage from "src/util/ShowMessage";
 import "swiper/css";
 import "swiper/css/navigation";
 import { A11y, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-type Props = {};
+type Props = {
+  TotalPropertByCountryState: {
+    propertyType: string;
+    totalProperties: number;
+  }[];
+};
 
-export default function ExploreByProperty({}: Props) {
-  const { UserSearchObj } = useUserSearch();
+export default function ExploreByProperty({
+  TotalPropertByCountryState,
+}: Props) {
   // Explore Country------------------------------------------------------------
   const ExploreCountrySwiperPrevButton = useRef<HTMLButtonElement>(null);
   const ExploreCountrySwiperNextButton = useRef<HTMLButtonElement>(null);
-  const [TotalPropertByCountryState, setTotalPropertByCountryState] = useState<
-    { propertyType: string; totalProperties: number }[]
-  >([]);
-  const theme = useTheme();
 
-  useEffect(() => {
-    if (UserSearchObj.selectedCountry !== "") {
-      if (TotalPropertByCountryState.length === 0) {
-        loadTotalPropertByPropertyType();
-      }
-    }
-  }, [UserSearchObj]);
-
-  const loadTotalPropertByPropertyType = () => {
-    Property.GetTotalPropertByPropertyType(
-      UserSearchObj.selectedCountry,
-      (res) => {
-        setTotalPropertByCountryState(res);
-      },
-      (err) => {
-        showMessage(err, "error", theme, () => {});
-      }
-    );
-  };
+  // useEffect(() => {
+  //   if (UserSearchObj.selectedCountry !== "") {
+  //     if (TotalPropertByCountryState.length === 0) {
+  //       loadTotalPropertByPropertyType();
+  //     }
+  //   }
+  // }, [UserSearchObj]);
 
   return (
     <SwiperWrapper>

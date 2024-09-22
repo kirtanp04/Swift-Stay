@@ -1,20 +1,34 @@
 import { Box, Grid, styled, Typography } from "@mui/material";
-import Img from "src/assets/img/GujaratIMG.jpeg";
 import LazyImage from "src/components/LazyImage";
+import { Property } from "src/ObjMgr/Property";
 
-type Props = {};
+type Props = {
+  Properties: Property[];
+};
 
-export default function TrendingDestinations({}: Props) {
+export default function TrendingDestinations({ Properties }: Props) {
   return (
     <Box>
       <GridContainer container gap={"10px"} xl={12} justifyContent={"center"}>
         <SubGrid xl={5} lg={5.5}>
-          <LazyImage alt="" src={Img} style={{ width: "100%", height: 230 }} />
-          <StateName>Gujarat</StateName>
+          <LazyImage
+            alt={Properties[0].name}
+            src={Properties[0].images[0]}
+            style={{ width: "100%", height: 230 }}
+          />
+          <StateName>
+            {Properties[0].name + " | " + Properties[0].state.split("-")[0]}
+          </StateName>
         </SubGrid>
         <SubGrid xl={5} lg={5.5}>
-          <LazyImage alt="" src={Img} style={{ width: "100%", height: 230 }} />
-          <StateName>Gujarat</StateName>
+          <LazyImage
+            alt={Properties[1].name}
+            src={Properties[1].images[0]}
+            style={{ width: "100%", height: 230 }}
+          />
+          <StateName>
+            {Properties[1].name + " | " + Properties[1].state.split("-")[0]}
+          </StateName>
         </SubGrid>
       </GridContainer>
 
@@ -26,27 +40,35 @@ export default function TrendingDestinations({}: Props) {
       >
         <SubGrid xl={3.5} lg={3.5} sx={{ height: 230 }}>
           <LazyImage
-            alt=""
-            src={Img}
+            alt={Properties[2].name}
+            src={Properties[2].images[0]}
             style={{ width: "100%", height: "100%" }}
           />
-          <StateName sx={{ fontSize: "0.95rem" }}>Gujarat</StateName>
+          <StateName>
+            {Properties[2].name + " | " + Properties[2].state.split("-")[0]}
+          </StateName>
         </SubGrid>
+
         <SubGrid xl={3.5} lg={3.5} sx={{ height: 230 }}>
           <LazyImage
-            alt=""
-            src={Img}
+            alt={Properties[3].name}
+            src={Properties[3].images[0]}
             style={{ width: "100%", height: "100%" }}
           />
-          <StateName sx={{ fontSize: "0.95rem" }}>Gujarat</StateName>
+          <StateName>
+            {Properties[3].name + " | " + Properties[3].state.split("-")[0]}
+          </StateName>
         </SubGrid>
+
         <SubGrid xl={3.5} lg={3.5} sx={{ height: 230 }}>
           <LazyImage
-            alt=""
-            src={Img}
+            alt={Properties[4].name}
+            src={Properties[4].images[0]}
             style={{ width: "100%", height: "100%" }}
           />
-          <StateName sx={{ fontSize: "0.95rem" }}>Gujarat</StateName>
+          <StateName>
+            {Properties[4].name + " | " + Properties[4].state.split("-")[0]}
+          </StateName>
         </SubGrid>
       </GridContainer>
     </Box>
@@ -71,7 +93,7 @@ const SubGrid = styled(Grid)(() => ({
 }));
 
 const StateName = styled(Typography)(({ theme }) => ({
-  fontSize: "1.4rem",
+  fontSize: "1.2rem",
   color: theme.palette.text.primary,
   textAlign: "left",
   // flex: 0.3,

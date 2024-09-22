@@ -45,8 +45,7 @@ function PropertyList({
   return (
     <Rootstyle>
       <Header sx={{ color: theme.palette.text.secondary }}>
-        <span style={{ color: theme.themeColor }}>{state?.split("-")[0]}:</span>{" "}
-        {FilteredPropertyList.length} Properties found
+        <span style={{ color: theme.themeColor }}>{state?.split("-")[0]}</span>{" "}
       </Header>
       <Divider />
 
@@ -122,15 +121,37 @@ function PropertyList({
                 <Text sx={{ color: theme.palette.text.primary, width: 100 }}>
                   Jobs availability
                 </Text>
-                <Text
-                  sx={{
-                    color: objProperty.jobHiring
-                      ? theme.palette.color.success.main
-                      : theme.palette.color.rose.main,
-                  }}
-                >
-                  {objProperty.jobHiring ? "A" : "N"}
-                </Text>
+                {objProperty.jobHiring ? (
+                  <Text
+                    sx={{
+                      backgroundColor: theme.palette.color.info.darker,
+                      padding: "0.3rem",
+                      color: theme.palette.background.default,
+                      cursor: "pointer",
+                      borderRadius: "5px",
+                    }}
+                    onClick={() =>
+                      navigate(
+                        Path.job.jobDetail(
+                          country!,
+                          state!,
+                          objProperty.name,
+                          objProperty._id
+                        )
+                      )
+                    }
+                  >
+                    View job detail
+                  </Text>
+                ) : (
+                  <Text
+                    sx={{
+                      color: theme.palette.color.rose.main,
+                    }}
+                  >
+                    N
+                  </Text>
+                )}
               </InfoWrapper>
 
               {objProperty.totalRooms > 0 &&

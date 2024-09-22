@@ -1,28 +1,25 @@
-import { Box, Button, Typography, styled, useTheme } from "@mui/material";
+import { Box, Button, Chip, Typography, styled, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { DeleteIcon, EditIcon, PlusIcon } from "src/assets/iconify";
+import { TimeFormatter } from "src/common/TimeFormater";
+import LazyImage from "src/components/LazyImage";
 import Page from "src/components/Page";
-import useAuth from "src/hooks/useAuth";
-import showLoading from "src/util/ShowLoading";
-import showMessage from "src/util/ShowMessage";
-import { PropertyApi, PropertyClass } from "./DataObject";
+import { RESIconButton } from "src/components/RESIconButton";
 import Scrollbar from "src/components/Scrollbar";
 import LoadingSkeleton from "src/components/Skeleton";
-import LazyImage from "src/components/LazyImage";
-import { Chip } from "@mui/material";
-import { getChipColor } from "./PropertyList";
-import { TimeFormatter } from "src/common/TimeFormater";
-import RoomCard from "./RoomCard";
-import { RESIconButton } from "src/components/RESIconButton";
-import { DeleteIcon, EditIcon, PlusIcon, UpdateIcon } from "src/assets/iconify";
-import AddPropertyDialog from "./AddPropertyDialog";
+import useAuth from "src/hooks/useAuth";
 import { Path } from "src/Router/path";
-import { RoomClass } from "../room/DataObject";
+import showLoading from "src/util/ShowLoading";
+import showMessage from "src/util/ShowMessage";
 import AddRoomDialog from "../room/AddRoomDialog";
+import { RoomClass } from "../room/DataObject";
+import AddPropertyDialog from "./AddPropertyDialog";
+import { PropertyApi, PropertyClass } from "./DataObject";
+import { getChipColor } from "./PropertyList";
+import RoomCard from "./RoomCard";
 
-type Props = {};
-
-export default function PropertyViewer({}: Props) {
+export default function PropertyViewer() {
   const [Property, setProperty] = useState<PropertyClass>(new PropertyClass());
   const [showUpdatePropertyDialog, setShowUpdatePropertyDialog] =
     useState<boolean>(false);

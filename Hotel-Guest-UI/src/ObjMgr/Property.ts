@@ -74,43 +74,7 @@ export class Property {
     }
 
 
-    static GetTotalPropertByCountry = async (country: string, onsuccess: (porpertyList: { state: string; totalProperties: number }[]) => void, onfail: (err: any) => void) => {
-        try {
-            const _Param = getGETParamData(Param.broker.Property, Param.function.property.GetTotalPropertByCountry, { country: country })
-            await Api.get(_Param, (res) => {
 
-                if (res.error === '') {
-                    onsuccess(res.data)
-                } else {
-                    onfail(res.error)
-                }
-
-            }, (progressValue) => {
-                console.log(progressValue)
-            })
-        } catch (error: any) {
-            onfail(error.message)
-        }
-    }
-
-    static GetTotalPropertByPropertyType = async (country: string, onsuccess: (porpertyList: { propertyType: string; totalProperties: number }[]) => void, onfail: (err: any) => void) => {
-        try {
-            const _Param = getGETParamData(Param.broker.Property, Param.function.property.GetTotalPropertyByType, { country: country })
-            await Api.get(_Param, (res) => {
-
-                if (res.error === '') {
-                    onsuccess(res.data)
-                } else {
-                    onfail(res.error)
-                }
-
-            }, (progressValue) => {
-                console.log(progressValue)
-            })
-        } catch (error: any) {
-            onfail(error.message)
-        }
-    }
 
 
     static GetPropertyListByFilterSearch = async (pObjFilter: any, onsuccess: (porpertyList: any) => void, onfail: (err: any) => void) => {
