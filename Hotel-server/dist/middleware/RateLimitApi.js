@@ -7,7 +7,7 @@ const UserResponse_1 = require("./UserResponse");
 // const allowlist = ['192.168.0.56', '192.168.0.21'] //Ip address
 exports.MainApiLimit = (0, express_rate_limit_1.rateLimit)({
     windowMs: 60 * 1000, // 1min,
-    limit: 5, // 5 call
+    limit: 100, // 5 call
     legacyHeaders: true,
     standardHeaders: true,
     requestPropertyName: 'MainApiLimit',

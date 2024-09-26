@@ -39,12 +39,15 @@ class Login {
 exports.Login = Login;
 class UserClass {
     constructor() {
-        this._id = '';
-        this.name = '';
-        this.email = '';
-        this.password = '';
-        this.profileImg = '';
-        this.phone = '';
+        this._id = "";
+        this.name = "";
+        this.email = "";
+        this.password = "";
+        this.isEmailVerified = false;
+        this.confirmPassword = "";
+        this.country = '';
+        this.profileImg = "";
+        this.phone = "";
         this.role = enumUserRole.guest;
         this.createdAt = new Date();
     }
@@ -60,12 +63,21 @@ const UserSchema = new mongoose_1.Schema({
         required: [true, 'Email is required.'],
         unique: true,
     },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
     password: {
         type: String,
         required: true,
     },
     profileImg: {
         type: String,
+    },
+    country: {
+        type: String,
+        required: [true, 'Country is required.'],
+        unique: true,
     },
     phone: {
         type: String,

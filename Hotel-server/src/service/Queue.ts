@@ -1,73 +1,61 @@
-import { Queue as BullQueue, Worker, Job } from 'bullmq';
-import { Crypt } from '../common';
-import { SecrtKey } from '../env';
+import async from 'async';
 
+export class QueueManager {
+    private queues: { [key: string]: async.QueueObject<any> };
 
-
-export class _Queue {
-    private _queue: BullQueue<any> | null = null;
-
-    // Initialize the queue
-    createQueue(queueName: string): void {
-        if (this._queue) {
-            console.warn(`Queue ${queueName} already exists.`);
-            return;
-        }
-
-        this._queue = new BullQueue(queueName, {
-            connection: {
-                port: SecrtKey.REDIS.PORT,
-                host: SecrtKey.REDIS.URL,
-            }
-        });
-        console.log(`Queue ${queueName} created successfully.`);
+    constructor() {
+        this.queues = {}; // Initialize an object to hold different queues
     }
 
-    // Add data to the queue
-    async addDataInQueue(queueName: string, data: any): Promise<void> {
-        if (!this._queue) {
-            console.error('Queue not initialized. Call createQueue first.');
-            return;
-        }
-
+    // Method to create a new named queue with a specified concurrency
+    public createQueue(queueName: string, concurrency: number) {
         try {
-            const encryptedData = Crypt.Encryption(data).data;
-            await this._queue.add(queueName, encryptedData, {
-                delay: 1500,
-                removeOnComplete: true,
-                removeOnFail: true,
-            });
+            this.queues[queueName] = async.queue(this.processTask.bind(this, queueName), concurrency);
+            console.log("New Que has been created" + queueName)
+        } catch (error) {
+            console.error(`Error whuile creating queue "${queueName}":`, error);
+        }
+
+    }
+
+    // Task processor that handles the task based on the queue name
+    private async processTask(queueName: string, task: any, callback: async.ErrorCallback<Error>) {
+        try {
+            // Handle task based on the queue name
+            console.log(`Processing task from queue "${queueName}":`, task);
+            // Simulate async processing (e.g., sending email, storing data, etc.)
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate a delay
+            console.log(`Task completed from queue "${queueName}":`, task);
+            callback(null); // Signal task completion
         } catch (error: any) {
-            console.error('Error adding data to queue:', error.message);
+            console.error(`Error processing task from queue "${queueName}":`, error);
+            callback(error); // Signal error
         }
     }
 
-    // Process jobs from the queue
-    async processQueueData(queueName: string, onSuccess: (job: Job) => void, onFail: (err: any) => void): Promise<void> {
-        if (!this._queue) {
-            console.error('Queue not initialized. Call createQueue first.');
+    // Method to add a task to the specified queue
+    public addTask(queueName: string, task: any) {
+        if (!this.queues[queueName]) {
+            console.error(`Queue "${queueName}" does not exist. Please create it first.`);
             return;
         }
-
-        const worker = new Worker(queueName, async (job: Job) => {
-            try {
-                onSuccess(job);
-            } catch (error) {
-                onFail(error);
-            }
-        }, {
-            connection: {
-                port: SecrtKey.REDIS.PORT,
-                host: SecrtKey.REDIS.URL,
+        this.queues[queueName].push(task, (err) => {
+            if (err) {
+                console.error(`Error processing task in queue "${queueName}":`, err);
+            } else {
+                console.log(`Task added to queue "${queueName}" successfully.`);
             }
         });
+    }
 
-        worker.on('completed', (job) => {
-            console.log(`Job ${job.id} completed`);
-        });
-
-        worker.on('failed', (job, err) => {
-            console.error(`Job ${job?.id} failed:`, err.message);
+    // Optional: Method to start processing tasks in a specified queue
+    public startQueue(queueName: string) {
+        if (!this.queues[queueName]) {
+            console.error(`Queue "${queueName}" does not exist.`);
+            return;
+        }
+        this.queues[queueName].drain(() => {
+            console.log(`All tasks in queue "${queueName}" have been processed.`);
         });
     }
 }

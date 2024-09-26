@@ -23,37 +23,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Review = exports.ReviewClass = exports.ReviewInfo = void 0;
+exports.Subscriber = exports.SubscriberClass = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 const PropertyModel_1 = require("./PropertyModel");
-const UserModel_1 = require("./UserModel");
-class ReviewInfo {
-    constructor() {
-        this.user = new UserModel_1.UserClass();
-        this.message = '';
-        this.rating = 0;
-        this.createAt = new Date();
-    }
-}
-exports.ReviewInfo = ReviewInfo;
-class ReviewClass {
+class SubscriberClass {
     constructor() {
         this._id = '';
         this.property = new PropertyModel_1.PropertyClass();
-        this.reviewInfo = [];
+        this.adminID = "";
+        this.subscribers = [];
     }
 }
-exports.ReviewClass = ReviewClass;
-const ReviewSchema = new mongoose_1.Schema({
-    property: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Property', required: true },
-    reviewInfo: [
-        {
-            user: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: true },
-            message: { type: String },
-            rating: { type: Number, max: 5 },
-            createAt: { type: Date, default: Date.now }
-        }
+exports.SubscriberClass = SubscriberClass;
+const SubscriberSchema = new mongoose_1.Schema({
+    adminID: { type: String, required: [true, 'Admin ID is required.'] },
+    property: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Property' },
+    subscribers: [
+        { type: mongoose_1.Schema.Types.ObjectId, ref: 'User' }
     ]
 });
-ReviewSchema.index({ property: 1 });
-exports.Review = mongoose_1.default.model('Review', ReviewSchema);
+SubscriberSchema.index({ adminID: 1 });
+exports.Subscriber = mongoose_1.default.model('Subscriber', SubscriberSchema);

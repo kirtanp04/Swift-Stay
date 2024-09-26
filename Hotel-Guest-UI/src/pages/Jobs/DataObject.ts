@@ -1,4 +1,6 @@
+import { Api, getGETParamData } from "src/common/ApiCall";
 import { isUndefinedOrNull } from "src/common/common";
+import { Param } from "src/Constant";
 
 export enum enumJobStatus {
     OPEN = "open",
@@ -28,7 +30,7 @@ export enum enumJobExperience {
     OneYear = "1 year",
     OneAndhalf = "1.5 year",
     TwoToFour = "2 to 4 year",
-    More = "More than 4 years"
+    More = "More than 4 years",
 }
 
 export class Job {
@@ -36,7 +38,7 @@ export class Job {
 
     PropertyID: string = "";
 
-    PropertyName: string = "Lakeview-Villas"
+    PropertyName: string = "Lakeview-Villas";
 
     AdminID: string = "";
 
@@ -81,6 +83,54 @@ export class Job {
         }
     }
 
+    static GetJobsByPropertyID = async (
+        propertyID: string,
+
+        onsuccess: (res: any) => void,
+        onfail: (err: string) => void
+    ) => {
+        try {
+            const _Param = getGETParamData(
+                Param.broker.Job,
+                Param.function.job.GetAllJobByProperty,
+                { propertyID: propertyID }
+            );
+
+            await Api.get(_Param, (res) => {
+                if (res.error !== "") {
+                    onfail(res.error);
+                } else {
+                    onsuccess(res.data);
+                }
+            });
+        } catch (error: any) {
+            onfail(error);
+        }
+    };
 
 
+    static GetJobDetail = async (
+        propertyID: string,
+        jobID: string,
+        onsuccess: (res: any) => void,
+        onfail: (err: string) => void
+    ) => {
+        try {
+            const _Param = getGETParamData(
+                Param.broker.Job,
+                Param.function.job.GetJobDetail,
+                { propertyID: propertyID, jobID: jobID }
+            );
+
+            await Api.get(_Param, (res) => {
+                if (res.error !== "") {
+                    onfail(res.error);
+                } else {
+                    onsuccess(res.data);
+                }
+            });
+        } catch (error: any) {
+            onfail(error);
+        }
+    };
 }

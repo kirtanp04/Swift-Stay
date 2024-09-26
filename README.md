@@ -50,6 +50,7 @@
 
         - Cluster -> for heavy traffic
         - Redis Pub/Sub -> for chat system
+        - async -> for creating Queue to process task like[sending email, storing chat data, sending notifications,......] base on concurrency
         - compression
         - node-cache
 

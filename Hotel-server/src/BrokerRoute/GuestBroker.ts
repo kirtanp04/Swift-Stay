@@ -14,6 +14,7 @@ const _GuestRoomBroker: string = Param.broker.guest.Room;
 const _GuestPaymentBroker: string = Param.broker.guest.payment;
 const _GuestBookingBroker: string = Param.broker.guest.booking;
 const _GuestChatBroker: string = Param.broker.guest.chat;
+const _GuestJobBroker: string = Param.broker.guest.Job;
 
 GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -44,6 +45,9 @@ GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextF
 
                     case _GuestChatBroker:
                         return SendResponseToUser(await Functions.ChatFunction.findFunction(paramObj, req, res, next), next);
+
+                    case _GuestJobBroker:
+                        return SendResponseToUser(await Functions.JobFunction.findFunction(paramObj, req, res, next), next);
 
                     default:
                         const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
@@ -90,6 +94,9 @@ GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: Next
 
                         case _GuestChatBroker:
                             return SendResponseToUser(await Functions.ChatFunction.findFunction(paramObj, req, res, next), next);
+
+                        case _GuestJobBroker:
+                            return SendResponseToUser(await Functions.JobFunction.findFunction(paramObj, req, res, next), next);
 
                         default:
                             const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);

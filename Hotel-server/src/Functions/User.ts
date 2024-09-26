@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { Queue } from '..';
 import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
 import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Response';
 import { EmailTemplate, Param, QueueName } from '../Constant';

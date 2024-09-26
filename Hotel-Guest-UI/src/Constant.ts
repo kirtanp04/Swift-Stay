@@ -14,7 +14,7 @@ export const Param = {
         Auth: 'GuestAuthBroker',
         Property: 'GuestPropertyBroker',
         Room: 'GuestRoomBroker',
-
+        Job: 'GuestJobBroker',
         chat: 'GuestChatBroker',
         payment: 'GuestPaymentBroker',
         booking: 'GuestBookingBroker'
@@ -50,6 +50,10 @@ export const Param = {
             UpdateBookingInfo: 'GuestUpdateBookinInfo',
             generateInvoice: 'GuestGenerateInvoice',
             getMyBookingList: 'GuestGetMyBookingList'
+        },
+        job: {
+            GetAllJobByProperty: 'GuestGetAllJobByProperty',
+            GetJobDetail: 'GuestGetJobDetail',
         }
     },
 };

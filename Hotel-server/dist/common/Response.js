@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetUserSuccessObj = exports.GetUserErrorObj = exports.errorPath = exports.UserResponse = exports.ProjectResponse = void 0;
+const HTTPStatusCode_1 = require("./HTTPStatusCode");
 class ProjectResponse {
     constructor() {
         this.data = '';
@@ -10,7 +11,7 @@ class ProjectResponse {
 exports.ProjectResponse = ProjectResponse;
 class UserResponse {
     constructor() {
-        this.statusCode = 200;
+        this.statusCode = HTTPStatusCode_1.HttpStatusCodes.OK;
         this.Message = '';
         this.isError = false;
     }
@@ -27,7 +28,7 @@ const GetUserErrorObj = (errMess, statusCode) => {
     _objErr.Message = errMess;
     _objErr.data = '';
     _objErr.isError = true;
-    _objErr.statusCode = statusCode || 404;
+    _objErr.statusCode = statusCode || HTTPStatusCode_1.HttpStatusCodes.BAD_REQUEST;
     return _objErr;
 };
 exports.GetUserErrorObj = GetUserErrorObj;
@@ -36,7 +37,7 @@ const GetUserSuccessObj = (Data, statusCode) => {
     _objSucc.Message = '';
     _objSucc.data = Data;
     _objSucc.isError = false;
-    _objSucc.statusCode = statusCode || 404;
+    _objSucc.statusCode = statusCode || HTTPStatusCode_1.HttpStatusCodes.OK;
     return _objSucc;
 };
 exports.GetUserSuccessObj = GetUserSuccessObj;

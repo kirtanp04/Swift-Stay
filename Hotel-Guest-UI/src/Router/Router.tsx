@@ -1,5 +1,5 @@
 import { ElementType, Suspense, lazy } from "react";
-import { useRoutes } from "react-router-dom";
+import { Navigate, useRoutes } from "react-router-dom";
 import LoadingPage from "src/components/LoadingPage";
 import NotificationContext from "src/context/Notification";
 import { UserSearchContextProvider } from "src/context/UserSearchContext";
@@ -34,6 +34,7 @@ const PropertyListByState = Loadable(
 );
 
 const JobDetail = Loadable(lazy(() => import("src/pages/Jobs/JobDetail")));
+const JobList = Loadable(lazy(() => import("src/pages/Jobs/JobList")));
 const Bookin = Loadable(lazy(() => import("src/pages/Booking/Booking")));
 
 export default function Router() {
@@ -56,9 +57,25 @@ export default function Router() {
               index: true,
               element: <PropertyListByState />,
             },
+          ],
+        },
+
+        {
+          path: ":propertyName/:propertyID",
+          children: [
             {
-              path: ":propertyName/:propertyID/job-detail",
+              element: (
+                <Navigate to="/:propertyName/:propertyID/job-list" replace />
+              ),
+              index: true,
+            },
+            {
+              path: ":jobtitle/:jobID/job-detail",
               element: <JobDetail />,
+            },
+            {
+              path: "job-list",
+              element: <JobList />,
             },
           ],
         },
@@ -68,7 +85,11 @@ export default function Router() {
         },
         {
           path: "mybooking",
-          element: <BookingList />,
+          element: (
+            <AuthGaurd>
+              <BookingList />
+            </AuthGaurd>
+          ),
         },
         {
           path: ":country/:state/:propertyName/:propertyID/booking/:roomType/:roomID",

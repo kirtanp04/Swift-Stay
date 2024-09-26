@@ -40,6 +40,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const CryptoTS = __importStar(require("crypto-ts"));
 const Convert_1 = require("./Convert");
 const Response_1 = require("./Response");
+const env_1 = require("../env");
 // import { logEntry } from 'src/logging/logger';
 class Crypt {
     static Decryption(value) {
@@ -144,8 +145,8 @@ class Crypt {
     }
 }
 exports.Crypt = Crypt;
-Crypt.key = CryptoTS.enc.Utf8.parse('knjbvuigbuvhuy84578953686578ty78');
-Crypt.Iv = CryptoTS.enc.Utf8.parse('knjbvuigbuvhuy84578953686578ty78');
+Crypt.key = CryptoTS.enc.Utf8.parse(env_1.SecrtKey.ENCRYPTION_KEY);
+Crypt.Iv = CryptoTS.enc.Utf8.parse(env_1.SecrtKey.ENCRYPTION_KEY);
 function isTypeString(value) {
     if (typeof value === 'string') {
         return true;

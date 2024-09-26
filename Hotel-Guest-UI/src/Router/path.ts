@@ -39,12 +39,18 @@ export const Path = {
     },
 
     job: {
-        jobDetail: (countryName: string, stateName: string, propertyName: string, propertyID: string): string => {
-            const formattedCountryName = Path.formatName(countryName);
-            const formattedStateName = Path.formatName(stateName);
+        jobList: (propertyName: string, propertyID: string): string => {
+
             const formattedPropertyName = Path.formatName(propertyName);
-            return `${rootPath}${formattedCountryName}/${formattedStateName}/${formattedPropertyName}/${propertyID}/job-detail`;
-        }
+            return `${rootPath}/${formattedPropertyName}/${propertyID}/job-list`;
+        },
+        jobDetail: (propertyName: string, propertyID: string, jobtitle: string, jobID: string): string => {
+
+            const formattedPropertyName = Path.formatName(propertyName);
+            const formattedjobtitle = Path.formatName(jobtitle);
+            return `${rootPath}/${formattedPropertyName}/${propertyID}/${formattedjobtitle}/${jobID}/job-detail`;
+        },
+
     }
 
 

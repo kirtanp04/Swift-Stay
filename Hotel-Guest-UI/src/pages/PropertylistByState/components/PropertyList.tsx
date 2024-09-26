@@ -132,12 +132,7 @@ function PropertyList({
                     }}
                     onClick={() =>
                       navigate(
-                        Path.job.jobDetail(
-                          country!,
-                          state!,
-                          objProperty.name,
-                          objProperty._id
-                        )
+                        Path.job.jobList(objProperty.name, objProperty._id)
                       )
                     }
                   >

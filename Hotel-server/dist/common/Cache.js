@@ -95,3 +95,16 @@ Cache.getCacheData = (cacheKey) => {
         return _res;
     }
 };
+Cache.ClearAllCache = () => {
+    let _res = new Response_1.ProjectResponse();
+    try {
+        _a._myCache.flushAll();
+        _res.data = 'cleared all cached';
+    }
+    catch (error) {
+        _res.error = (0, Response_1.errorPath)('common/Cache', 'getCacheData', 84) + error;
+    }
+    finally {
+        return _res;
+    }
+};

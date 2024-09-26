@@ -8,7 +8,8 @@
     "start:prod": "npm run build && node ./dist/src/server.js",
     "build": "npx tsc",
     "dev": "nodemon ./src/index.ts",
-    "debug": "node --inspect=9229 -r ts-node/register ./src/index.ts"
+    "debug": "node --inspect=9229 -r ts-node/register ./src/index.ts",
+    "clear": "npx ts-node "
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "@types/cors": "^2.8.17",
     "@types/cryptr": "^4.0.3",
     "@types/dotenv": "^8.2.0",
+    "async": "^3.2.6",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "bull": "^4.16.3",
@@ -44,6 +46,7 @@
     "stripe": "^16.8.0"
   },
   "devDependencies": {
+    "@types/async": "^3.2.24",
     "@types/bcrypt": "^5.0.2",
     "@types/compression": "^1.7.5",
     "@types/express": "^4.17.21",

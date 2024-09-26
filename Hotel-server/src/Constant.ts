@@ -27,6 +27,7 @@ export const Param = {
       chat: 'GuestChatBroker',
       payment: 'GuestPaymentBroker',
       booking: 'GuestBookingBroker',
+      Job: 'GuestJobBroker',
     },
   },
 
@@ -104,6 +105,10 @@ export const Param = {
         generateInvoice: 'GuestGenerateInvoice',
         getMyBookingList: 'GuestGetMyBookingList',
       },
+      job: {
+        GetAllJobByProperty: 'GuestGetAllJobByProperty',
+        GetJobDetail: 'GuestGetJobDetail',
+      }
     },
   },
 };
@@ -127,6 +132,11 @@ export const CacheKey = {
       PropertyProfitByMonth: (emailID: string, year: number) => `#@Manager#@${emailID}#@${year}#@#@PropertyProfitByMonth#@`,
     },
     JobList: (adminID: string) => `#@Manager#@${adminID}#@jobList#@`,
+  },
+
+  job: {
+    JobsByProperty: (propertyID: string) => `#@Common#@${propertyID}#@jobList#@`,
+    JobDetail: (jobID: string) => `#@Common#@${jobID}#@jobDetail#@`,
   },
 
   chat: (chatKey: string) => `#@ManagerChat#@${chatKey}#@UserChat#@`,

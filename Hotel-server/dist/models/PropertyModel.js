@@ -25,12 +25,16 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Property = exports.PropertyClass = exports.enumPropertyType = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const Review_1 = require("./Review");
+const Subscriber_1 = require("./Subscriber");
 var enumPropertyType;
 (function (enumPropertyType) {
     enumPropertyType["Hotel"] = "Hotel";
     enumPropertyType["Resort"] = "Resort";
     enumPropertyType["Apartment"] = "Apartment";
     enumPropertyType["Bungalow"] = "Bungalow";
+    enumPropertyType["Villa"] = "Villa";
+    enumPropertyType["Cottage"] = "Cottage";
 })(enumPropertyType || (exports.enumPropertyType = enumPropertyType = {}));
 class PropertyClass {
     constructor() {
@@ -50,54 +54,39 @@ class PropertyClass {
         this.amenities = [];
         this.images = [];
         this.rooms = [];
+        this.reviews = new Review_1.ReviewClass();
+        this.subscribers = new Subscriber_1.SubscriberClass();
+        this.jobHiring = false;
+        this.checkInTime = '';
+        this.checkOutTime = '';
         this.createdAt = new Date();
+        this.updatedAt = new Date();
     }
 }
 exports.PropertyClass = PropertyClass;
 const PropertySchema = new mongoose_1.Schema({
-    adminID: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: true },
+    adminID: { type: String, required: [true, 'Admin ID is required.'] },
     name: { type: String, required: [true, 'Property name is required.'] },
-    propertyType: { enum: [enumPropertyType.Hotel, enumPropertyType.Resort, enumPropertyType.Bungalow, enumPropertyType.Apartment], default: enumPropertyType.Hotel },
+    propertyType: { type: String, enum: Object.values(enumPropertyType), default: enumPropertyType.Hotel },
     address: { type: String, required: [true, 'Property address is required.'] },
-    city: { type: String, required: [true, 'city is required.'] },
-    state: { type: String, required: [true, 'state is required.'] },
-    country: { type: String, required: [true, 'country is required.'] },
-    zipCode: { type: String, required: [true, 'zip code is required.'] },
-    phone: { type: String, required: [true, 'phone number is required.'] },
-    email: { type: String, required: [true, 'email is required.'] },
+    city: { type: String, required: [true, 'City is required.'] },
+    state: { type: String, required: [true, 'State is required.'] },
+    country: { type: String, required: [true, 'Country is required.'] },
+    zipCode: { type: String, required: [true, 'Zip code is required.'] },
+    phone: { type: String, required: [true, 'Phone number is required.'] },
+    email: { type: String, required: [true, 'Email is required.'] },
     website: { type: String },
     description: { type: String },
+    checkInTime: { type: String },
+    checkOutTime: { type: String },
     rooms: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Room' }],
+    reviews: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Review' },
+    subscribers: { type: mongoose_1.Schema.Types.ObjectId, ref: 'Subscriber' },
     amenities: [String],
     images: [String],
-    createdAt: { type: Date },
+    jobHiring: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
 });
+PropertySchema.index({ adminID: 1 });
 exports.Property = mongoose_1.default.model('Property', PropertySchema);
-// type: { type: String, enum: ['hotel', 'resort', 'apartment', 'bungalow'], required: true },
-// name: { type: String, required: true },
-// description: { type: String },
-// location: {
-//   address: { type: String },
-//   city: { type: String },
-//   state: { type: String },
-//   country: { type: String }
-// },
-// // Common fields for all types
-// rating: { type: Number },
-// rooms: { type: Number },
-// amenities: [{ type: String }],
-// // Specific fields for each type
-// // Example for 'hotel'
-// stars: { type: Number },
-// // Example for 'resort'
-// activities: [{ type: String }],
-// // Example for 'apartment'
-// roomsDetails: [{
-//   roomNumber: { type: Number },
-//   price: { type: Number }
-// }],
-// // Example for 'bungalow'
-// hasGarden: { type: Boolean },
-// // Additional common fields
-// createdAt: { type: Date, default: Date.now }
-// });

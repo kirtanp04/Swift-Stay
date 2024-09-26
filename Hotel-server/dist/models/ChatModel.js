@@ -23,37 +23,28 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Review = exports.ReviewClass = exports.ReviewInfo = void 0;
+exports.Chat = exports.TChat = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const PropertyModel_1 = require("./PropertyModel");
-const UserModel_1 = require("./UserModel");
-class ReviewInfo {
+class TChat {
     constructor() {
-        this.user = new UserModel_1.UserClass();
-        this.message = '';
-        this.rating = 0;
-        this.createAt = new Date();
+        this.key = '';
+        this.chatInfo = [];
     }
 }
-exports.ReviewInfo = ReviewInfo;
-class ReviewClass {
-    constructor() {
-        this._id = '';
-        this.property = new PropertyModel_1.PropertyClass();
-        this.reviewInfo = [];
-    }
-}
-exports.ReviewClass = ReviewClass;
-const ReviewSchema = new mongoose_1.Schema({
-    property: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Property', required: true },
-    reviewInfo: [
-        {
-            user: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: true },
-            message: { type: String },
-            rating: { type: Number, max: 5 },
-            createAt: { type: Date, default: Date.now }
-        }
-    ]
+exports.TChat = TChat;
+const ChatSchema = new mongoose_1.Schema({
+    key: { type: String, required: [true, 'Chat key is required.'] },
+    chatInfo: [{
+            message: { type: String, required: [true, 'Message is required.'] },
+            date: { type: Date, required: [true, 'Date is required.'] },
+            senderDetail: {
+                _id: { type: String, required: [true, 'Sender Id is required.'] },
+                email: { type: String, required: [true, 'Sender Email is required.'] },
+                name: { type: String, required: [true, 'Sender Name is required.'] },
+                role: { type: String, required: [true, 'Sender Role is required.'] },
+                profileImg: { type: String },
+            },
+        }]
 });
-ReviewSchema.index({ property: 1 });
-exports.Review = mongoose_1.default.model('Review', ReviewSchema);
+ChatSchema.index({ key: 1 });
+exports.Chat = mongoose_1.default.model('chat', ChatSchema);

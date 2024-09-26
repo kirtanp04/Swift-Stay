@@ -9,6 +9,9 @@ import { TParam } from '../types/Type';
 const _ManagerAddNewJob: string = Param.function.manager.Job.AddnewJob;
 const _ManagerGetAllJob: string = Param.function.manager.Job.GetAllJobs;
 
+const _GuestGetAllJobByProperty: string = Param.function.guest.job.GetAllJobByProperty;
+const _GuestGetJobDetail: string = Param.function.guest.job.GetJobDetail;
+
 export class JobFunction {
     private static objUserResponse: UserResponse = new UserResponse();
 
@@ -19,6 +22,8 @@ export class JobFunction {
         _Function.next = next;
         _Function.objParam = objParam;
 
+
+
         switch (objParam.function) {
             case _ManagerAddNewJob:
                 this.objUserResponse = await _Function.AddNewJob();
@@ -26,6 +31,14 @@ export class JobFunction {
 
             case _ManagerGetAllJob:
                 this.objUserResponse = await _Function.GetAllJobList();
+                break;
+
+            case _GuestGetAllJobByProperty:
+                this.objUserResponse = await _Function.GetAllJobByProperty();
+                break;
+
+            case _GuestGetJobDetail:
+                this.objUserResponse = await _Function.GetJobDetail();
                 break;
 
             default:
@@ -96,6 +109,10 @@ class Functions {
                         Cache.ClearCache(CacheKey.manager.JobList(objJob.AdminID));
                     }
 
+                    if (Cache.getCacheData(CacheKey.job.JobsByProperty(objJob.PropertyID)).error === '') {
+                        Cache.ClearCache(CacheKey.job.JobsByProperty(objJob.PropertyID));
+                    }
+
                     if (Cache.getCacheData(CacheKey.manager.property(CheckAdmin.data.email)).error === '') {
                         Cache.ClearCache(CacheKey.manager.property(CheckAdmin.data.email));
                     }
@@ -130,6 +147,71 @@ class Functions {
                 }
             } else {
                 this.objUserResponse = GetUserErrorObj(CheckAdmin.error, HttpStatusCodes.NOT_ACCEPTABLE);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    public GetAllJobByProperty = async (): Promise<UserResponse> => {
+        try {
+            const { propertyID } = this.objParam!.data;
+
+            const cacheData = Cache.getCacheData(CacheKey.job.JobsByProperty(propertyID));
+
+            if (cacheData.error === '') {
+                this.objUserResponse = GetUserSuccessObj(cacheData.data, HttpStatusCodes.OK);
+            } else {
+                const Jobs = await Job.aggregate([
+                    {
+                        $match: {
+                            $and: [
+                                {
+                                    PropertyID: propertyID
+                                }
+                            ]
+
+                        }
+                    }
+                ]);
+                Cache.SetCache(CacheKey.job.JobsByProperty(propertyID), Jobs);
+                this.objUserResponse = GetUserSuccessObj(Jobs, HttpStatusCodes.OK);
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+
+    public GetJobDetail = async (): Promise<UserResponse> => {
+        try {
+            const { propertyID, jobID } = this.objParam!.data;
+
+            const cacheData = Cache.getCacheData(CacheKey.job.JobDetail(jobID));
+
+            if (cacheData.error === '') {
+                this.objUserResponse = GetUserSuccessObj(cacheData.data, HttpStatusCodes.OK);
+            } else {
+                const jobDetail = await Job.findOne({
+                    $and: [{
+                        _id: jobID
+                    }, {
+                        PropertyID: propertyID
+                    }]
+                })
+
+                if (jobDetail !== null) {
+                    Cache.SetCache(CacheKey.job.JobDetail(jobID), jobDetail);
+                    this.objUserResponse = GetUserSuccessObj(jobDetail, HttpStatusCodes.OK);
+                } else {
+                    this.objUserResponse = GetUserErrorObj("Server error: invalid payload or url, no such job available", HttpStatusCodes.BAD_REQUEST);
+                }
+
+
             }
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);

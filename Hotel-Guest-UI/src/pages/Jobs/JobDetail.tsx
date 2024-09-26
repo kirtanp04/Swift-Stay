@@ -9,71 +9,47 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Page from "src/components/Page";
 import { enumJobStatus, Job } from "./DataObject";
 import LoadingSkeleton from "src/components/Skeleton";
 import { RESIconButton } from "src/components/RESIconButton";
 import { ApplyIcon } from "src/assets/iconify";
-
-const jobPosting: any = {
-  _id: "66eee5ecc1b9a79596c6e41b",
-  AdminID: "669de20b25ab0a21e2079728",
-  PropertyID: "66b1e967dc33700f217bbeb1",
-  PropertyName: "Lakeview Villas",
-  title: "Assistant Hotel Manager",
-  description:
-    "The Assistant Hotel Manager will support the General Manager in managing",
-  location: "Anand, Gujarat, India",
-  salary: 55000,
-  currency: "₹",
-  JobType: "full-time",
-  category: "management",
-  status: "open",
-  experience: "At least 6 months",
-  requirements: [
-    "Bachelor's degree in Hospitality Management or equivalent",
-    "Strong leadership and interpersonal skills",
-    "Proficiency in hotel management software",
-    "Ability to manage multiple departments effectively",
-    "Excellent communication and problem-solving skills",
-  ],
-  benefits: [
-    "Health insurance",
-    "Paid vacation days",
-    "Employee discounts on hotel services",
-    "Retirement plan",
-    "Career development opportunities",
-  ],
-  customInfo: [
-    {
-      label: "Work Shifts",
-      value: "Must be available for weekend and evening shifts",
-      _id: "66eee5ecc1b9a79596c6e41c",
-    },
-    {
-      label: "Reports To",
-      value: "General Manager",
-      _id: "66eee5ecc1b9a79596c6e41d",
-    },
-    {
-      label: "Accommodation",
-      value: "Provided on site",
-      _id: "66eee5ecc1b9a79596c6e41e",
-    },
-  ],
-  createdAt: "2024-09-21T15:21:51.293+00:00",
-  updatedAt: "2024-09-21T15:21:51.293+00:00",
-};
+import showMessage from "src/util/ShowMessage";
+import showLoading from "src/util/ShowLoading";
 
 export default function JobDetail() {
-  const { state, country, propertyName, propertyID } = useParams();
-  const [ObjJobdetail, setJobDetail] = useState<Job>(jobPosting);
-
+  const { jobtitle, jobID, propertyName, propertyID } = useParams();
+  const [ObjJobdetail, setJobDetail] = useState<Job>(new Job());
   const theme = useTheme();
+
+  useEffect(() => {
+    getJobDetail();
+  }, []);
+
+  const getJobDetail = () => {
+    showLoading(theme, true);
+    try {
+      Job.GetJobDetail(
+        propertyID!,
+        jobID!,
+        (res) => {
+          showLoading(theme, false);
+          setJobDetail(res);
+        },
+        (err) => {
+          showLoading(theme, false);
+          showMessage(err, "error", theme, () => {});
+        }
+      );
+    } catch (error: any) {
+      showMessage(error.message, "error", theme, () => {});
+    }
+  };
+
   return (
-    <Page title={`Job preview | ${propertyName}`}>
+    <Page title={`${jobtitle} | Job preview | ${propertyName}`}>
       <RootStyle>
         <HeaderWrapper>
           <LoadingSkeleton
@@ -382,11 +358,11 @@ const HeaderText = styled(Typography)(({ theme }) => ({
   fontFamily: "Heading",
 }));
 
-const HeaderHotelAction = styled(Typography)(() => ({
-  display: "flex",
-  alignItems: "center",
-  gap: "15px",
-}));
+// const HeaderHotelAction = styled(Typography)(() => ({
+//   display: "flex",
+//   alignItems: "center",
+//   gap: "15px",
+// }));
 
 const TextWrapper = styled(Box)(() => ({
   width: "100%",
@@ -395,6 +371,7 @@ const TextWrapper = styled(Box)(() => ({
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
+  flex: 1,
 }));
 const TextSkeleton = styled(LoadingSkeleton)(() => ({
   width: "100%",
@@ -424,6 +401,8 @@ const Text = styled(Typography)(({ theme }) => ({
   [theme.breakpoints.down("xl")]: {
     fontSize: "0.85rem",
   },
+  display: "flex",
+  flex: 1,
 }));
 
 const ContentWrapper = styled(Box)(() => ({

@@ -16,23 +16,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MongoDB = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const common_1 = require("../common");
+const env_1 = require("../env");
 class MongoDB {
 }
 exports.MongoDB = MongoDB;
 _a = MongoDB;
-MongoDB.ConnectDB = () => __awaiter(void 0, void 0, void 0, function* () {
+MongoDB.ConnectDB = (next) => __awaiter(void 0, void 0, void 0, function* () {
     let _userRes = new common_1.UserResponse();
-    try {
-        yield mongoose_1.default.connect('mongodb+srv://kirtanp04:OyBd0kVg6JZxkvpy@hotelcluster.exs9nof.mongodb.net/Stay_Swift').then(() => {
-            _userRes.isError = false;
-            _userRes.data = 'Database Connection: Success';
-        });
+    if (mongoose_1.default.connection.readyState === 0) { // not connected yet
+        try {
+            yield mongoose_1.default.connect(env_1.SecrtKey.MNOGO_URL).then(() => {
+                _userRes.isError = false;
+                _userRes.data = 'Database Connection: Success';
+            });
+        }
+        catch (error) {
+            _userRes.Message = error;
+            _userRes.isError = true;
+        }
     }
-    catch (error) {
-        _userRes.Message = (0, common_1.errorPath)('Database/DB.ts', 'ConnectDB', 17) + error;
-        _userRes.isError = true;
-    }
-    finally {
-        console.log(_userRes);
-    }
+    return _userRes;
 });

@@ -2,17 +2,18 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Jwt = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const env_1 = require("../env");
 const Crypt_1 = require("./Crypt");
 const Response_1 = require("./Response");
-// const privateKey = fs.readFileSync(path.join(__dirname, 'private_key.pem'), 'utf8');
-// const publicKey = fs.readFileSync(path.join(__dirname, 'public_key.pem'), 'utf8');
-const JWT_KEY = 'jbut*%$%^JHFR^$^$^&FC64';
 class Jwt {
 }
 exports.Jwt = Jwt;
+_a = Jwt;
+Jwt.JWT_KEY = env_1.SecrtKey.JWT_KEY;
 Jwt.SignJwt = (data, expireIn) => {
     let _res = new Response_1.ProjectResponse();
     try {
@@ -20,9 +21,9 @@ Jwt.SignJwt = (data, expireIn) => {
         if (objEncrypt.error === '') {
             const getToken = jsonwebtoken_1.default.sign({
                 data: objEncrypt.data,
-            }, JWT_KEY, {
+            }, _a.JWT_KEY, {
                 expiresIn: expireIn || '1h',
-                //  algorithm: 'RS256' 
+                //  algorithm: 'RS256'
             });
             if (getToken) {
                 _res.data = getToken;
@@ -45,7 +46,7 @@ Jwt.SignJwt = (data, expireIn) => {
 Jwt.VerifyJwt = (token) => {
     let _res = new Response_1.ProjectResponse();
     try {
-        const decodedToken = jsonwebtoken_1.default.verify(token, JWT_KEY);
+        const decodedToken = jsonwebtoken_1.default.verify(token, _a.JWT_KEY);
         if (decodedToken) {
             const objDecrypt = Crypt_1.Crypt.Decryption(decodedToken.data);
             if (objDecrypt.error === '') {

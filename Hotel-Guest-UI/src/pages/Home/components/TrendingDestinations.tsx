@@ -1,16 +1,49 @@
 import { Box, Grid, styled, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import LazyImage from "src/components/LazyImage";
+import useUserSearch from "src/hooks/useUserSearch";
 import { Property } from "src/ObjMgr/Property";
+import { Path } from "src/Router/path";
 
 type Props = {
   Properties: Property[];
 };
 
 export default function TrendingDestinations({ Properties }: Props) {
+  const {
+    UserSearchObj: { selectedCountry },
+  } = useUserSearch();
+  const navigate = useNavigate();
+
+  const SeeAvailability = (
+    propertyName: string,
+    propertyId: string,
+    state: string
+  ) => {
+    navigate(
+      Path.proprty.PropertyDetail(
+        selectedCountry,
+        state,
+        propertyName,
+        propertyId
+      )
+    );
+  };
   return (
     <Box>
       <GridContainer container gap={"10px"} xl={12} justifyContent={"center"}>
-        <SubGrid xl={5} lg={5.5}>
+        <SubGrid
+          xl={5}
+          lg={5.5}
+          sx={{ cursor: "pointer" }}
+          onClick={() =>
+            SeeAvailability(
+              Properties[0].name,
+              Properties[0]._id,
+              Properties[0].state
+            )
+          }
+        >
           <LazyImage
             alt={Properties[0].name}
             src={Properties[0].images[0]}
@@ -20,7 +53,19 @@ export default function TrendingDestinations({ Properties }: Props) {
             {Properties[0].name + " | " + Properties[0].state.split("-")[0]}
           </StateName>
         </SubGrid>
-        <SubGrid xl={5} lg={5.5}>
+
+        <SubGrid
+          xl={5}
+          lg={5.5}
+          sx={{ cursor: "pointer" }}
+          onClick={() =>
+            SeeAvailability(
+              Properties[1].name,
+              Properties[1]._id,
+              Properties[1].state
+            )
+          }
+        >
           <LazyImage
             alt={Properties[1].name}
             src={Properties[1].images[0]}
@@ -38,7 +83,18 @@ export default function TrendingDestinations({ Properties }: Props) {
         justifyContent={"center"}
         sx={{ marginTop: "1rem" }}
       >
-        <SubGrid xl={3.5} lg={3.5} sx={{ height: 230 }}>
+        <SubGrid
+          xl={3.5}
+          lg={3.5}
+          sx={{ height: 230, cursor: "pointer" }}
+          onClick={() =>
+            SeeAvailability(
+              Properties[2].name,
+              Properties[2]._id,
+              Properties[2].state
+            )
+          }
+        >
           <LazyImage
             alt={Properties[2].name}
             src={Properties[2].images[0]}
@@ -49,7 +105,18 @@ export default function TrendingDestinations({ Properties }: Props) {
           </StateName>
         </SubGrid>
 
-        <SubGrid xl={3.5} lg={3.5} sx={{ height: 230 }}>
+        <SubGrid
+          xl={3.5}
+          lg={3.5}
+          sx={{ height: 230, cursor: "pointer" }}
+          onClick={() =>
+            SeeAvailability(
+              Properties[3].name,
+              Properties[3]._id,
+              Properties[3].state
+            )
+          }
+        >
           <LazyImage
             alt={Properties[3].name}
             src={Properties[3].images[0]}
@@ -60,7 +127,18 @@ export default function TrendingDestinations({ Properties }: Props) {
           </StateName>
         </SubGrid>
 
-        <SubGrid xl={3.5} lg={3.5} sx={{ height: 230 }}>
+        <SubGrid
+          xl={3.5}
+          lg={3.5}
+          sx={{ height: 230, cursor: "pointer" }}
+          onClick={() =>
+            SeeAvailability(
+              Properties[4].name,
+              Properties[4]._id,
+              Properties[4].state
+            )
+          }
+        >
           <LazyImage
             alt={Properties[4].name}
             src={Properties[4].images[0]}
