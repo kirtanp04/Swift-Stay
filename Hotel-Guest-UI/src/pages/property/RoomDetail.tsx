@@ -12,7 +12,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { PersonIcon, PreviewIcon } from "src/assets/iconify";
 import EToolTip from "src/components/EToolTip";
 import IfLogedin from "src/components/IfLogedin";
@@ -28,6 +28,7 @@ type Props = {
 
 export default function RoomDetail({ Rooms }: Props) {
   const { propertyName, state, country, propertyID } = useParams();
+  const navigate = useNavigate();
 
   const theme = useTheme();
   return (
@@ -216,17 +217,15 @@ export default function RoomDetail({ Rooms }: Props) {
                               cursor: "pointer",
                             }}
                             onClick={() =>
-                              window.open(
-                                window.location.origin +
-                                  Path.booking.bookingForm(
-                                    country!,
-                                    state!,
-                                    propertyName!,
-                                    propertyID!,
-                                    objRoom._id,
-                                    objRoom.type
-                                  ),
-                                "_blank"
+                              navigate(
+                                Path.booking.bookingForm(
+                                  country!,
+                                  state!,
+                                  propertyName!,
+                                  propertyID!,
+                                  objRoom._id,
+                                  objRoom.type
+                                )
                               )
                             }
                           >

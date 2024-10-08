@@ -58,7 +58,6 @@ export default function NavBarContent() {
           />
         </CountryDetailWrapper>
 
-        <ListPropertyButton>About</ListPropertyButton>
         <ListPropertyButton>List your property</ListPropertyButton>
         <IfLogedin
           Else={
