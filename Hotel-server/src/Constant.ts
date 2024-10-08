@@ -64,6 +64,7 @@ export const Param = {
       chat: {
         saveChat: 'ManagerSaveChatService',
         initRedisForChat: 'InitRedisForChat',
+        getChatData: 'getChatData'
       },
       booking: {
         GetBookingListByAdmin: 'ManagerGetBookinListByAdmin',
@@ -90,6 +91,7 @@ export const Param = {
       chat: {
         saveChat: 'GuestSaveChatService',
         initRedisForChat: 'InitRedisForChat',
+        getChatData: 'getChatData'
       },
       room: {
         GetRoomDetail: 'GuestGetRoomDetail',

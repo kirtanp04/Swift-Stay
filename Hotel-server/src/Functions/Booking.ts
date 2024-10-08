@@ -755,8 +755,22 @@ class Functions {
                         },
                     ]);
 
-                    Cache.SetCache(CacheKey.manager.chatUserbaseBooking(adminID), BookingList);
-                    this.objUserResponse = GetUserSuccessObj(BookingList, HttpStatusCodes.OK);
+
+                    const uniqueRes = BookingList.reduce(
+                        (acc, current) => {
+                            const key = `${current.propertyID}-${current.user._id}`;
+                            if (!acc.map[key]) {
+                                acc.map[key] = true;
+                                acc.result.push(current);
+                            }
+                            return acc;
+                        },
+                        { map: {}, result: [] }
+                    ).result;
+
+
+                    Cache.SetCache(CacheKey.manager.chatUserbaseBooking(adminID), uniqueRes);
+                    this.objUserResponse = GetUserSuccessObj(uniqueRes, HttpStatusCodes.OK);
                 }
             } else {
                 this.objUserResponse = GetUserErrorObj(isAdmin.error, HttpStatusCodes.NOT_ACCEPTABLE);

@@ -80,9 +80,7 @@ export default function Errorlogs({}: Props) {
               flex: 0.5,
               renderCell: (param: any) => (
                 <TextWrapper>
-                  <Text>
-                    {TimeFormatter.formatTimeDifference(param.row.date)}
-                  </Text>
+                  <Text>{TimeFormatter.getTimeDifference(param.row.date)}</Text>
                 </TextWrapper>
               ),
             },

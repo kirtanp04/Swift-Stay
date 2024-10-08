@@ -7,6 +7,7 @@ import { Server } from "socket.io";
 import { SocketKeyName, WebSocket } from "./Socket";
 import { Redis } from "./redis";
 import { SecrtKey } from "./env";
+import os from 'os';
 
 const port = process.env.PORT || 5000;
 
@@ -70,6 +71,29 @@ _Redis.subscribe(
         Socket.SendChatMessageInRoom(SocketKeyName.ReceiveError, err);
     }
 );
+
+app.get('/', (req, res) => {
+    const userInfo = os.userInfo();
+    const systemInfo = {
+        user: userInfo.username,
+        hostname: os.hostname(),
+        platform: os.platform(),
+        architecture: os.arch(),
+        osType: os.type(),
+        osRelease: os.release(),
+        uptime: os.uptime(),
+        totalMemory: os.totalmem(),
+        freeMemory: os.freemem(),
+        cpus: os.cpus(),
+        homeDir: os.homedir(),
+        tmpDir: os.tmpdir(),
+        networkInterfaces: os.networkInterfaces(),
+        endianness: os.endianness(),
+    };
+    res.json(systemInfo);
+});
+
+
 
 // Start the HTTP server
 server.listen(port, () => {

@@ -6,6 +6,7 @@ import * as Functions from '../Functions/index';
 import { Param } from '../Constant';
 import { MongoDB } from '../DB/MongoDB';
 import { GetUserErrorObj, HttpStatusCodes } from '../common';
+import { VerifyAPIKey } from '../middleware/ValidateApi';
 
 const GuestBrokerRouter: Router = express.Router();
 const _GuestAuthBroker: string = Param.broker.guest.Auth;
@@ -18,66 +19,17 @@ const _GuestJobBroker: string = Param.broker.guest.Job;
 
 GuestBrokerRouter.get('/:param', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const isDBConnected = await MongoDB.ConnectDB(next);
+        const isApiVerified = VerifyAPIKey(req);
 
-        if (isDBConnected.isError === false) {
-            const { param } = req.params;
-            const objDecrypt = Crypt.Decryption(param);
+        if (isApiVerified.error === '') {
+            const isDBConnected = await MongoDB.ConnectDB(next);
 
-            if (objDecrypt.error === '') {
-                const paramObj: TParam = objDecrypt.data;
+            if (isDBConnected.isError === false) {
+                const { param } = req.params;
+                const objDecrypt = Crypt.Decryption(param);
 
-                switch (paramObj.Broker) {
-                    case _GuestAuthBroker:
-                        return SendResponseToUser(await Functions.UserFunction.findFunction(paramObj, req, res, next), next);
-
-                    case _GuestPaymentBroker:
-                        return SendResponseToUser(await Functions.PaymentFunction.findFunction(paramObj, req, res, next), next);
-
-                    case _GuestRoomBroker:
-                        return SendResponseToUser(await Functions.RoomFunction.findFunction(paramObj, req, res, next), next);
-
-                    case _GuestPropertyBroker:
-                        return SendResponseToUser(await Functions.PropertyFunction.findFunction(paramObj, req, res, next), next);
-
-                    case _GuestBookingBroker:
-                        return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
-
-                    case _GuestChatBroker:
-                        return SendResponseToUser(await Functions.ChatFunction.findFunction(paramObj, req, res, next), next);
-
-                    case _GuestJobBroker:
-                        return SendResponseToUser(await Functions.JobFunction.findFunction(paramObj, req, res, next), next);
-
-                    default:
-                        const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
-                        return SendResponseToUser(errMess, next);
-                }
-            } else {
-                return SendResponseToUser(GetUserErrorObj(`Server Error: ${objDecrypt.error}`, HttpStatusCodes.BAD_REQUEST), next);
-            }
-        } else {
-            return SendResponseToUser(GetUserErrorObj(` ${isDBConnected.Message}`, HttpStatusCodes.BAD_REQUEST), next);
-        }
-    } catch (error: any) {
-        return SendResponseToUser(GetUserErrorObj(`Server Error: ${error.message}`, HttpStatusCodes.BAD_REQUEST), next);
-    }
-});
-
-GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const isDBConnected = await MongoDB.ConnectDB(next);
-        if (isDBConnected.isError === false) {
-            const { param } = req.params;
-            const objDecrypt = Crypt.Decryption(param);
-
-            if (objDecrypt.error === '') {
-                const decryptResBody = Crypt.Decryption(req.body.data);
-
-                if (decryptResBody.error === '') {
-                    let paramObj: TParam = objDecrypt.data;
-
-                    paramObj.data = decryptResBody.data;
+                if (objDecrypt.error === '') {
+                    const paramObj: TParam = objDecrypt.data;
 
                     switch (paramObj.Broker) {
                         case _GuestAuthBroker:
@@ -88,6 +40,9 @@ GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: Next
 
                         case _GuestRoomBroker:
                             return SendResponseToUser(await Functions.RoomFunction.findFunction(paramObj, req, res, next), next);
+
+                        case _GuestPropertyBroker:
+                            return SendResponseToUser(await Functions.PropertyFunction.findFunction(paramObj, req, res, next), next);
 
                         case _GuestBookingBroker:
                             return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
@@ -103,17 +58,75 @@ GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: Next
                             return SendResponseToUser(errMess, next);
                     }
                 } else {
-                    const errMess = GetUserErrorObj('Server error: Not able to decrypt body', HttpStatusCodes.BAD_REQUEST);
-                    return SendResponseToUser(errMess, next);
+                    return SendResponseToUser(GetUserErrorObj(`Server Error: ${objDecrypt.error}`, HttpStatusCodes.BAD_REQUEST), next);
                 }
             } else {
-                return SendResponseToUser(
-                    GetUserErrorObj(`Server Error: ${objDecrypt.error} + Params`, HttpStatusCodes.BAD_REQUEST),
-                    next
-                );
+                return SendResponseToUser(GetUserErrorObj(` ${isDBConnected.Message}`, HttpStatusCodes.BAD_REQUEST), next);
             }
         } else {
-            return SendResponseToUser(GetUserErrorObj(` ${isDBConnected.Message}`, HttpStatusCodes.BAD_REQUEST), next);
+            return SendResponseToUser(GetUserErrorObj(isApiVerified.error, HttpStatusCodes.BAD_REQUEST), next);
+        }
+    } catch (error: any) {
+        return SendResponseToUser(GetUserErrorObj(`Server Error: ${error.message}`, HttpStatusCodes.BAD_REQUEST), next);
+    }
+});
+
+GuestBrokerRouter.post('/:param', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const isApiVerified = VerifyAPIKey(req);
+
+        if (isApiVerified.error === '') {
+            const isDBConnected = await MongoDB.ConnectDB(next);
+            if (isDBConnected.isError === false) {
+                const { param } = req.params;
+                const objDecrypt = Crypt.Decryption(param);
+
+                if (objDecrypt.error === '') {
+                    const decryptResBody = Crypt.Decryption(req.body.data);
+
+                    if (decryptResBody.error === '') {
+                        let paramObj: TParam = objDecrypt.data;
+
+                        paramObj.data = decryptResBody.data;
+
+                        switch (paramObj.Broker) {
+                            case _GuestAuthBroker:
+                                return SendResponseToUser(await Functions.UserFunction.findFunction(paramObj, req, res, next), next);
+
+                            case _GuestPaymentBroker:
+                                return SendResponseToUser(await Functions.PaymentFunction.findFunction(paramObj, req, res, next), next);
+
+                            case _GuestRoomBroker:
+                                return SendResponseToUser(await Functions.RoomFunction.findFunction(paramObj, req, res, next), next);
+
+                            case _GuestBookingBroker:
+                                return SendResponseToUser(await Functions.BookingFunction.findFunction(paramObj, req, res, next), next);
+
+                            case _GuestChatBroker:
+                                return SendResponseToUser(await Functions.ChatFunction.findFunction(paramObj, req, res, next), next);
+
+                            case _GuestJobBroker:
+                                return SendResponseToUser(await Functions.JobFunction.findFunction(paramObj, req, res, next), next);
+
+                            default:
+                                const errMess = GetUserErrorObj('Server error: Wrong Broker', HttpStatusCodes.BAD_REQUEST);
+                                return SendResponseToUser(errMess, next);
+                        }
+                    } else {
+                        const errMess = GetUserErrorObj('Server error: Not able to decrypt body', HttpStatusCodes.BAD_REQUEST);
+                        return SendResponseToUser(errMess, next);
+                    }
+                } else {
+                    return SendResponseToUser(
+                        GetUserErrorObj(`Server Error: ${objDecrypt.error} + Params`, HttpStatusCodes.BAD_REQUEST),
+                        next
+                    );
+                }
+            } else {
+                return SendResponseToUser(GetUserErrorObj(` ${isDBConnected.Message}`, HttpStatusCodes.BAD_REQUEST), next);
+            }
+        } else {
+            return SendResponseToUser(GetUserErrorObj(isApiVerified.error, HttpStatusCodes.BAD_REQUEST), next);
         }
     } catch (error: any) {
         return SendResponseToUser(GetUserErrorObj(`Server Error: ${error.message}`, HttpStatusCodes.BAD_REQUEST), next);

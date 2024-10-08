@@ -126,4 +126,36 @@ export class ChatApi {
             onFail(error.message);
         }
     };
+
+
+    static GetChatData = async (
+        adminID: string,
+        role: string,
+        ChatKey: string,
+        onsuccess: (res: any) => void,
+        onfail: (err: any) => void
+    ) => {
+        try {
+            const _Param = getGETParamData(
+                Param.broker.manager.chat,
+                Param.function.manager.chat.getChatData,
+                { id: adminID, role: role, chatKey: ChatKey }
+            );
+            await Api.protectedGet(
+                _Param,
+                (res) => {
+                    if (res.error === "") {
+                        onsuccess(res.data);
+                    } else {
+                        onfail(res.error);
+                    }
+                },
+                (progressValue) => {
+                    console.log(progressValue);
+                }
+            );
+        } catch (error: any) {
+            onfail(error.message);
+        }
+    };
 }

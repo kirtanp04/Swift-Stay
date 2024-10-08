@@ -35,7 +35,7 @@ const NavBarWrapper = styled(Box)(({ theme }) => ({
   width: "100%",
   display: "flex",
   flexDirection: "column",
-  padding: "0.7rem 1rem",
+  padding: "0.7rem 0remrem",
   backgroundColor: theme.palette.background.neutral,
   borderBottom: `1px solid ${theme.palette.border}`,
   alignItems: "center",

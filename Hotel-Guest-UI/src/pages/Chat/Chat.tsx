@@ -19,7 +19,7 @@ import { SocketService } from "src/service/Socket";
 import showMessage from "src/util/ShowMessage";
 import { enumUserRole } from "../Authentication/AuthMgr";
 import { Chat as TChat } from "./DataObject";
-import { ShowTostMessage } from "src/util/ShowToast";
+import showLoading from "src/util/ShowLoading";
 
 type Props = {
   open: boolean;
@@ -63,10 +63,8 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
     TChat.InitRedis(
       id,
       role,
-      (res) => {
-        if (res) {
-          ShowTostMessage(theme, "success", "Redis", res);
-        }
+      () => {
+        getChatData();
         const _ChatObj = new TChat();
         _ChatObj.key = propertyID + id;
         _Socket.joinRoom(_ChatObj, (err) => {
@@ -75,6 +73,23 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
       },
       (err) => {
         showMessage(err, "error", theme, () => {});
+      }
+    );
+  };
+
+  const getChatData = () => {
+    showLoading(theme, true);
+    TChat.GetChatData(
+      id,
+      role,
+      propertyID + id,
+      (res) => {
+        setChatMessages(res.chatInfo);
+        showLoading(theme, false);
+      },
+      (err) => {
+        showMessage(err, "error", theme, () => {});
+        showLoading(theme, false);
       }
     );
   };
@@ -120,11 +135,6 @@ export default function Chat({ open, property, onClose, propertyID }: Props) {
   function onUserTyping(msg: TChat) {
     if (msg) {
     }
-    // if (!ShowTypingLoading) {
-    //   setShowTypingLoading(true);
-    // }
-    // if (msg) {
-    // }
   }
 
   return (

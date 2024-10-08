@@ -1,23 +1,25 @@
 import { NextFunction, Request, Response } from 'express';
 import { Cache, GetUserErrorObj, GetUserSuccessObj, HttpStatusCodes, ProjectResponse, UserResponse } from '../common';
-import { CacheKey, Param } from '../Constant';
+import { CacheKey, Param, QueueName } from '../Constant';
 import { checkAdminVerification } from '../middleware/AdiminVerification';
 import { checkGuestVerification } from '../middleware/GuestVerification';
-import { Chat } from '../models/ChatModel';
+import { Chat, TChat } from '../models/ChatModel';
 import { enumUserRole } from '../models/UserModel';
 import { Redis } from '../service/Redis';
 import { ChatObj, TParam } from '../types/Type';
+import { QueueManager } from '../service/Queue';
 
-// guest
-const _GuestSaveChat = Param.function.guest.chat.saveChat;
+// // guest
+// const _GuestSaveChat = Param.function.guest.chat.saveChat;
 
-// Admin
-const _ManagerSaveChat = Param.function.manager.chat.saveChat;
+// // Admin
+// const _ManagerSaveChat = Param.function.manager.chat.saveChat;
 
 // common
 
 const _InitAdminRedis = Param.function.guest.chat.initRedisForChat;
 const _InitGuestRedis = Param.function.guest.chat.initRedisForChat;
+const _GetChatData = Param.function.guest.chat.getChatData;
 
 const _Redis = new Redis();
 
@@ -32,13 +34,13 @@ export class ChatFunction {
         _Function.objParam = objParam;
 
         switch (objParam.function) {
-            case _GuestSaveChat:
-                this.objUserResponse = await _Function.SaveChatData();
-                break;
+            // case _GuestSaveChat:
+            //     this.objUserResponse = await _Function.SaveChatData();
+            //     break;
 
-            case _ManagerSaveChat:
-                this.objUserResponse = await _Function.SaveChatData();
-                break;
+            // case _ManagerSaveChat:
+            //     this.objUserResponse = await _Function.SaveChatData();
+            //     break;
 
             case _InitGuestRedis:
                 this.objUserResponse = await _Function.InitRedisForChat();
@@ -46,6 +48,10 @@ export class ChatFunction {
 
             case _InitAdminRedis:
                 this.objUserResponse = await _Function.InitRedisForChat();
+                break;
+
+            case _GetChatData:
+                this.objUserResponse = await _Function.GetChatData();
                 break;
 
             default:
@@ -60,6 +66,8 @@ export class ChatFunction {
 class Functions {
     private objUserResponse: UserResponse = new UserResponse();
 
+    private ChatQueue: QueueManager = new QueueManager();
+
     public req: Request | null = null;
 
     public res: Response | null = null;
@@ -68,7 +76,7 @@ class Functions {
 
     public objParam: TParam = new TParam();
 
-    public SaveChatData = async (): Promise<UserResponse> => {
+    private SaveChatData = async (): Promise<UserResponse> => {
         try {
             const chatData: ChatObj = this.objParam.data;
 
@@ -88,7 +96,12 @@ class Functions {
                     { key: chatData.key },
                     {
                         $push: {
-                            chatInfo: chatData,
+                            chatInfo: {
+                                message: chatData.message,
+                                date: chatData.date,
+                                senderDetail: chatData.senderDetail,
+                                key: chatData.key
+                            },
                         },
                     },
                     { upsert: true, new: true }
@@ -133,10 +146,12 @@ class Functions {
 
             if (res.error === '') {
                 const Redisres = await _Redis.connect();
+                this.ChatQueue.createQueue(QueueName.ChatQueue, 1);
 
                 _Redis.subscribeAdminChat(
                     (mess) => {
-                        console.log('Admin', mess);
+                        this.objParam.data = mess;
+                        this.ChatQueue.addTask(QueueName.ChatQueue, async () => await this.SaveChatData());
                     },
                     (err) => {
                         console.log(err);
@@ -145,7 +160,9 @@ class Functions {
 
                 _Redis.subscribeUserChat(
                     (mess) => {
-                        console.log('guest', mess);
+                        console.log(mess)
+                        this.objParam.data = mess;
+                        this.ChatQueue.addTask(QueueName.ChatQueue, async () => await this.SaveChatData());
                     },
                     (err) => {
                         console.log(err);
@@ -162,6 +179,46 @@ class Functions {
                     res.error !== '' ? res.error : 'Server error: you are not a valid user.',
                     HttpStatusCodes.NOT_ACCEPTABLE
                 );
+            }
+        } catch (error: any) {
+            this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);
+        } finally {
+            return this.objUserResponse;
+        }
+    };
+
+    public GetChatData = async (): Promise<UserResponse> => {
+        try {
+            const { id, role, chatKey } = this.objParam.data;
+
+            let verifiyRes = new ProjectResponse();
+            if (role === enumUserRole.guest) {
+                verifiyRes = await checkGuestVerification(id);
+            }
+
+            if (role === enumUserRole.admin) {
+                verifiyRes = await checkAdminVerification(id);
+            }
+
+            if (verifiyRes.error === '') {
+                const cacheData = Cache.getCacheData(CacheKey.chat(chatKey));
+
+                if (cacheData.error === '') {
+                    this.objUserResponse = GetUserSuccessObj(cacheData.data, HttpStatusCodes.OK);
+                } else {
+                    const ChatData = await Chat.findOne({ key: chatKey });
+
+                    if (ChatData !== null) {
+                        Cache.SetCache(CacheKey.chat(chatKey), ChatData);
+                        this.objUserResponse = GetUserSuccessObj(ChatData, HttpStatusCodes.OK);
+                    } else {
+                        this.objUserResponse = GetUserSuccessObj(new TChat(), HttpStatusCodes.OK);
+                    }
+                }
+
+                //clear cache base on chat key
+            } else {
+                this.objUserResponse = GetUserErrorObj(verifiyRes.error, HttpStatusCodes.NOT_ACCEPTABLE);
             }
         } catch (error: any) {
             this.objUserResponse = GetUserErrorObj(error.message, HttpStatusCodes.BAD_REQUEST);

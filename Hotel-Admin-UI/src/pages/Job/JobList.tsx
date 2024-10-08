@@ -108,7 +108,8 @@ export default function JobList() {
             {
               field: "JobType",
               headerName: "JobType",
-              width: 120,
+              flex: 1,
+              align: "center",
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Chip
@@ -126,7 +127,8 @@ export default function JobList() {
             {
               field: "salary",
               headerName: "salary",
-              width: 100,
+              align: "center",
+              flex: 1,
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Text>{param.row.currency + " " + param.row.salary}</Text>
@@ -136,7 +138,8 @@ export default function JobList() {
             {
               field: "category",
               headerName: "Category",
-              width: 150,
+              align: "center",
+              flex: 1,
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Text>{param.row.category}</Text>
@@ -146,7 +149,8 @@ export default function JobList() {
             {
               field: "status",
               headerName: "Status",
-              width: 100,
+              align: "center",
+              flex: 1,
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Chip
@@ -168,11 +172,12 @@ export default function JobList() {
             {
               field: "createdAt",
               headerName: "Created On",
-              width: 120,
+              align: "center",
+              flex: 1,
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Text>
-                    {TimeFormatter.formatTimeDifference(param.row.createdAt)}
+                    {TimeFormatter.getTimeDifference(param.row.createdAt)}
                   </Text>
                 </TextWrapper>
               ),
@@ -180,11 +185,12 @@ export default function JobList() {
             {
               field: "updatedAt",
               headerName: "Last Updated",
-              width: 120,
+              align: "center",
+              flex: 1,
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Text>
-                    {TimeFormatter.formatTimeDifference(param.row.updatedAt)}
+                    {TimeFormatter.getTimeDifference(param.row.updatedAt)}
                   </Text>
                 </TextWrapper>
               ),

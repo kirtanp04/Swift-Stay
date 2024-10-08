@@ -1,11 +1,14 @@
 import axios from "axios";
+import { Crypt } from "src/common/Crypt";
 import { BackendBaseApi } from "src/Constant";
+import { SecretKey } from "src/env";
 
 const axiosCall = axios.create({
     baseURL: BackendBaseApi + '/swiftstay/guest/api',
     headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json;charset=UTF-8',
+        'x-api-key': Crypt.Encryption({ key: SecretKey.apiKey, time: new Date() }).data
 
     },
     maxContentLength: 10000000,

@@ -6,18 +6,18 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import "/node_modules/flag-icons/css/flag-icons.min.css";
 import { Country, ICountry } from "country-state-city";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import EToolTip from "src/components/EToolTip";
+import IfLogedin from "src/components/IfLogedin";
+import LoginPopOver from "src/components/LoginPopOver";
 import { MUIMenu } from "src/components/mui/MUIMenu";
+import { _UserSearchObj } from "src/context/UserSearchContext";
 import useUserSearch from "src/hooks/useUserSearch";
 import { Path } from "src/Router/path";
 import getFlagClassName from "src/util/getCountryFlagUrl";
-import IfLogedin from "src/components/IfLogedin";
-import { _UserSearchObj } from "src/context/UserSearchContext";
-import LoginPopOver from "src/components/LoginPopOver";
-import EToolTip from "src/components/EToolTip";
+import "/node_modules/flag-icons/css/flag-icons.min.css";
 
 export default function NavBarContent() {
   const navigate = useNavigate();
@@ -58,6 +58,7 @@ export default function NavBarContent() {
           />
         </CountryDetailWrapper>
 
+        <ListPropertyButton>About</ListPropertyButton>
         <ListPropertyButton>List your property</ListPropertyButton>
         <IfLogedin
           Else={
@@ -125,11 +126,12 @@ export default function NavBarContent() {
 }
 
 const RootStyle = styled(Box)(() => ({
-  width: "80%",
+  width: "100%",
   margin: "auto",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
+  padding: "0rem 0.7rem",
 }));
 
 const LogoWrapper = styled(Box)(() => ({

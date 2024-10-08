@@ -14,6 +14,7 @@ export class TChat {
 const ChatSchema = new Schema<TChat>({
     key: { type: String, required: [true, 'Chat key is required.'] },
     chatInfo: [{
+        key: { type: String, required: [true, 'Chat key is required.'] },
         message: { type: String, required: [true, 'Message is required.'] },
         date: { type: Date, required: [true, 'Date is required.'] },
         senderDetail: {

@@ -1,11 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import { Crypt, HttpStatusCodes, Jwt, Storage } from '../common';
 import { GetUserErrorObj, GetUserSuccessObj, UserResponse } from '../common/Response';
-import { EmailTemplate, Param, QueueName } from '../Constant';
+import { EmailTemplate, Param } from '../Constant';
 import { SecrtKey } from '../env';
 import { enumUserRole, Login, User, UserClass } from '../models/UserModel';
 import { Email } from '../service/Email';
+import { QueueManager } from '../service/Queue';
 import { TParam } from '../types/Type';
+
+// import { _QueueManager } from '..';
 
 const _CreateGuestAccount: string = Param.function.guest.register;
 
@@ -52,6 +55,8 @@ export class UserFunction {
 
 class Functions {
     private objUserResponse: UserResponse = new UserResponse();
+
+    private EmailQueue: QueueManager = new QueueManager()
 
     public req: Request | null = null;
 
@@ -308,41 +313,40 @@ class Functions {
                                 const setCookie = Storage.setCookie('Auth', getToken.data, this.res!);
 
                                 if (setCookie.error === '') {
-                                    let _Email = new Email({});
 
-                                    _Email.from = 'Swift Stay';
-                                    _Email.to = email;
-                                    _Email.subject = 'login Activity';
-                                    _Email.html = EmailTemplate.LogedIn(isUser.name);
+                                    async function sendMail() {
+                                        const _Email = new Email({});
 
-                                    // Queue.addDataInQueue(QueueName.EmailQueue, _Email)
+                                        _Email.from = 'Swift Stay';
+                                        _Email.to = email;
+                                        _Email.subject = 'login Activity';
+                                        _Email.html = EmailTemplate.LogedIn(isUser!.name);
+                                        _Email.sendEmail(
+                                            () => { },
+                                            (err) => {
 
-                                    let isError: boolean = false;
-
-                                    _Email.sendEmail(
-                                        () => { },
-                                        (err) => {
-                                            if (err) {
-                                                this.objUserResponse = GetUserErrorObj(err, HttpStatusCodes.BAD_REQUEST);
-                                                isError = true;
                                             }
-                                        }
-                                    );
-
-                                    if (!isError) {
-                                        this.objUserResponse = GetUserSuccessObj(
-                                            {
-                                                email: isUser.email,
-                                                name: isUser.name,
-                                                profile: isUser.profileImg,
-                                                role: isUser.role,
-                                                id: isUser._id,
-                                                isEmailVerified: isUser.isEmailVerified,
-                                                country: isUser.country
-                                            },
-                                            HttpStatusCodes.ACCEPTED
                                         );
                                     }
+                                    this.EmailQueue.createQueue("Email", 2)
+
+                                    this.EmailQueue.addTask('Email', () => sendMail());
+
+
+
+                                    this.objUserResponse = GetUserSuccessObj(
+                                        {
+                                            email: isUser.email,
+                                            name: isUser.name,
+                                            profile: isUser.profileImg,
+                                            role: isUser.role,
+                                            id: isUser._id,
+                                            isEmailVerified: isUser.isEmailVerified,
+                                            country: isUser.country
+                                        },
+                                        HttpStatusCodes.ACCEPTED
+                                    );
+
                                 } else {
                                     this.objUserResponse = GetUserErrorObj('Server error: not able to setcookie', HttpStatusCodes.BAD_REQUEST);
                                 }

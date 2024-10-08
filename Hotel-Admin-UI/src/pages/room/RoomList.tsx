@@ -205,7 +205,7 @@ export default function RoomList({}: Props) {
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Text>
-                    {TimeFormatter.formatTimeDifference(param.row.createdAt)}
+                    {TimeFormatter.getTimeDifference(param.row.createdAt)}
                   </Text>
                 </TextWrapper>
               ),
@@ -217,7 +217,7 @@ export default function RoomList({}: Props) {
               renderCell: (param: any) => (
                 <TextWrapper>
                   <Text>
-                    {TimeFormatter.formatTimeDifference(param.row.updatedAt)}
+                    {TimeFormatter.getTimeDifference(param.row.updatedAt)}
                   </Text>
                 </TextWrapper>
               ),

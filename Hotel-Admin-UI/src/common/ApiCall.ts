@@ -85,6 +85,7 @@ export class Api {
         if (encryptedData.error === "") {
           const response = await axiosCall.post(encryptParamData.data, {
             data: encryptedData.data,
+
           });
           debugger
           if (response) {

@@ -256,15 +256,18 @@ export default function PropertyViewer() {
                       isLoading={Property._id !== "" ? false : true}
                     >
                       <Label>Job Availability :</Label>
-                      <Text
+
+                      <Box
                         sx={{
-                          color: Property.jobHiring
-                            ? (theme.palette.color.success as any)
-                            : (theme.palette.color.error.main as any),
+                          height: 15,
+                          width: 15,
+                          borderRadius: "50%",
+                          backgroundColor:
+                            Property.jobHiring === false
+                              ? theme.palette.color.error.main
+                              : theme.palette.color.success.main,
                         }}
-                      >
-                        {Property.jobHiring ? "A" : "N"}
-                      </Text>
+                      />
                     </TextSkeleton>
                   </TextWrapper>
 
@@ -292,7 +295,7 @@ export default function PropertyViewer() {
                     >
                       <Label>Create On :</Label>
                       <Text>
-                        {TimeFormatter.formatTimeDifference(Property.createdAt)}
+                        {TimeFormatter.getTimeDifference(Property.createdAt)}
                       </Text>
                     </TextSkeleton>
                   </TextWrapper>
@@ -303,7 +306,7 @@ export default function PropertyViewer() {
                     >
                       <Label>Last Update :</Label>
                       <Text>
-                        {TimeFormatter.formatTimeDifference(Property.updatedAt)}
+                        {TimeFormatter.getTimeDifference(Property.updatedAt)}
                       </Text>
                     </TextSkeleton>
                   </TextWrapper>

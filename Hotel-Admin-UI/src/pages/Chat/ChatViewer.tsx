@@ -10,6 +10,8 @@ import { SocketService } from "src/service/Socket";
 import showMessage from "src/util/ShowMessage";
 import { enumUserRole } from "../Authentication/AuthMgr";
 import { ChatApi, ChatObj, ChatUser } from "./DataObject";
+import { TimeFormatter } from "src/common/TimeFormater";
+import showLoading from "src/util/ShowLoading";
 
 export default function ChatViewer() {
   const [Message, setMessage] = useState("");
@@ -56,19 +58,42 @@ export default function ChatViewer() {
     );
   }, []);
 
+  useEffect(() => {
+    getChatData();
+  }, [SelectedUser]);
+
   const InitRedis = () => {
     ChatApi.InitRedis(
       id,
       role,
-      (res) => {
+      () => {
         // alert('init redis')
-        showMessage(res, theme, () => {});
+        // showMessage(res, theme, () => {});
       },
 
       (err) => {
         showMessage(err, theme, () => {});
       }
     );
+  };
+
+  const getChatData = () => {
+    if (SelectedUser.user._id !== "") {
+      showLoading(theme, true);
+      ChatApi.GetChatData(
+        id,
+        role,
+        SelectedUser.propertyID + SelectedUser.user._id,
+        (res) => {
+          setChatMessages(res.chatInfo);
+          showLoading(theme, false);
+        },
+        (err) => {
+          showMessage(err, theme, () => {});
+          showLoading(theme, false);
+        }
+      );
+    }
   };
 
   const GetChatObj = (message: string): ChatObj => {
@@ -110,12 +135,6 @@ export default function ChatViewer() {
   };
 
   const OnChangeMessage = (value: string) => {
-    // if (!ShowTypingLoading) {
-    //   _Socket.sendChatMessageInRoom(
-    //     SocketKeyName.TypingMessage,
-    //     GetChatObj("user is typing")
-    //   );
-    // }
     setMessage(value);
   };
 
@@ -207,6 +226,7 @@ export default function ChatViewer() {
                     <MessageText
                       sx={{
                         color:
+                          // theme.palette.text.primary,
                           objChat.senderDetail.email === email
                             ? theme.palette.background.default
                             : theme.palette.text.primary,
@@ -214,7 +234,9 @@ export default function ChatViewer() {
                     >
                       {objChat.message}
                     </MessageText>
-                    <MessageDate>{objChat.date as any}</MessageDate>
+                    <MessageDate>
+                      {TimeFormatter.getTimeDifference(objChat.date as any)}
+                    </MessageDate>
                   </MessageTextWrapper>
                 ))}
               </div>
@@ -292,7 +314,7 @@ const SendButtonWrapper = styled(Box)(({ theme }) => ({
   borderLeft: `1px solid ${theme.palette.divider}`,
 }));
 
-const MessageTextWrapper = styled(Box)(() => ({
+const MessageTextWrapper = styled(Box)(({ theme }) => ({
   minHeight: 20,
   padding: "10px",
   display: "flex",
@@ -301,9 +323,10 @@ const MessageTextWrapper = styled(Box)(() => ({
   borderRadius: "15px",
   maxWidth: "80%",
   textWrap: "wrap",
-
+  border: `1px solid ${theme.palette.border}`,
   gap: "10px",
-  minWidth: "25%",
+  width: "30%",
+  // minWidth: "25%",
   position: "relative",
   marginTop: "10px",
   overflow: "hidden",
@@ -326,7 +349,7 @@ const MessageListWrapper = styled(Box)(() => ({
 
 const MessageDate = styled(Typography)(({ theme }) => ({
   fontSize: "0.75rem",
-  color: theme.themeColor,
+  color: theme.palette.text.secondary,
   marginLeft: "auto",
   position: "absolute",
   bottom: 5,
