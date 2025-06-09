@@ -13,7 +13,7 @@ Swift Stay is a modern platform designed for booking and managing various types 
 - 💼 **Booking Management**: Admins can handle all bookings and schedules through a streamlined interface.
 - 🔐 **Secure Payments**: Integration with Stripe for smooth and secure payments.
 
----
+
 
 # **About Swift Stay**
 
@@ -39,7 +39,7 @@ For property owners and managers, Swift Stay provides a comprehensive platform t
 
 Our platform features a built-in **chat system** that allows users to connect directly with the property management team. Whether it's a question about amenities or a special request, communication is simple and fast, ensuring a seamless booking experience.
 
----
+
 
 # **Tech Stack Overview**
 
@@ -82,7 +82,7 @@ Our platform features a built-in **chat system** that allows users to connect di
 - **Compression**: Use gzip/deflate compression to reduce response sizes.
 - **Node Cache**: Caching frequently used data to enhance response time and reduce load.
 
----
+
 
 ### **Frontend (Client-Side)**
 
