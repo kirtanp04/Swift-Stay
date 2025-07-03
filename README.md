@@ -2,7 +2,9 @@
 
 Swift Stay is a modern platform designed for booking and managing various types of properties such as hotels, resorts, apartments, and bungalows. Property owners can host their properties, manage bookings, and provide excellent customer service through the platform's integrated chat system. This project includes an admin panel for property management, real-time chat, and property listing features.
 
-<!-- ![Swift Stay Preview](./public/swiftstay-preview.png) -->
+![Swift Stay User](./Hotel-Guest-UI/public/Swift-Stay-User.jpeg)
+
+![Swift Stay User](./Hotel-Admin-UI/public/Swift-Stay-Admin.jpeg)
 
 ## **Features**
 
